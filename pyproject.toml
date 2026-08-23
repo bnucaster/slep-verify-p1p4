@@ -1,4 +1,6 @@
-# 依赖版本未锁定，实现时按环境实测后在此登记（CLAUDE.md 工程约定）。
+# 依赖版本未锁定；2026-08-24 实测通过的环境（.venv, Python 3.13.1, Windows 11）：
+# torch 2.13.0+cpu / numpy 2.5.2 / scipy 1.18.1 / scikit-learn 1.9.0
+# / PyYAML 6.0.3 / matplotlib 3.11.1 / pytest 9.1.1。是否锁定待与用户商定。
 [project]
 name = "slep-p1p4"
 version = "0.0.1"
