@@ -1,0 +1,27 @@
+# 依赖版本未锁定，实现时按环境实测后在此登记（CLAUDE.md 工程约定）。
+[project]
+name = "slep-p1p4"
+version = "0.0.1"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy",
+  "scipy",
+  "torch",
+  "pyyaml",
+  "scikit-learn",
+  "matplotlib",
+]
+# normalizing flow（归一化流）库在实现熵/密度双路估计时选定并登记于此
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

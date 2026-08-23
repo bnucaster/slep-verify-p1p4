@@ -1,0 +1,4 @@
+# 数据分族（CLAUDE.md 硬规则 1）。改动此文件属协议级变更，须用户书面确认。
+calibration: [99, 100]
+development: [0, 1, 2, 3, 4]
+evaluation: [5, 6, 7, 8, 9]   # 冻结前禁止使用，由 src/slep/guard.py 强制

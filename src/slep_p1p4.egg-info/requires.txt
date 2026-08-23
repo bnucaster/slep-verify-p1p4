@@ -1,0 +1,9 @@
+numpy
+scipy
+torch
+pyyaml
+scikit-learn
+matplotlib
+
+[dev]
+pytest

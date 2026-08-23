@@ -1,0 +1,7 @@
+{
+  "frozen": false,
+  "frozen_at": null,
+  "protocol_hash": null,
+  "external_timestamp_url": null,
+  "note": "置位 frozen 之前须完成 docs/protocol_v1.1_draft.md 全部占位并取得外部时间戳（OSF 或公开仓库提交哈希）"
+}
