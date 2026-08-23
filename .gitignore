@@ -7,3 +7,4 @@ data/
 results/**/checkpoints/
 .DS_Store
 # metrics.json 与校准产物必须入库（审计需要），不要加入忽略
+*.egg-info/
