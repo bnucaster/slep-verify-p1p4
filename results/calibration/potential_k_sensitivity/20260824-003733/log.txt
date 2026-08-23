@@ -1,0 +1,9 @@
+run_dir: D:\PythonProjects\slep-verify\slep-p1p4\results\calibration\potential_k_sensitivity\20260824-003733
+查询点 49 个，V_true 范围 [-1.836, 83.533] nats
+k=   4  err_true=0.9191  err_oracle=0.8637  radius(mean/max)=0.020/0.039
+k=   8  err_true=0.5552  err_oracle=0.5580  radius(mean/max)=0.031/0.060
+k=  16  err_true=0.3999  err_oracle=0.3825  radius(mean/max)=0.045/0.084
+k=  32  err_true=0.3762  err_oracle=0.2777  radius(mean/max)=0.064/0.109
+k=  64  err_true=0.4067  err_oracle=0.1458  radius(mean/max)=0.090/0.158
+k= 128  err_true=0.3970  err_oracle=0.1234  radius(mean/max)=0.128/0.206
+k= 256  err_true=0.6455  err_oracle=0.0901  radius(mean/max)=0.181/0.294
