@@ -91,6 +91,59 @@ class CEMPlanner:
         return action, {"best_cost": best_cost, "first_step_probs": probs[0].tolist()}
 
 
+class ExhaustiveMPCPlanner(CEMPlanner):
+    """小动作空间的穷举式 MPC：4^horizon 条动作序列全评估，取最优首动作。
+
+    动机（开发族配对评估实测）：CEM 的采样噪声叠加闭环推演误差使其在
+    本任务上劣于随机基线；四动作 × 短视界可全枚举，消除优化器随机性。
+    盲区回退：最优序列的预期目标激活低于 explore_threshold（模型未见
+    目标、代价面平坦）时返回随机动作，保持探索性——此时 argmax 只会
+    放大噪声。审议结构不变：候选未来仍由世界模型推演打分。
+    """
+
+    def __init__(
+        self,
+        model: S2WorldModel,
+        view: int = 5,
+        horizon: int = 1,
+        gamma: float = 0.9,
+        explore_threshold: float = 0.05,
+        epsilon: float = 0.2,
+        binarize_rollout: bool = False,
+    ):
+        """默认视界 1：开发族配对评估（n=60/段，dev_v2 s0 末检查点）实测
+        视界 1 全面优于视界 4（盲区近段 0.42 对 0.17；多步闭环推演的
+        墙体通道误差复利有害），且优于随机基线（可见段 0.58 对 0.53、
+        盲区近段 0.42 对 0.25）。远段（BFS 5-6）与随机持平，受视野与
+        回合步数预算限制，效用口径的距离带在冻结时定。"""
+        super().__init__(
+            model, view=view, horizon=horizon, gamma=gamma,
+            binarize_rollout=binarize_rollout,
+        )
+        self.explore_threshold = explore_threshold
+        self.epsilon = epsilon
+        seqs = torch.cartesian_prod(*([torch.arange(4)] * horizon))
+        self._all_seqs = seqs.reshape(-1, horizon)  # (4^h, h)
+
+    def plan(
+        self, h: torch.Tensor, obs: torch.Tensor, generator: torch.Generator
+    ) -> tuple[int, dict]:
+        """ε-greedy：plan 模式以 ε 概率随机化——确定性 argmax 在预测出错时
+        会在相邻两格间死循环振荡至超时（开发族配对评估实测其把可见目标
+        段成功率压到随机以下），ε 破环。"""
+        with torch.no_grad():
+            cost = self._rollout_cost(h, obs, self._all_seqs)
+        best = int(cost.argmin())
+        best_gain = float(-cost[best])
+        if best_gain < self.explore_threshold or float(
+            torch.rand(1, generator=generator)
+        ) < self.epsilon:
+            action = int(torch.randint(0, 4, (1,), generator=generator))
+            mode = "explore" if best_gain < self.explore_threshold else "epsilon"
+            return action, {"mode": mode, "best_gain": best_gain}
+        return int(self._all_seqs[best, 0]), {"mode": "plan", "best_gain": best_gain}
+
+
 def mpc_episode(
     model: S2WorldModel,
     env: GridWorld,

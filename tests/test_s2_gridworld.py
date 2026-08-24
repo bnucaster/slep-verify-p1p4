@@ -7,7 +7,7 @@ import torch
 
 from slep import guard
 from slep.systems import s2_gridworld as gw
-from slep.systems.s2_planner import CEMPlanner, mpc_episode
+from slep.systems.s2_planner import CEMPlanner, ExhaustiveMPCPlanner, mpc_episode
 from slep.systems.s2_world_model import S2WorldModel
 
 
@@ -89,6 +89,26 @@ def test_novelty_injection():
     assert not env.maze[env.position]
     assert env.goal is not None and not env.maze[env.goal]
     assert info["new_position"] == env.position
+
+
+def test_exhaustive_planner_modes_and_determinism():
+    seed = guard.family_seeds("calibration", purpose="test-s2")[0]
+    torch.manual_seed(seed)
+    rng = np.random.default_rng(seed)
+    model = S2WorldModel(50, 4, 16, 8, 0.2, 0.04)
+    planner = ExhaustiveMPCPlanner(model, view=5, horizon=2, epsilon=0.0)
+    env = gw.make_episode_env(6, 5, rng)
+    gen = torch.Generator()
+    gen.manual_seed(seed)
+    action, info = planner.plan(torch.zeros(8), torch.from_numpy(env.observe()), gen)
+    assert action in (0, 1, 2, 3)
+    assert info["mode"] in ("plan", "explore")
+    assert planner._all_seqs.shape == (16, 2)
+    # ε=1 时必为随机化模式
+    planner_eps = ExhaustiveMPCPlanner(model, view=5, horizon=1, epsilon=1.0,
+                                       explore_threshold=-1.0)
+    _, info2 = planner_eps.plan(torch.zeros(8), torch.from_numpy(env.observe()), gen)
+    assert info2["mode"] in ("epsilon", "explore")
 
 
 def test_world_model_shapes_and_training_step_reduces_loss():
