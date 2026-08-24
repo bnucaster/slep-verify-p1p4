@@ -1,0 +1,21 @@
+# CAL-P4 配置（M1 校准，任务二 2e，plan_v2 第 5 节第 2 条）。
+# matched_system 指向 2d（geometry_match）产物；种子经 guard.family_seeds 解析。
+matched_system: results/calibration/geometry_match/20260824-075955/matched_s2.json
+seed_family: calibration
+# 主链模拟（白化坐标 Euler–Maruyama，dt 稳定域见 systems/cal_langevin.py）
+chains: 8
+steps: 200000
+dt: 0.05
+burn_in: 5000
+thin: 25              # 每链保留 (steps−burn_in)/thin ≈ 7800 → 总样本 ≈ 6.2 万
+n_queries: 4000
+k_potential: 32
+k_density: 64
+low_dim_arm:
+  enabled: true
+  target_eig: [0.05, 0.4, 3.0, 20.0, 120.0, 600.0]  # 维数灾对照臂（d=6）的谱目标，量级取 S1 试点范围
+  target_logdet_std: 2.0
+  obs_dim: 16
+null_control:
+  decoder_noise_scale: 0.05
+sigma_x_sweep: [0.05, 0.15, 0.3]
