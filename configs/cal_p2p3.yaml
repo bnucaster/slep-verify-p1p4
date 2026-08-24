@@ -1,0 +1,25 @@
+# CAL-P2/P3 配置（M1 校准，任务四 4b，plan_v2 第 5 节第 3 条）。
+# 在几何匹配 d=16 系统上量 Â_OM 分位分离与测地偏差的噪声地板。
+matched_system: results/calibration/geometry_match/20260824-075955/matched_s2.json
+seed_family: calibration
+p2:
+  n_chains: 8
+  sim_steps: 8000        # thin=1 连续轨迹，烧入后切段
+  burn_in: 5000
+  dt: 0.05
+  seg_len: 120
+  n_traj: 200
+  n_surrogates: 20
+  grad_point: mid        # 一般轨迹口径；左点口径的恒等自检见 tests/test_om_action.py
+  est_arm:               # 全链（估计 V̂）子样本臂
+    n_traj: 50
+    ref_steps: 100000
+    ref_thin: 25
+    k_potential: 32
+p3:
+  n_pairs: 24
+  n_segments: 32
+  n_starts: 4
+  chord_quantile_band: [0.25, 0.75]   # 端点对弦长取中段，避免过近/过远退化
+  inject_alphas: [0.0, 0.02, 0.05, 0.1, 0.2]  # 注入偏差幅度（弦长的倍数）
+  n_inject_reps: 8

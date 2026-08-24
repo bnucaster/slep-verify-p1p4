@@ -58,7 +58,10 @@ def om_action(
 
     z_req = z_eval.detach().requires_grad_(True)
     v_val = potential_fn(z_req)
-    (grad_v,) = torch.autograd.grad(v_val.sum(), z_req)
+    # allow_unused：常数势（势项消融）对 z 无依赖，梯度按零处理
+    (grad_v,) = torch.autograd.grad(v_val.sum(), z_req, allow_unused=True)
+    if grad_v is None:
+        grad_v = torch.zeros_like(z_req)
     g = metric_fn(z_eval.detach())  # (n, d, d)
     nat_grad = torch.linalg.solve(g, grad_v.unsqueeze(-1)).squeeze(-1)  # ĝ⁻¹∂V
 
