@@ -13,7 +13,8 @@ dependencies = [
   "scikit-learn",
   "matplotlib",
 ]
-# normalizing flow（归一化流）库在实现熵/密度双路估计时选定并登记于此
+# normalizing flow（归一化流）：不引外部库，自研最小 RealNVP 于
+# src/slep/estimators/flow.py（判定代码冻结要求链路可审计，仓库内实现更可控）
 
 [project.optional-dependencies]
 dev = ["pytest"]

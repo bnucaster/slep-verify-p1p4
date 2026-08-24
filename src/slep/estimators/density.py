@@ -49,6 +49,7 @@ def log_density_knn(
     z_ref: torch.Tensor,
     k: int,
     return_info: bool = False,
+    standardize: bool = False,
 ) -> torch.Tensor | tuple[torch.Tensor, dict[str, torch.Tensor]]:
     """kNN 对数密度，公式见模块 docstring。返回 (q,)。
 
@@ -56,12 +57,24 @@ def log_density_knn(
     （r_k = 0 时密度发散，直接报错）；对参照集内点估密度须由调用方
     先行去重或留一。
 
-    return_info 附带 radius（(q,) 第 k 近邻距离，供支撑度诊断与
-    自检误差界使用）。
+    standardize 置真时在逐维标准化坐标 x' = (z − μ)/σ（μ、σ 取自参照集）
+    下取球形邻域，密度按仿射变换回原坐标：log p_z = log p_{x'} − Σ_j log σ_j。
+    坐标尺度跨多个量级时（试点实测约 3 个量级）球形邻域在原坐标下退化，
+    标准化是 kNN 路的推荐口径；两种口径的选择在结果中注明。
+
+    return_info 附带 radius（(q,) 第 k 近邻距离；标准化口径下为标准化
+    坐标的距离，供支撑度诊断与自检误差界使用）。
     """
     n_ref, d = z_ref.shape
     if not 1 <= k <= n_ref:
         raise ValueError(f"k={k} 超出参照集大小 {n_ref}")
+    correction = 0.0
+    if standardize:
+        mean = z_ref.mean(dim=0)
+        std = z_ref.std(dim=0).clamp_min(1e-12)
+        z_query = (z_query - mean) / std
+        z_ref = (z_ref - mean) / std
+        correction = -torch.log(std).sum()
     dists = torch.cdist(z_query, z_ref)
     r_k = dists.kthvalue(k, dim=-1).values  # (q,)
     if not torch.all(r_k > 0):
@@ -71,6 +84,7 @@ def log_density_knn(
         - torch.digamma(torch.tensor(float(n_ref), dtype=z_query.dtype))
         - unit_ball_log_volume(d)
         - d * torch.log(r_k)
+        + correction
     )
     if not return_info:
         return log_p
@@ -86,15 +100,17 @@ def self_information_knn(
     volume_correction: bool = True,
     chunk_size: int = 64,
     return_info: bool = False,
+    standardize: bool = False,
 ) -> torch.Tensor | tuple[torch.Tensor, dict[str, torch.Tensor]]:
     """体积校正自信息 Î = −log p̂ + (1/2)·log det ĝ，返回 (q,)。
 
     volume_correction 置假时退化为 −log p̂（含 / 不含校正双版本并报是
     EXP-P4 的预注册要求，docs/plan_v2.md 第 8 节第 7 条）。
+    standardize 透传给 kNN 密度路（见 log_density_knn）。
 
     return_info 附带 log_density、logdet_g、radius，供诊断与消融。
     """
-    log_p, info = log_density_knn(z_query, z_ref, k, return_info=True)
+    log_p, info = log_density_knn(z_query, z_ref, k, return_info=True, standardize=standardize)
     if not volume_correction:
         if not return_info:
             return -log_p
