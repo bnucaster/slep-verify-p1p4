@@ -1,0 +1,90 @@
+{
+  "_meta": {
+    "date": "2026-08-24",
+    "status": "全部条目为提案；冻结在任务七（协议 v1.1 外部时间戳后判定代码写死）。CLAUDE.md 硬规则 2：每个数值溯源到 source 字段的产物文件。",
+    "scope": "校准阶段（M1）可公式化的阈值与口径；依赖描述阶段实测的条目在 pending_on 注明缺口。"
+  },
+  "p4_temperature_tolerance": {
+    "rule": "|T̂ − T_ref|/T_ref ≤ 0.12（分半与重复运行同容差）",
+    "derivation": "2 × 校准各臂位 flow 主口径最大相对误差（exact 臂 6.0%）",
+    "source": "results/calibration/cal_p4/20260824-093612/tolerance_proposal.json",
+    "status": "提案"
+  },
+  "p4_lack_of_fit": {
+    "rule_original": "二次项 F 检验 p > 0.05 且 ΔBIC(线性−二次) < 2（母论文判据，照测照报）",
+    "rule_supplement": "增补效应量：曲率效应量 ρ = |c|·SD(V̂)/|b| ≤ 0.17；p 值拒绝但 ρ 低于上限时记'统计可检的估计器曲率，非实质弯曲'，两层并报",
+    "derivation": "真仿射校准系统上 flow 主口径实测 ρ ≤ 0.0825（三臂位），上限取 2 倍；p 判据在真仿射系统上普遍拒绝（n=4000），单用会假失败",
+    "source": "results/calibration/cal_p4/20260824-093612/metrics.json",
+    "status": "提案"
+  },
+  "p4_split_half": {
+    "rule": "|T̂₁ − T̂₂|/T̄ < 20%（plan_v2 第 8 节原文）",
+    "calibration_note": "校准实测分半差 ≤ 7.6%，原容差无须收紧",
+    "source": "results/calibration/cal_p4/20260824-093612/metrics.json",
+    "status": "plan 固定值，校准复核通过"
+  },
+  "p4_density_path": {
+    "rule": "Î 的密度主口径 = flow（estimators/flow.py）；kNN（标准化坐标）作互证与消融口径并报",
+    "derivation": "kNN 路 d=16 全链 T̂ 误差 19–33%（仪器门失败），flow 路 1.2–6.0%（隔离诊断证两侧各自近真）",
+    "source": "results/calibration/cal_p4/20260824-081859/INTERPRETATION.md",
+    "status": "提案"
+  },
+  "p2_concentration": {
+    "rule": "观测轨迹 Â_OM 中位数低于其代理分布 Q1 的轨迹比例 > 75%（plan_v2 原文）；主代理 = 度量口径平滑随机路径（protocols/surrogates.py metric 版）",
+    "null_floor": "空白（代理充伪观测）比例基线 0.25，二项 q95 = 0.25 + 1.645·sqrt(0.1875/n_traj)；校准实测空白 0.20–0.33 落带内，真动力学 0.96–1.00",
+    "surrogate_note": "欧氏口径代理因动能失配满分离（常数势同样分离），不得作主代理",
+    "source": "results/calibration/cal_p2p3/20260824-094053/metrics.json",
+    "status": "提案"
+  },
+  "p2_potential_ablation": {
+    "rule": "消融判据统计口径 = 逐轨迹标准化间隙（(median(A_surr)−A_obs)/IQR(A_surr)）的含势/常数势配对差；二值比例判据对消融不敏感（校准实测）",
+    "power_note": "本合成配置（漂移/噪声比 ≈ 0.16）配对差中位仅 +0.09，接近无功效；判据可用性由描述阶段诊断图三（真实 S2 的 Â_OM 重叠度）实测后定",
+    "source": "results/calibration/cal_p2p3/20260824-094053/metrics.json",
+    "status": "口径提案；功效 pending_on 描述阶段",
+    "pending_on": "M2 描述阶段诊断图三"
+  },
+  "p3_deviation_effect_size": {
+    "rule": "偏差判定的最小效应量（归一化偏差面积差）≥ 0.0125",
+    "derivation": "注入标定：最小可检测 α=0.02（弦长 2% 横向偏差）对应实测偏差 0.0128，减地板中位 0.0004；地板 q95 = 0.0028",
+    "source": "results/calibration/cal_p2p3/20260824-094053/metrics.json",
+    "status": "提案"
+  },
+  "p3_solver_qc": {
+    "rule": "测地求解残差（白化坐标梯度范数）≤ 3e-3 为质检通过",
+    "derivation": "10 × 校准实测残差 q95（3.0e-4）",
+    "source": "results/calibration/cal_p2p3/20260824-101516/metrics.json",
+    "status": "提案"
+  },
+  "p3_uniqueness_certification": {
+    "rule": "非唯一 ⟺ 存在备选临界路径：相对能量差 < ε_E = 0.05 且与最优路径互偏差（归一化面积）> s_min = 0.028；判非唯一的端点对剔除出 P3 分析",
+    "derivation": "能量差实测双峰 [≤3e-4] ∪ [≥0.247]，ε_E 取间隙中点量级；s_min = 10 × 偏差地板 q95；本几何 16/24 对通过认证",
+    "source": "results/calibration/cal_p2p3/20260824-101516/metrics.json",
+    "status": "提案"
+  },
+  "p1_plateau_detector": {
+    "rule_fixed": "θ = 1%/窗、连续 3 窗（plan_v2 冻结值）；斜率取绝对值双侧口径（解释记录于 protocols/plateau.py，冻结时显式写入）",
+    "window_selection": "按描述阶段实测 σ_Û 查工作特性表选 W；σ=0.005 档 W=10 可行（q90 定位误差 81 检查点）",
+    "data_requirements": "σ_Û ≤ θ·sqrt(W)/(3·sqrt(12))（评估批量按 1/sqrt(n_eval) 缩放可达）；检查点视界 ≥ t_flat(最慢曲线) + 3W",
+    "source": "results/calibration/cal_p1/20260824-085526/metrics.json",
+    "status": "提案；W 数值 pending_on 描述阶段实测 σ_Û",
+    "pending_on": "M2 描述阶段 Û 噪声实测"
+  },
+  "support_exclusion": {
+    "rule": "轨迹点低支撑 ⟺ 其对参照集的 k 近邻半径（标准化坐标）> 参照集留一半径分布的 q99；低支撑段按 plan_v2 第 8 节 EXP-P3 第 3 条剔除",
+    "derivation": "公式化规则，数值运行期从当次参照集计算（自适应规模）；CAL-P2 全链臂未见剔除影响分离的迹象",
+    "source": "src/slep/estimators/drift.py support_radius；results/calibration/cal_p2p3/20260824-094053/metrics.json",
+    "status": "公式提案，数值运行期计算"
+  },
+  "geometry_gate": {
+    "rule": "访问区域 ĝ 的 log10 条件数中位 ≤ 6 且谱参与维数中位 ≥ 1.5",
+    "derivation": "校准已证可行域：S2 匹配几何 log10 条件数中位 5.74 全链恢复成立；S1 β=4 坍缩例参与维数 1.04（排除线下），β=1 为 2.57。上限 6 含外推余量，外推成分注明",
+    "source": "results/calibration/geometry_match/20260824-075955/match_report.json；results/calibration/s1_pilot/20260824-072324/summary.json",
+    "status": "提案（含外推成分）"
+  },
+  "vhat_operationalization": {
+    "rule": "V̂ 主口径 = 欧氏邻域 + 查询点解码 NLL 均值（k=32）；S1 类集中各向异性几何上若描述阶段证实量程压缩污染仿射拟合，S1 记 T̂ 不可辨识走降级预案（plan_v2 第 7 节第 4 条）",
+    "source": "results/calibration/vhat_debias/DECISION.md",
+    "status": "口径固定；降级触发 pending_on 描述阶段",
+    "pending_on": "M2 描述阶段 S1 诊断"
+  }
+}
