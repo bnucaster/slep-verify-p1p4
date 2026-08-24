@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "b8e5a68145c6e6756241281c1e9665c09d61842c",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts\\run_geometry_match.py"
+  ],
+  "created": "2026-08-24T07:59:56+0100",
+  "torch": "2.13.0+cpu"
+}

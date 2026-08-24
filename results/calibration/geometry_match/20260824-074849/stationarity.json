@@ -1,0 +1,22 @@
+{
+  "s1": {
+    "mean_abs_err_max": 0.03671158081197776,
+    "mean_tol_min": 0.04107919181288746,
+    "mean_within_tol": true,
+    "var_abs_err_max": 0.033034522749618045,
+    "var_within_tol": true,
+    "rhat_max": 1.0018209082222858,
+    "n_samples": 8000,
+    "note": "均值/方差容差由 OU 有效样本量闭式推导（见 tests/test_cal_langevin.py 文件头）"
+  },
+  "s2": {
+    "mean_abs_err_max": 0.030556631098539212,
+    "mean_tol_min": 0.04107919181288746,
+    "mean_within_tol": true,
+    "var_abs_err_max": 0.04454231953035748,
+    "var_within_tol": true,
+    "rhat_max": 1.0017757658086393,
+    "n_samples": 8000,
+    "note": "均值/方差容差由 OU 有效样本量闭式推导（见 tests/test_cal_langevin.py 文件头）"
+  }
+}

@@ -1,0 +1,7 @@
+run_dir: D:\PythonProjects\slep-verify\slep-p1p4\results\calibration\geometry_match\20260824-074849
+目标[s1] d=8 logdet_std=3.77 log10cond中位=4.51
+匹配[s1] a=0.980 logdet_std 目标 3.77 → 达成 4.62, log10cond中位达成 4.84
+平稳[s1] 均值达标=True 方差达标=True R̂max=1.0018 n=8000
+目标[s2] d=16 logdet_std=16.25 log10cond中位=5.70
+匹配[s2] a=0.980 logdet_std 目标 16.25 → 达成 10.05, log10cond中位达成 9.58
+平稳[s2] 均值达标=True 方差达标=True R̂max=1.0018 n=8000

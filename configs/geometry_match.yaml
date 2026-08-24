@@ -1,0 +1,21 @@
+# 几何匹配配置（M1 校准，任务二 2d，plan_v2 第 5 节第 1 条）。
+# 匹配目标取试点实测谱统计；种子经 guard.family_seeds 解析。
+s1_pilot_run: results/calibration/s1_pilot/20260824-072324
+s1_target_beta: 1.0   # β=4 在试点规模下完全坍缩（KL=0，谱退化），不作匹配目标，见该 run 的 summary.json
+s2_pilot_run: results/calibration/s2_pilot/20260824-073008
+s2_target_seed_index: 0   # 目标取校准族第 0 个种子的谱；另一种子作稳健性参照
+obs_dim: 32
+sigma_dec: 0.2
+sigma_x: 0.05
+temperature: 0.5
+well_w_min: 0.5
+well_w_max: 2.0        # 刚度对数均匀分布于 [min, max]
+warp_tau: 2.0
+seed_family: calibration
+seed_index: 0
+# 平稳性验证（OU 闭式目标，容差推导见 tests/test_cal_langevin.py 文件头）
+chains: 8
+steps: 24000
+dt: 0.05
+burn_in: 4000
+thin: 20
