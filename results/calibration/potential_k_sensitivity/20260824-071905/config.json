@@ -1,0 +1,22 @@
+{
+  "seed_family": "calibration",
+  "seed_index": 0,
+  "latent_dim": 2,
+  "obs_dim": 8,
+  "alpha": 1.0,
+  "sigma_x": 0.1,
+  "sigma_dec": 0.3,
+  "n_ref": 40000,
+  "k_grid": [
+    4,
+    8,
+    16,
+    32,
+    64,
+    128,
+    256
+  ],
+  "query_grid_side": 7,
+  "query_grid_halfwidth": 1.4,
+  "seed_resolved": 99
+}

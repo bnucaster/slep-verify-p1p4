@@ -73,3 +73,24 @@ def assert_seed_allowed(
         f"种子 {seed} 未登记于 configs/seeds.yaml 的任何分族。"
         f"场景: {purpose or '未注明'}。请先与用户确认分族归属再登记使用。"
     )
+
+
+def family_seeds(
+    family: str,
+    purpose: str = "",
+    seeds_file: Path = SEEDS_FILE,
+    freeze_file: Path = FREEZE_FILE,
+) -> list[int]:
+    """按分族名返回种子表，脚本取种子的唯一入口（工程约定：种子不得内联）。
+
+    评估族与 assert_seed_allowed 同规则：冻结置位前一律拦截。
+    """
+    families = _load_seed_families(seeds_file)
+    if family not in families:
+        raise KeyError(f"未知分族 {family!r}，可用: {sorted(families)}")
+    if family == "evaluation" and not is_frozen(freeze_file):
+        raise EvalFamilyIsolationError(
+            f"评估族种子表在冻结（freeze_status.frozen）置位前不可读取。"
+            f"场景: {purpose or '未注明'}。"
+        )
+    return list(families[family])

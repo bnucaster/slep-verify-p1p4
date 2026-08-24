@@ -30,7 +30,8 @@ from slep.systems.selfcheck import LinearGaussianSelfCheck
 from slep.utils.runs import create_run_dir
 
 CONFIG = {
-    "seed": 99,  # 校准族（configs/seeds.yaml）
+    "seed_family": "calibration",  # 实际种子经 guard.family_seeds 从 configs/seeds.yaml 解析
+    "seed_index": 0,
     "latent_dim": 2,
     "obs_dim": 8,
     "alpha": 1.0,
@@ -44,8 +45,10 @@ CONFIG = {
 
 
 def main() -> None:
-    guard.assert_seed_allowed(CONFIG["seed"], purpose="cal-potential-k-sensitivity")
-    run_dir = create_run_dir("calibration", "potential_k_sensitivity", CONFIG)
+    seed = guard.family_seeds(CONFIG["seed_family"], purpose="cal-potential-k-sensitivity")[
+        CONFIG["seed_index"]
+    ]
+    run_dir = create_run_dir("calibration", "potential_k_sensitivity", {**CONFIG, "seed_resolved": seed})
     log_lines: list[str] = []
 
     def log(msg: str) -> None:
@@ -55,7 +58,7 @@ def main() -> None:
     log(f"run_dir: {run_dir}")
 
     gen = torch.Generator()
-    gen.manual_seed(CONFIG["seed"])
+    gen.manual_seed(seed)
     system = LinearGaussianSelfCheck.build(
         CONFIG["latent_dim"], CONFIG["obs_dim"], CONFIG["alpha"],
         CONFIG["sigma_x"], CONFIG["sigma_dec"], generator=gen,
@@ -100,12 +103,12 @@ def main() -> None:
         json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    _plot(rows, run_dir)
+    _plot(rows, run_dir, seed)
     (run_dir / "log.txt").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
     log(f"产物已写入 {run_dir}")
 
 
-def _plot(rows: list[dict], run_dir) -> None:
+def _plot(rows: list[dict], run_dir, seed: int) -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -133,7 +136,7 @@ def _plot(rows: list[dict], run_dir) -> None:
     ax.set_ylim(bottom=0)
     ax.set_xlabel("近邻数 k", color=ink2)
     ax.set_ylabel("查询点平均绝对误差（nats）", color=ink2)
-    ax.set_title("V̂ 主操作化的 k 敏感性（已知势合成系统，种子 99）",
+    ax.set_title(f"V̂ 主操作化的 k 敏感性（已知势合成系统，种子 {seed}）",
                  color=ink, fontsize=11)
     ax.grid(True, axis="y", color=muted, alpha=0.25, linewidth=0.6)
     for spine in ("top", "right"):

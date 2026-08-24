@@ -46,6 +46,28 @@ def test_eval_seed_allowed_after_freeze_on_tmp_copy(tmp_path):
         guard.assert_seed_allowed(5, purpose="unit-test-real-file-still-blocks")
 
 
+def test_family_seeds_calibration_matches_registry():
+    assert guard.family_seeds("calibration") == [99, 100]
+
+
+def test_family_seeds_unknown_family_rejected():
+    with pytest.raises(KeyError):
+        guard.family_seeds("holdout")
+
+
+def test_family_seeds_evaluation_blocked_before_freeze():
+    with pytest.raises(guard.EvalFamilyIsolationError):
+        guard.family_seeds("evaluation", purpose="unit-test")
+
+
+def test_family_seeds_evaluation_allowed_on_frozen_copy(tmp_path):
+    frozen_copy = tmp_path / "freeze_status.json"
+    payload = json.loads(guard.FREEZE_FILE.read_text(encoding="utf-8"))
+    payload["frozen"] = True
+    frozen_copy.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    assert guard.family_seeds("evaluation", freeze_file=frozen_copy) == [5, 6, 7, 8, 9]
+
+
 def test_calibration_and_development_unaffected_by_freeze_state(tmp_path):
     frozen_copy = tmp_path / "freeze_status.json"
     payload = json.loads(guard.FREEZE_FILE.read_text(encoding="utf-8"))

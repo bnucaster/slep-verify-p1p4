@@ -49,10 +49,14 @@ def _as_var_vector(
 def decoder_mean_jacobian(
     decoder_mean: Callable[[torch.Tensor], torch.Tensor], z: torch.Tensor
 ) -> torch.Tensor:
-    """解码器均值在单个潜点 z（d 维向量）处的 Jacobian，返回 D×d 矩阵。"""
+    """解码器均值在单个潜点 z（d 维向量）处的 Jacobian，返回 D×d 矩阵。
+
+    取前向模式（jacfwd）：代价按输入维 d 计，观测维 D 远大于 d 的解码器
+    （图像解码器 D 为像素数）下远快于反向模式。
+    """
     if z.ndim != 1:
-        raise ValueError("z 须为单个潜点（一维张量）；批量调用由上层循环处理")
-    return torch.func.jacrev(decoder_mean)(z.detach())
+        raise ValueError("z 须为单个潜点（一维张量）；批量调用见 *_batch")
+    return torch.func.jacfwd(decoder_mean)(z.detach())
 
 
 def fisher_pullback_gaussian(
@@ -64,6 +68,27 @@ def fisher_pullback_gaussian(
     jac = decoder_mean_jacobian(decoder_mean, z)
     var = _as_var_vector(obs_var, jac.shape[0], jac.dtype, jac.device)
     return jac.T @ (jac / var.unsqueeze(-1))
+
+
+def fisher_pullback_gaussian_batch(
+    decoder_mean: Callable[[torch.Tensor], torch.Tensor],
+    z_query: torch.Tensor,
+    obs_var: float | torch.Tensor,
+    chunk_size: int = 64,
+) -> torch.Tensor:
+    """路径一的批量版：z_query 形状 (q, d)，返回 (q, d, d)。
+
+    vmap + jacfwd 逐块求 Jacobian，chunk_size 限制 (chunk, D, d) 中间张量
+    内存。decoder_mean 须为纯函数（单点 (d,) → (D,)，无批内状态）。
+    """
+    z_query = z_query.detach()
+    jac_fn = torch.func.vmap(torch.func.jacfwd(decoder_mean))
+    out = []
+    for start in range(0, z_query.shape[0], chunk_size):
+        jac = jac_fn(z_query[start : start + chunk_size])  # (c, D, d)
+        var = _as_var_vector(obs_var, jac.shape[1], jac.dtype, jac.device)
+        out.append(torch.einsum("cja,cjb->cab", jac / var.unsqueeze(0).unsqueeze(-1), jac))
+    return torch.cat(out)
 
 
 def fisher_score_covariance_mc(
