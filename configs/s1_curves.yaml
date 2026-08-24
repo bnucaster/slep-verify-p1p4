@@ -1,0 +1,20 @@
+# S1 三曲线计算配置（M2 描述，任务六 6a，plan_v2 第 6 节）。
+# 读 s1_train 战役检查点，逐检查点算 Û（因子探针复合）、⟨V̂⟩、Ŝ（flow/kNN 双路）。
+train_campaign: dev_v1
+out_campaign: dev_v1
+# 样本集（互不重叠，逐 run 以种子派生流抽取）
+n_ref: 10000          # V̂ 参照集（潜态取后验采样）
+n_query: 1024         # V̂ 查询点
+n_probe_train: 24000  # 探针训练（后验均值）
+n_probe_test: 24000   # 探针测试；复合 Û 标准误约 0.0016，满足 W=3 的
+                      # CAL-P1 条件 σ_Û ≤ θ·sqrt(W)/(3·sqrt(12)) ≈ 0.0017
+n_flow_train: 12000
+n_flow_val: 2000
+n_entropy_eval: 8000
+k_potential: 32       # V̂ 主口径（欧氏邻域，k 敏感性见校准）
+k_entropy: 8
+flow: {couplings: 8, hidden: 64, epochs: 8, batch: 1024}
+plateau_window: 3     # 均匀检查点段（每 2k 步共 10 点）上可行的窗长；
+                      # 确证阶段检查点须加密（描述阶段结论，冻结时定节奏）
+sigma_u_folds: 8      # σ_Û 实测：末检查点测试集分折
+torch_threads: 6

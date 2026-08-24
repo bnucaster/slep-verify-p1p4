@@ -138,7 +138,10 @@ def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, l
 
 
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     smoke = "--smoke" in sys.argv
     if smoke:
         cfg = {**cfg, "campaign": "smoke_v1", "train_steps": 60, "checkpoint_log2_until": 16,

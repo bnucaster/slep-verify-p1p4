@@ -1,0 +1,27 @@
+# S2 能力阶梯低档（任务六 6c 试点；探索性）。
+# 与基准档（configs/s2_train.yaml）唯一差异：隐维 16 → 8。
+campaign: tier_low_v1
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 8
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+episodes: 500
+episode_len: 64
+train_steps: 6000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 200
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: development
+torch_threads: 6
+sanity_nav:   # 规划器为定稿口径（穷举视界 1 + ε），不再入配置
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24

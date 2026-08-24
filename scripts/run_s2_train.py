@@ -23,7 +23,7 @@ import yaml
 
 from slep import guard
 from slep.systems import s2_gridworld as gw
-from slep.systems.s2_planner import CEMPlanner, mpc_episode
+from slep.systems.s2_planner import ExhaustiveMPCPlanner, mpc_episode
 from slep.systems.s2_world_model import S2WorldModel
 from slep.utils.runs import REPO_ROOT, create_campaign_dir
 
@@ -47,7 +47,7 @@ def nav_sanity(model: S2WorldModel, cfg: dict, seed: int) -> dict:
     rng = np.random.default_rng(seed + 10_000)  # 留出迷宫流，与训练数据流分离
     gen = torch.Generator()
     gen.manual_seed(seed + 10_000)
-    planner = CEMPlanner(model, view=cfg["view"], **sn["planner"])
+    planner = ExhaustiveMPCPlanner(model, view=cfg["view"])  # 定稿口径（视界 1 + ε）
     successes, steps_used = 0, []
     n_done = 0
     while n_done < sn["n_mazes"]:
@@ -138,7 +138,10 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
 
 
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     smoke = "--smoke" in sys.argv
     if smoke:
         cfg = {**cfg, "campaign": "smoke_v1", "episodes": 60, "train_steps": 120,

@@ -1,0 +1,23 @@
+# S2 四诊断图配置（M2 描述，任务六 6b，plan_v2 第 6 节）。
+# 末检查点、开发族 5 种子；每图配数值输出，直接代入阈值公式。
+train_campaign: dev_v2
+out_campaign: dev_v2
+n_episodes: 400
+episode_len: 64
+burn_in: 8            # 剔除初始零隐态段
+n_ref: 20000          # (h, o_next) 参照对
+n_query: 2000
+k_potential: 32
+flow: {couplings: 8, hidden: 64, epochs: 10, batch: 1024}
+n_flow_train: 16000
+n_flow_val: 2000
+n_shuffle_null: 200   # 图2 打乱标签零假设重复数
+bootstrap: 500        # 图1 高/低梯度比的自助重采样数
+# 图3（Â_OM 重叠度）
+n_traj: 100
+traj_len: 60
+n_surrogates: 20
+# 图4（漂移梯度占比）
+n_drift_eval: 1500
+k_drift: 256
+torch_threads: 6
