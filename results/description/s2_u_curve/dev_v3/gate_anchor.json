@@ -1,0 +1,28 @@
+{
+  "random_baseline": {
+    "per_seed": {
+      "0": 0.2875,
+      "1": 0.24375,
+      "2": 0.28125,
+      "3": 0.225,
+      "4": 0.23125
+    },
+    "pooled": 0.25375000000000003
+  },
+  "plateau": {
+    "smoothing": 5,
+    "window": 3,
+    "plateau_step_pooled": 15500
+  },
+  "trained_level": {
+    "tail_mean_last3": 0.31916666666666665,
+    "uniform_peak": {
+      "step": 16000,
+      "pooled": 0.32875
+    }
+  },
+  "gate_derivation": {
+    "s2_nav_success_min": 0.29,
+    "rule": "随机基线池化与训练平台水平（末三均值 0.319–峰值 0.329）区间的中点，保留两位"
+  }
+}

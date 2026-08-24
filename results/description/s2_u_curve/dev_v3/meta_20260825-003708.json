@@ -1,0 +1,17 @@
+{
+  "git": {
+    "commit": "0d8ba492a5ef0e8c7516714d11056a5213ce0334",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts\\probe_s2_u_curve.py",
+    "--config",
+    "configs/s2_train_long.yaml",
+    "--seed",
+    "4"
+  ],
+  "created": "2026-08-25T00:37:08+0100",
+  "torch": "2.13.0+cpu"
+}

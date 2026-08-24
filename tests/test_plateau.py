@@ -44,3 +44,29 @@ def test_noisy_flat_curve_detected_early():
     out = detect_plateau(u, window=20)
     assert out["plateau_index"] is not None
     assert out["plateau_index"] <= 5 * 20  # 前几窗内即应判平
+
+
+def test_smoothing_index_mapping_on_constant_curve():
+    # 常数曲线：W=3 时首个可判窗 j=2，平台点=(2+1)*3=9；
+    # 平滑 s=5 末端对齐使原始序号整体 +（s−1）。
+    u = torch.full((60,), 0.5, dtype=torch.float64)
+    assert detect_plateau(u, window=3)["plateau_index"] == 9
+    out = detect_plateau(u, window=3, smoothing=5)
+    assert out["plateau_index"] == 9 + 4
+    assert out["smoothing"] == 5
+
+
+def test_wobbly_saturation_needs_smoothing():
+    # 构造对应 dev_v3 实测量级的检查点波动（σ_rel≈1.5%>θ=1%，
+    # 见 results/description/s2_u_curve/dev_v3/）：真饱和曲线叠加
+    # 波动后，未平滑 W=3 判据应失效，平滑 5 应在饱和段内检出。
+    seed = guard.family_seeds("calibration", purpose="test-plateau")[0]
+    gen = torch.Generator()
+    gen.manual_seed(seed + 1)
+    t = _t(80)
+    base = 0.32 * (1 - torch.exp(-t / 10.0))
+    u = base + 0.0048 * torch.randn(80, generator=gen, dtype=torch.float64)
+    assert detect_plateau(u, window=3)["plateau_index"] is None
+    out = detect_plateau(u, window=3, smoothing=5)
+    assert out["plateau_index"] is not None
+    assert out["plateau_index"] >= 30  # 饱和段（膝点约 3×时间常数）之后
