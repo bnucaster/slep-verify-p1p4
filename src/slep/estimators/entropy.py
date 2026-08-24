@@ -24,12 +24,27 @@ from slep.estimators.flow import FlowDensity
 
 
 def entropy_knn(
-    z_samples: torch.Tensor, k: int, chunk_size: int = 2048, return_info: bool = False
+    z_samples: torch.Tensor,
+    k: int,
+    chunk_size: int = 2048,
+    return_info: bool = False,
+    standardize: bool = False,
 ) -> float | tuple[float, dict[str, torch.Tensor]]:
-    """kNN 留一熵估计，公式见模块 docstring。z_samples 形状 (N, d)。"""
+    """kNN 留一熵估计，公式见模块 docstring。z_samples 形状 (N, d)。
+
+    standardize 置真时在逐维标准化坐标下估计后按仿射变换换算回原坐标：
+    H_z = H_std + Σ_j log σ_j（微分熵在可逆仿射下的精确关系）。各向异性
+    强的分布（如聚合后验）里球形邻域在原坐标退化，标准化口径偏差更小；
+    两口径的选择随结果注明。
+    """
     n, d = z_samples.shape
     if not 1 <= k <= n - 1:
         raise ValueError(f"k={k} 超出留一可用范围 [1, {n - 1}]")
+    correction = 0.0
+    if standardize:
+        std = z_samples.std(dim=0).clamp_min(1e-12)
+        correction = float(torch.log(std).sum())
+        z_samples = (z_samples - z_samples.mean(dim=0)) / std
     radii = []
     for i in range(0, n, chunk_size):
         dists = torch.cdist(z_samples[i : i + chunk_size], z_samples)
@@ -42,6 +57,7 @@ def entropy_knn(
         float(torch.digamma(torch.tensor(float(n))) - torch.digamma(torch.tensor(float(k))))
         + unit_ball_log_volume(d)
         + d * float(torch.log(r_k).mean())
+        + correction
     )
     if not return_info:
         return ent

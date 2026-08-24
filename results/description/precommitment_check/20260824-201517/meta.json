@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "91719faeb530a6aaa9582c5bd17e8e0a6a90dde6",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts\\run_precommitment_check.py"
+  ],
+  "created": "2026-08-24T20:15:17+0100",
+  "torch": "2.13.0+cpu"
+}

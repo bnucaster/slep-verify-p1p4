@@ -87,7 +87,7 @@ def diagnose_seed(cfg, train_cfg, seed: int, out_dir, log) -> dict:
         return model.decoder_mean(z.float()).double()
 
     # 图一：V̂ 与其 ĝ 度量下梯度范数
-    g_q = fisher_pullback_gaussian_batch(dec, h_q, obs_var)
+    g_q = fisher_pullback_gaussian_batch(dec, h_q, obs_var).detach()
     logdet_g = torch.linalg.slogdet(g_q).logabsdet
     h_req = h_q.detach().requires_grad_(True)
     v_parts = []
@@ -97,7 +97,7 @@ def diagnose_seed(cfg, train_cfg, seed: int, out_dir, log) -> dict:
     v_q = torch.cat(v_parts)
     (grad_v,) = torch.autograd.grad(v_q.sum(), h_req)
     nat = torch.linalg.solve(g_q, grad_v.unsqueeze(-1)).squeeze(-1)
-    grad_norm = torch.einsum("ti,tij,tj->t", nat, g_q, nat).clamp_min(0).sqrt()
+    grad_norm = torch.einsum("ti,tij,tj->t", nat, g_q, nat).clamp_min(0).sqrt().detach()
     v_q = v_q.detach()
     q_lo, q_hi = torch.quantile(grad_norm, 1 / 3), torch.quantile(grad_norm, 2 / 3)
     lo_med = float(grad_norm[grad_norm <= q_lo].median())
@@ -145,8 +145,15 @@ def diagnose_seed(cfg, train_cfg, seed: int, out_dir, log) -> dict:
     def v_fn(z):
         return potential.potential_knn(dec, obs_var, z, h_ref, o_ref, k=cfg["k_potential"])
 
+    # 诊断层正则：代理可游走到解码器饱和的度量奇异区，g⁻¹∇V 与白化
+    # 分解在该区数值爆炸；加相对地板 floor·I（floor = 1e-3 × 查询点度量
+    # 特征值中位数）。确证阶段由支撑度剔除承接此情形，此处只保证诊断
+    # 可算并记录口径。
+    g_floor = 1e-3 * float(torch.linalg.eigvalsh(g_q).median())
+    eye_h = torch.eye(model.hidden_dim, dtype=torch.float64)
+
     def g_fn(z):
-        return fisher_pullback_gaussian_batch(dec, z, obs_var)
+        return fisher_pullback_gaussian_batch(dec, z, obs_var) + g_floor * eye_h
 
     ep_idx = rng.permutation(cfg["n_episodes"])[: cfg["n_traj"]]
     gen_s = torch.Generator()

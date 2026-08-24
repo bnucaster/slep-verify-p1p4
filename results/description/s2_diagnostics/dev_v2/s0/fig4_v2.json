@@ -1,0 +1,5 @@
+{
+  "gradient_fraction": 0.0,
+  "residual_ratio_train": 1.0620142054536548,
+  "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+}

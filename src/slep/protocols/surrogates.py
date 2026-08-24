@@ -102,6 +102,7 @@ def smooth_random_surrogate_metric(
     generator: torch.Generator,
     smooth_window: int | None = None,
     pin_endpoint: bool = True,
+    metric_floor_rel: float = 1e-3,
 ) -> tuple[torch.Tensor, dict]:
     """度量口径主代理，动机见模块 docstring。
 
@@ -109,6 +110,11 @@ def smooth_random_surrogate_metric(
     速率，步进 δz = s_t · L(z)⁻ᵀ v_w（L 为当前点度量的 Cholesky 因子，
     使 ‖δz‖_ĝ = s_t）。端点桥修正（pin_endpoint，正式口径恒开；关闭
     仅供构造性质自检）后返回度量长度比作质检量。
+
+    metric_floor_rel：构造正则——代理可游走到度量数值奇异的离流形区
+    （真实解码器 sigmoid 饱和使 Jacobian 行消失，S2 实测），分解前给
+    度量加 floor·I，floor = metric_floor_rel × 观测轨迹度量特征值中位数。
+    正则只作用于代理步进构造，不进入任何估计量。
     """
     n, d = traj.shape[0] - 1, traj.shape[1]
     delta = traj[1:] - traj[:-1]
@@ -116,13 +122,15 @@ def smooth_random_surrogate_metric(
     metric_speeds = torch.einsum("ti,tij,tj->t", delta, g_obs, delta).clamp_min(0).sqrt()
     perm = torch.randperm(n, generator=generator)
     speeds_perm = metric_speeds[perm]
+    floor = metric_floor_rel * float(torch.linalg.eigvalsh(g_obs).median())
+    eye = torch.eye(d, dtype=traj.dtype)
 
     window = smooth_window or direction_autocorr_time(traj)
     dirs_w = _smooth_unit_dirs(n, d, window, generator, traj.dtype)
 
     points = [traj[0]]
     for t in range(n):
-        g_here = metric_fn(points[-1].unsqueeze(0))[0]
+        g_here = metric_fn(points[-1].unsqueeze(0))[0] + floor * eye
         chol = torch.linalg.cholesky(g_here)
         step = torch.linalg.solve_triangular(
             chol.T, (speeds_perm[t] * dirs_w[t]).unsqueeze(-1), upper=True

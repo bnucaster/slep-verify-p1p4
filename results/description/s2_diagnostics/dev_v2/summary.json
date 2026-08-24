@@ -1,0 +1,217 @@
+[
+  {
+    "seed": 0,
+    "fig1": {
+      "grad_norm_quantiles": [
+        6.242983875981111,
+        7.1668080440669275,
+        7.729111289839459,
+        8.26691769632883,
+        9.95246163813243
+      ],
+      "hi_lo_median_ratio": 1.3913337658699487,
+      "ratio_ci90": [
+        1.371929375577602,
+        1.4061380556105343
+      ]
+    },
+    "fig2": {
+      "corrected": {
+        "slope": 0.08300278224436194,
+        "r_squared": 0.16041601569284203,
+        "p_lack_of_fit": 0.009027957398793873,
+        "curvature_effect_ratio": 0.06074211007057718,
+        "temperature_hat": 12.04778891695436
+      },
+      "uncorrected": {
+        "slope": 0.06679866499154666,
+        "r_squared": 0.21505974885953383
+      },
+      "null_r2_q95": 0.0016527550105469007
+    },
+    "fig3": {
+      "gap_standardized_median": 0.33727511763572693,
+      "frac_below_q1": 1.0,
+      "null_binomial_q95": 0.3212305894612701
+    },
+    "fig4": {
+      "gradient_fraction": 0.0,
+      "residual_ratio_train": 1.0620142054536548,
+      "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+    },
+    "n_states": 44000,
+    "wall_seconds": 549
+  },
+  {
+    "seed": 1,
+    "fig1": {
+      "grad_norm_quantiles": [
+        6.231599277127798,
+        7.41278869763317,
+        8.007237805967915,
+        8.646378063851634,
+        10.362933228448618
+      ],
+      "hi_lo_median_ratio": 1.4426391548231434,
+      "ratio_ci90": [
+        1.4205488894936829,
+        1.465624851785774
+      ]
+    },
+    "fig2": {
+      "corrected": {
+        "slope": 0.05681908234589487,
+        "r_squared": 0.09110193804273048,
+        "p_lack_of_fit": 1.1829037432751232e-11,
+        "curvature_effect_ratio": 0.25458584907109566,
+        "temperature_hat": 17.599721056956653
+      },
+      "uncorrected": {
+        "slope": 0.047868311472251734,
+        "r_squared": 0.18040671458247426
+      },
+      "null_r2_q95": 0.0019396819539112705
+    },
+    "fig3": {
+      "gap_standardized_median": 0.25885245203971863,
+      "frac_below_q1": 0.97,
+      "null_binomial_q95": 0.3212305894612701
+    },
+    "fig4": {
+      "gradient_fraction": 0.0,
+      "residual_ratio_train": 3.161962219929513,
+      "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+    },
+    "n_states": 44000,
+    "wall_seconds": 550
+  },
+  {
+    "seed": 2,
+    "fig1": {
+      "grad_norm_quantiles": [
+        6.223428500470537,
+        7.238448689142307,
+        7.796515714050937,
+        8.417327818224122,
+        10.057759625209654
+      ],
+      "hi_lo_median_ratio": 1.4201065656944794,
+      "ratio_ci90": [
+        1.4008423280132436,
+        1.4377441084443423
+      ]
+    },
+    "fig2": {
+      "corrected": {
+        "slope": 0.07276328485706703,
+        "r_squared": 0.14208482047203252,
+        "p_lack_of_fit": 7.18781678206904e-14,
+        "curvature_effect_ratio": 0.2034375371433642,
+        "temperature_hat": 13.743194826406693
+      },
+      "uncorrected": {
+        "slope": 0.058985734324660484,
+        "r_squared": 0.28151959228966394
+      },
+      "null_r2_q95": 0.0020697987041820944
+    },
+    "fig3": {
+      "gap_standardized_median": 0.3028557002544403,
+      "frac_below_q1": 1.0,
+      "null_binomial_q95": 0.3212305894612701
+    },
+    "fig4": {
+      "gradient_fraction": 0.0,
+      "residual_ratio_train": 1.003687346069837,
+      "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+    },
+    "n_states": 44000,
+    "wall_seconds": 562
+  },
+  {
+    "seed": 3,
+    "fig1": {
+      "grad_norm_quantiles": [
+        6.109838089813316,
+        7.300610279562608,
+        7.976451072236003,
+        8.600100975101995,
+        10.328712946931233
+      ],
+      "hi_lo_median_ratio": 1.4522682453590146,
+      "ratio_ci90": [
+        1.4322147045374307,
+        1.4738817352007136
+      ]
+    },
+    "fig2": {
+      "corrected": {
+        "slope": 0.05138860910737204,
+        "r_squared": 0.08978811755308946,
+        "p_lack_of_fit": 1.8874979971493065e-13,
+        "curvature_effect_ratio": 0.24129757340675106,
+        "temperature_hat": 19.45956540506062
+      },
+      "uncorrected": {
+        "slope": 0.04263206444933902,
+        "r_squared": 0.17984537725190264
+      },
+      "null_r2_q95": 0.0017839174976584315
+    },
+    "fig3": {
+      "gap_standardized_median": 0.42089518904685974,
+      "frac_below_q1": 1.0,
+      "null_binomial_q95": 0.3212305894612701
+    },
+    "fig4": {
+      "gradient_fraction": 0.0,
+      "residual_ratio_train": 1.0064115083324925,
+      "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+    },
+    "n_states": 44000,
+    "wall_seconds": 558
+  },
+  {
+    "seed": 4,
+    "fig1": {
+      "grad_norm_quantiles": [
+        6.3605551115498224,
+        7.3696665572810085,
+        7.976579043119052,
+        8.60010142467752,
+        10.140491093373738
+      ],
+      "hi_lo_median_ratio": 1.4157379993326171,
+      "ratio_ci90": [
+        1.3943678635186783,
+        1.4321851526139835
+      ]
+    },
+    "fig2": {
+      "corrected": {
+        "slope": 0.05128458632965277,
+        "r_squared": 0.07791966854248422,
+        "p_lack_of_fit": 7.790568741464464e-18,
+        "curvature_effect_ratio": 0.2955622126773264,
+        "temperature_hat": 19.499036095798623
+      },
+      "uncorrected": {
+        "slope": 0.04958023127011737,
+        "r_squared": 0.19162395032882007
+      },
+      "null_r2_q95": 0.0019561501970769106
+    },
+    "fig3": {
+      "gap_standardized_median": 0.34638452529907227,
+      "frac_below_q1": 0.98,
+      "null_binomial_q95": 0.3212305894612701
+    },
+    "fig4": {
+      "gradient_fraction": 0.0,
+      "residual_ratio_train": 1.02607891210385,
+      "estimator_note": "v2：零初始化头 + ψ=0 基线（estimators/drift.py 修复后）"
+    },
+    "n_states": 44000,
+    "wall_seconds": 552
+  }
+]

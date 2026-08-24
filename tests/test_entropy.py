@@ -76,6 +76,25 @@ def test_entropy_knn_correlated_gaussian_d8():
     assert abs(h_hat - h_true) < 0.2  # 回归层定值界，d=8 偏差更大留余量
 
 
+def test_entropy_knn_standardized_on_anisotropic_gaussian():
+    """标准化口径在强各向异性高斯上偏差更小；仿射换算精确性由构造保证。
+
+    真值 H = Σ log σ + (d/2)log(2πe)。断言：标准化口径误差不大于原坐标
+    口径误差（方向性），且落在标准化坐标推导容差内（同文件头容差体系，
+    标准化后分布为 N(0, I)，界与 d4 用例同构）。"""
+    gen = _gen(1)
+    d, n = 4, 20_000
+    scales = torch.tensor([50.0, 1.0, 1.0, 0.02], dtype=torch.float64)
+    z = torch.randn((n, d), generator=gen, dtype=torch.float64) * scales
+    h_true = float(torch.log(scales).sum()) + 0.5 * d * math.log(2 * math.pi * math.e)
+    h_raw = entropy_knn(z, k=K)
+    h_std, info = entropy_knn(z, k=K, return_info=True, standardize=True)
+    assert abs(h_std - h_true) <= abs(h_raw - h_true) + 1e-9
+    zs = (z - z.mean(0)) / z.std(0)
+    tol = _knn_tolerances(zs, info["radius"], torch.eye(d, dtype=torch.float64), d, n)
+    assert abs(h_std - h_true) <= tol
+
+
 def test_flow_density_and_entropy_standard_gaussian_d4():
     seeds = guard.family_seeds("calibration", purpose="test-entropy-flow")
     gen = _gen(0)

@@ -72,6 +72,11 @@ class _ScalarPotential(nn.Module):
             nn.Linear(dim, hidden), nn.Tanh(), nn.Linear(hidden, hidden), nn.Tanh(),
             nn.Linear(hidden, 1),
         )
+        # 输出头零初始化：初始 ψ ≡ 0 → 初始残差比 = 1，留出最优值不会
+        # 高于 1，占比获得构造性下界 ≥ 0。非零初始化在近奇异度量方向上
+        # g⁻¹∇ψ 初始即爆炸（S2 真实几何实测占比 −60），下界性质失效。
+        nn.init.zeros_(self.net[-1].weight)
+        nn.init.zeros_(self.net[-1].bias)
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
         return self.net(z).squeeze(-1)
@@ -122,7 +127,8 @@ def gradient_fraction(
         den = torch.einsum("ti,tij,tj->", drift[idx], g, drift[idx])
         return num / den
 
-    best_val = float("inf")
+    # ψ=0 基线先入榜：留出最优值 ≤ 1，占比下界 ≥ 0 构造性成立
+    best_val = float(residual_ratio_on(idx_val, create_graph=False).detach())
     for it in range(n_iters):
         loss = residual_ratio_on(idx_train, create_graph=True)
         opt.zero_grad()

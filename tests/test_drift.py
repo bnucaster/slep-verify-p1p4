@@ -93,6 +93,22 @@ def test_gradient_fraction_mixed_field_matches_closed_form():
     assert abs(out["fraction"] - frac_expected) < 0.05, (out, frac_expected)
 
 
+def test_gradient_fraction_lower_bound_on_ill_conditioned_metric():
+    """病态度量 + 无结构漂移下占比不得低于零（ψ=0 基线构造性下界）。"""
+    seeds = guard.family_seeds("calibration", purpose="test-drift")
+    gen = _gen(1)
+    d = 6
+    z = torch.randn((1500, d), generator=gen, dtype=torch.float64)
+    drift = torch.randn((1500, d), generator=gen, dtype=torch.float64)
+    scales = torch.tensor([1e-6, 1e-4, 1e-2, 1.0, 1.0, 1.0], dtype=torch.float64)
+
+    def metric(zz):
+        return torch.diag(scales).expand(zz.shape[0], d, d)
+
+    out = gradient_fraction(z, drift, metric, seed=seeds[0], n_iters=300)
+    assert out["fraction"] >= -1e-9, out
+
+
 def test_support_radius_monotone_and_far_point():
     gen = _gen(0)
     z_ref = torch.randn((5000, 3), generator=gen, dtype=torch.float64)

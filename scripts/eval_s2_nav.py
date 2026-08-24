@@ -86,7 +86,12 @@ def eval_run(cfg: dict, seed: int, run_dir) -> dict:
 
 
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    import sys
+
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     torch.set_num_threads(int(cfg["torch_threads"]))
     campaign = REPO_ROOT / "results" / "description" / "s2_train" / cfg["campaign"]
     seeds = guard.family_seeds(cfg["seed_family"], purpose="s2-nav-eval")
