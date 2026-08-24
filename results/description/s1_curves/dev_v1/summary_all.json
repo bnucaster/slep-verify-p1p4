@@ -1,0 +1,222 @@
+[
+  {
+    "beta": 1.0,
+    "seed": 0,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.001116329945720446,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.7330098394313904,
+      "shape_acc": 0.5047083333333333,
+      "scale_r2": 0.5944875757648423,
+      "posx_r2": 0.9288492045882902,
+      "posy_r2": 0.9039942440390956,
+      "v_mean": -1529.320582738499,
+      "v_std": 373.8731545284991,
+      "s_flow": 11.178237641711068,
+      "s_knn": 10.826789454848756
+    }
+  },
+  {
+    "beta": 1.0,
+    "seed": 1,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0014742871223536727,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.5998992160130777,
+      "shape_acc": 0.41604166666666664,
+      "scale_r2": 0.2879150536667586,
+      "posx_r2": 0.842585271083538,
+      "posy_r2": 0.8530548726353478,
+      "v_mean": -1861.9515850219059,
+      "v_std": 347.5180583996941,
+      "s_flow": 9.33584227274438,
+      "s_knn": 8.383274621744121
+    }
+  },
+  {
+    "beta": 1.0,
+    "seed": 2,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0007254272163827189,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.08144167522106467,
+      "shape_acc": 0.32416666666666666,
+      "scale_r2": 0.0014090315597969916,
+      "posx_r2": 5.703447330884792e-05,
+      "posy_r2": 0.0001339681844861884,
+      "v_mean": -642.1789662332634,
+      "v_std": 184.41819547773156,
+      "s_flow": 11.36356136157232,
+      "s_knn": 11.300660770552787
+    }
+  },
+  {
+    "beta": 1.0,
+    "seed": 3,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0012766316181867497,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.701044245492815,
+      "shape_acc": 0.4454166666666667,
+      "scale_r2": 0.6063493795664221,
+      "posx_r2": 0.8706653942749655,
+      "posy_r2": 0.8817455414632057,
+      "v_mean": -1801.4399841983663,
+      "v_std": 339.6573603958175,
+      "s_flow": 9.406670535309894,
+      "s_knn": 8.382031952047859
+    }
+  },
+  {
+    "beta": 1.0,
+    "seed": 4,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0010025480774154317,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.6595507792627315,
+      "shape_acc": 0.42525,
+      "scale_r2": 0.45398396565260835,
+      "posx_r2": 0.8847186724442943,
+      "posy_r2": 0.8742504789540237,
+      "v_mean": -1812.3995626249064,
+      "v_std": 344.5515232055874,
+      "s_flow": 9.158133642937798,
+      "s_knn": 8.20618861901802
+    }
+  },
+  {
+    "beta": 4.0,
+    "seed": 0,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0013909017910596452,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.6824869901318056,
+      "shape_acc": 0.4995833333333333,
+      "scale_r2": 0.5881225059128896,
+      "posx_r2": 0.8105838354223143,
+      "posy_r2": 0.8316582858586852,
+      "v_mean": -1689.395730011078,
+      "v_std": 330.64579900958444,
+      "s_flow": 11.006558510796582,
+      "s_knn": 10.502422962165936
+    }
+  },
+  {
+    "beta": 4.0,
+    "seed": 1,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0008178824788023906,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.08348958333333334,
+      "shape_acc": 0.33395833333333336,
+      "scale_r2": -1.812751975482918e-05,
+      "posx_r2": -0.00011468988052865114,
+      "posy_r2": -2.059364144479936e-05,
+      "v_mean": -651.4662266239354,
+      "v_std": 185.12144298152856,
+      "s_flow": 11.366755252063202,
+      "s_knn": 11.307796126881728
+    }
+  },
+  {
+    "beta": 4.0,
+    "seed": 2,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0007152966274226212,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.08109130031753022,
+      "shape_acc": 0.32416666666666666,
+      "scale_r2": 2.646565550246116e-05,
+      "posx_r2": 7.742242057051651e-05,
+      "posy_r2": 9.464652738122581e-05,
+      "v_mean": -641.5545002902631,
+      "v_std": 184.69521449736754,
+      "s_flow": 11.36378209760364,
+      "s_knn": 11.300864087519281
+    }
+  },
+  {
+    "beta": 4.0,
+    "seed": 3,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0018184405153866593,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.682360993800076,
+      "shape_acc": 0.4544166666666667,
+      "scale_r2": 0.6560547310302238,
+      "posx_r2": 0.7779346447844134,
+      "posy_r2": 0.8410379327189998,
+      "v_mean": -1838.547813751568,
+      "v_std": 271.39948994356723,
+      "s_flow": 9.943212772390773,
+      "s_knn": 9.63700739711118
+    }
+  },
+  {
+    "beta": 4.0,
+    "seed": 4,
+    "n_checkpoints": 22,
+    "sigma_u_final": 0.0003950022188004913,
+    "sigma_u_requirement_w": 3,
+    "sigma_u_requirement": 0.0016666666666666666,
+    "plateau_step": null,
+    "post_plateau_s_flow_change": null,
+    "final": {
+      "step": 20000,
+      "u_composite": 0.7402977567253137,
+      "shape_acc": 0.44566666666666666,
+      "scale_r2": 0.776913993797504,
+      "posx_r2": 0.8500222973207372,
+      "posy_r2": 0.8885880691163468,
+      "v_mean": -1716.306853612885,
+      "v_std": 336.47956482995966,
+      "s_flow": 10.464654089771557,
+      "s_knn": 9.969458210308717
+    }
+  }
+]

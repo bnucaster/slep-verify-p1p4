@@ -1,0 +1,22 @@
+{
+  "flow": {
+    "batch": 1024,
+    "couplings": 8,
+    "epochs": 8,
+    "hidden": 64
+  },
+  "k_entropy": 8,
+  "k_potential": 32,
+  "n_entropy_eval": 8000,
+  "n_flow_train": 12000,
+  "n_flow_val": 2000,
+  "n_probe_test": 24000,
+  "n_probe_train": 24000,
+  "n_query": 1024,
+  "n_ref": 10000,
+  "out_campaign": "dev_v1",
+  "plateau_window": 3,
+  "sigma_u_folds": 8,
+  "torch_threads": 6,
+  "train_campaign": "dev_v1"
+}

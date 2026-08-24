@@ -75,7 +75,7 @@ def main() -> None:
                 ax.spines[s].set_color(muted)
             ax.tick_params(colors=muted, labelcolor=ink2)
         axes[0].set_ylim(0, 1)
-        axes[1].set_yscale("log")
+        axes[1].set_yscale("symlog", linthresh=100)  # V̂ 早期 ~1e4、后期为负，对称对数轴
         axes[-1].set_xscale("log")
         axes[-1].set_xlabel("训练步（对数轴）", color=ink2)
         fig.suptitle(

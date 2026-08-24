@@ -1,0 +1,22 @@
+{
+  "beta": 4.0,
+  "seed": 4,
+  "n_checkpoints": 22,
+  "sigma_u_final": 0.0003950022188004913,
+  "sigma_u_requirement_w": 3,
+  "sigma_u_requirement": 0.0016666666666666666,
+  "plateau_step": null,
+  "post_plateau_s_flow_change": null,
+  "final": {
+    "step": 20000,
+    "u_composite": 0.7402977567253137,
+    "shape_acc": 0.44566666666666666,
+    "scale_r2": 0.776913993797504,
+    "posx_r2": 0.8500222973207372,
+    "posy_r2": 0.8885880691163468,
+    "v_mean": -1716.306853612885,
+    "v_std": 336.47956482995966,
+    "s_flow": 10.464654089771557,
+    "s_knn": 9.969458210308717
+  }
+}
