@@ -1,0 +1,8 @@
+run_dir: D:\PythonProjects\slep-verify\slep-p1p4\results\description\precommitment_check\20260824-210802
+  缓存命中 b1_s0
+  缓存命中 b1_s1
+  缓存命中 b1_s3
+  缓存命中 b1_s4
+  缓存命中 b4_s0
+  缓存命中 b4_s3
+  缓存命中 b4_s4

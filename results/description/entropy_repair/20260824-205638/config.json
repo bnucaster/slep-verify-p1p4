@@ -1,0 +1,51 @@
+{
+  "truth_sources": [
+    {
+      "beta": 1.0,
+      "seed": 0
+    },
+    {
+      "beta": 4.0,
+      "seed": 0
+    }
+  ],
+  "n_fit": 20000,
+  "gmm_components": [
+    8,
+    16,
+    32
+  ],
+  "truth_mc_n": 2000000,
+  "n_eval_flow_train": 6000,
+  "n_eval_flow_val": 1000,
+  "n_eval": 9000,
+  "n_repeats": 2,
+  "flow_configs": {
+    "current": {
+      "couplings": 8,
+      "hidden": 64,
+      "epochs": 8,
+      "batch": 1024
+    },
+    "boosted": {
+      "couplings": 12,
+      "hidden": 128,
+      "epochs": 25,
+      "batch": 512
+    },
+    "heavy": {
+      "couplings": 16,
+      "hidden": 128,
+      "epochs": 40,
+      "batch": 512
+    }
+  },
+  "knn_ks": [
+    1,
+    4,
+    8,
+    16
+  ],
+  "tolerance_safety": 1.5,
+  "torch_threads": 10
+}

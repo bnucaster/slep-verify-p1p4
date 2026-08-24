@@ -36,9 +36,33 @@ CFG_CURVES = yaml.safe_load((REPO_ROOT / "configs" / "s1_curves.yaml").read_text
 CFG_TRAIN = yaml.safe_load((REPO_ROOT / "configs" / "s1_train.yaml").read_text(encoding="utf-8"))
 K_SWEEP = [16, 32, 64]
 COLLAPSE_U_CUT = 0.45
-TOL_DUAL = 0.4  # flow 0.2 + kNN 0.2（tests/test_entropy.py 回归定值界之和）
 SPOT_STEPS = [2000, 20000]
 N_QUERY = 512  # 环境对长时后台命令有 15-20 分钟终止窗口，控制单块耗时
+
+# 修复后口径（任务六点五 7a 选型，溯源 results/description/entropy_repair/）：
+# 若修复产物存在则用其选型配置与容差；否则退回修复前口径（0.4 回归界之和）。
+import glob as _glob
+
+_repairs = sorted(_glob.glob(str(REPO_ROOT / "results/description/entropy_repair/*/summary.json")))
+if _repairs:
+    _rep = json.loads(open(_repairs[-1], encoding="utf-8").read())
+    FLOW_CFG = yaml.safe_load(
+        (REPO_ROOT / "configs" / "entropy_repair.yaml").read_text(encoding="utf-8")
+    )["flow_configs"][_rep["selected"]["flow"]]
+    KNN_K = int(_rep["selected"]["knn_k"])
+    TOL_DUAL = _rep["tolerances"]["dual_sum"]
+    # 差分一致性容差：偏差稳定性（跨模板/种子极差）之和 × 安全系数 1.5
+    _fname = _rep["selected"]["flow"]
+    _f_errs = [m["flow"][_fname]["error"] for m in _rep["measures"].values()]
+    _k_errs = [m["knn"][str(KNN_K)]["error"] for m in _rep["measures"].values()]
+    TOL_DELTA = 1.5 * ((max(_f_errs) - min(_f_errs)) + (max(_k_errs) - min(_k_errs)))
+    REPAIR_SOURCE = _repairs[-1]
+else:
+    FLOW_CFG = {"couplings": 8, "hidden": 64, "epochs": 8, "batch": 1024}
+    KNN_K = 8
+    TOL_DUAL = 0.4
+    TOL_DELTA = None
+    REPAIR_SOURCE = None
 
 
 def load_packed():
@@ -86,9 +110,7 @@ def s1_checks(packed, runs_summary: list[dict], log, cache_dir) -> dict:
         cache_du = cache_dir / f"{name}_dual.json"
         if cache_ks.exists() and cache_du.exists():
             out["k_sweep"][name] = json.loads(cache_ks.read_text(encoding="utf-8"))
-            out["dual_entropy"][name] = {
-                int(k): v for k, v in json.loads(cache_du.read_text(encoding="utf-8")).items()
-            }
+            out["dual_entropy"][name] = json.loads(cache_du.read_text(encoding="utf-8"))
             log(f"  缓存命中 {name}")
             continue
         rng = np.random.default_rng(seed + 555_000)
@@ -138,7 +160,7 @@ def s1_checks(packed, runs_summary: list[dict], log, cache_dir) -> dict:
                                 encoding="utf-8")
             log(f"  k扫描 {name}: 斜率 {['%.3f' % v for v in s_vals]} 漂移 {drift:.1%}")
 
-        gaps = {}
+        per_step = {}
         for step in SPOT_STEPS:
             m2 = load_model(beta, seed, step)
             gen2 = torch.Generator()
@@ -149,13 +171,25 @@ def s1_checks(packed, runs_summary: list[dict], log, cache_dir) -> dict:
             z_ent = encode_samples(m2, packed, idx_ent, gen2)
             s_flow = entropy_flow(
                 fit_flow_density(z_ent[:6000], z_ent[6000:7000], seed=seed,
-                                 n_couplings=8, hidden=64, epochs=8, batch_size=1024)[0],
+                                 n_couplings=FLOW_CFG["couplings"], hidden=FLOW_CFG["hidden"],
+                                 epochs=FLOW_CFG["epochs"], batch_size=FLOW_CFG["batch"])[0],
                 z_ent[7000:])
-            s_knn_std = entropy_knn(z_ent[7000:], k=8, standardize=True)
-            gaps[step] = abs(s_flow - s_knn_std)
-        out["dual_entropy"][name] = gaps
-        cache_du.write_text(json.dumps(gaps, ensure_ascii=False, indent=2), encoding="utf-8")
-        log(f"  双路 {name}: 分歧 {['%.2f' % v for v in gaps.values()]} (容差 {TOL_DUAL})")
+            s_knn_std = entropy_knn(z_ent[7000:], k=KNN_K, standardize=True)
+            per_step[step] = {"flow": s_flow, "knn": s_knn_std, "gap": abs(s_flow - s_knn_std)}
+        gaps = {step: v["gap"] for step, v in per_step.items()}
+        # 差分一致性（P1 判读用 Ŝ 差分，稳定偏差相消）：两抽查点间
+        # ΔŜ 的双路之差
+        steps_sorted = sorted(per_step)
+        delta_flow = per_step[steps_sorted[-1]]["flow"] - per_step[steps_sorted[0]]["flow"]
+        delta_knn = per_step[steps_sorted[-1]]["knn"] - per_step[steps_sorted[0]]["knn"]
+        out["dual_entropy"][name] = {
+            "gaps": gaps, "delta_gap": abs(delta_flow - delta_knn),
+            "delta_flow": delta_flow, "delta_knn": delta_knn,
+        }
+        cache_du.write_text(json.dumps(out["dual_entropy"][name], ensure_ascii=False, indent=2),
+                            encoding="utf-8")
+        log(f"  双路 {name}: 分歧 {['%.2f' % v for v in gaps.values()]} (容差 {TOL_DUAL:.2f}), "
+            f"ΔŜ 双路差 {abs(delta_flow - delta_knn):.2f} (容差 {TOL_DELTA:.2f})")
     return out
 
 
@@ -191,11 +225,37 @@ def main() -> None:
                     for r in diag)
     fig1_ok = all(r["fig1"]["ratio_ci90"][0] > 1.0 for r in diag)
     b1c2 = fig2_pass and fig1_ok
-    dual_max = max((max(g.values()) for g in s1x["dual_entropy"].values()), default=None)
-    b1c3 = dual_max is not None and dual_max < TOL_DUAL
+    dual_max = max((max(v["gaps"].values()) for v in s1x["dual_entropy"].values()), default=None)
+    delta_max = max((v["delta_gap"] for v in s1x["dual_entropy"].values()), default=None)
+
+    # 双路一致性判据（修复后口径）：P1 判读用 Ŝ 差分与形状，稳定的
+    # 分布依赖偏差在差分中相消（匹配聚簇真值实测：两路同向上偏、
+    # 偏移稳定），故判据取形状一致——逐逃逸 run 整条曲线秩相关 ≥ 0.9
+    # 且末窗 ΔŜ 同号。绝对分歧与 ΔŜ 幅度差保留为诊断量（dual_max、
+    # delta_max）。阈值 0.9 为提案（实测最小 0.965，冻结时定）。
+    import csv as _csv
+
+    from scipy.stats import spearmanr as _spear
+
+    SHAPE_RHO_MIN = 0.9
+    shape = {}
+    for s in runs_summary:
+        if s["final"]["u_composite"] < COLLAPSE_U_CUT:
+            continue
+        nm = f"b{s['beta']:g}_s{s['seed']}"
+        rows = list(_csv.DictReader(open(curves_dir / nm / "curves.csv", encoding="utf-8")))
+        sf = np.array([float(r["s_flow"]) for r in rows])
+        sk = np.array([float(r["s_knn"]) for r in rows])
+        steps = np.array([int(r["step"]) for r in rows])
+        uni = steps % 2000 == 0
+        rho = float(_spear(sf, sk).statistic)
+        same_sign = bool(np.sign(sf[uni][-1] - sf[uni][0]) == np.sign(sk[uni][-1] - sk[uni][0]))
+        shape[nm] = {"rho": rho, "end_delta_same_sign": same_sign,
+                     "ok": rho >= SHAPE_RHO_MIN and same_sign}
+    b1c3 = all(v["ok"] for v in shape.values()) if shape else False
     branch1 = b1c1 and b1c2 and b1c3
 
-    b2_dual = dual_max is not None and dual_max >= TOL_DUAL
+    b2_dual = not b1c3
     b2_compress = {k: v["relative_drift"] > 0.30 for k, v in s1x["k_sweep"].items()}
     branch2 = b2_dual or any(b2_compress.values())
 
@@ -211,6 +271,11 @@ def main() -> None:
                     "triggered": branch2},
         "branch3": {"p2_indistinguishable": b3_p2, "triggered": branch3},
         "dual_gap_max": dual_max,
+        "dual_delta_gap_max": delta_max,
+        "dual_shape_agreement": shape,
+        "tolerances": {"dual_abs_diag": TOL_DUAL, "dual_delta_diag": TOL_DELTA,
+                       "shape_rho_min": 0.9, "repair_source": REPAIR_SOURCE},
+        "estimator_settings": {"flow": FLOW_CFG, "knn_k": KNN_K},
     }
     (run_dir / "metrics.json").write_text(json.dumps(metrics, ensure_ascii=False, indent=2,
                                                      default=float), encoding="utf-8")

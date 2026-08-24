@@ -1,0 +1,22 @@
+# 熵双路修复选型配置（任务六点五 7a，预承诺页分支二）。
+# 真值构造：对逃逸 run 末检查点的潜态后验采样拟合 GMM（密度已知），
+# 熵取高精度 MC（误差量化并报告）。几何匹配哲学同 plan_v2 第 5 节第 1 条：
+# 在与真实问题同结构的分布上校准，不在规整流形上过检。
+truth_sources:            # 两个模板：β 两档各一个逃逸 run
+  - {beta: 1.0, seed: 0}
+  - {beta: 4.0, seed: 0}
+n_fit: 20000              # GMM 拟合样本（末检查点后验采样）
+gmm_components: [8, 16, 32]   # BIC 选阶网格
+truth_mc_n: 2000000       # 真值熵 MC 样本（SE 随报告）
+# 评估口径与 6a/6d 一致：flow 训练 6000/验证 1000，评估 9000
+n_eval_flow_train: 6000
+n_eval_flow_val: 1000
+n_eval: 9000
+n_repeats: 2              # 校准种子 {99,100} 各一遍
+flow_configs:
+  current:  {couplings: 8,  hidden: 64,  epochs: 8,  batch: 1024}
+  boosted:  {couplings: 12, hidden: 128, epochs: 25, batch: 512}
+  heavy:    {couplings: 16, hidden: 128, epochs: 40, batch: 512}
+knn_ks: [1, 4, 8, 16]
+tolerance_safety: 1.5     # 新容差 = 1.5 × 匹配真值上实测最大绝对误差（逐路）
+torch_threads: 10
