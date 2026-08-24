@@ -4,11 +4,15 @@
 （两层 MLP，sigmoid 输出）。循环更新即母论文 Setting 1（系统七元组）
 中的内部更新映射 Ψ；推理轨迹是隐状态 h 的演化。
 
-观测模型与 S1 同为高斯解码器 p(o|h) = N(o; μ_θ(h), σ_dec² I)：o 为
-view² 维局部观测，h 为 GRU 隐状态（潜变量，配置取 16 维），σ_dec 为
-固定标准差，保证 Fisher 度量闭式拉回可用。训练目标为教师强制下的
-下一步观测预测 NLL：h_t = Ψ(h_{t-1}, enc(o_t), a_t)，解码 μ_θ(h_t)
-对 o_{t+1} 计负对数似然。
+观测模型为对角高斯解码器 p(o|h) = N(o; μ_θ(h), diag(σ²))：o 为观测
+向量（双通道时 2·view² 维），h 为 GRU 隐状态（潜变量，配置取 16 维），
+σ² 为固定的逐维方差向量，保证 Fisher 度量闭式拉回可用
+（estimators.metric 支持对角 Σ）。逐通道方差的动机：随机策略数据中
+目标通道稀疏（可见帧约一成、单格），等方差 MSE 下其信号被墙体通道
+淹没，模型学不出目标预测（开发族 dev_v1 战役实测，导航 sanity 0–5%）；
+目标通道取更小的 σ 等效加权，属冻结前的观测模型设计选择，随配置
+记录。训练目标为教师强制下的下一步观测预测 NLL：
+h_t = Ψ(h_{t-1}, enc(o_t), a_t)，解码 μ_θ(h_t) 对 o_{t+1} 计负对数似然。
 """
 from __future__ import annotations
 
@@ -24,7 +28,10 @@ class S2WorldModel(nn.Module):
         embed_dim: int = 32,
         hidden_dim: int = 16,
         sigma_dec: float = 0.2,
+        goal_sigma_dec: float | None = None,
     ):
+        """goal_sigma_dec 非空时观测视为双通道（前半墙体 σ=sigma_dec，
+        后半目标 σ=goal_sigma_dec）；空时各维同方差 sigma_dec。"""
         super().__init__()
         self.encoder = nn.Sequential(nn.Linear(obs_dim, embed_dim), nn.ReLU())
         self.gru = nn.GRUCell(embed_dim + action_dim, hidden_dim)
@@ -33,6 +40,13 @@ class S2WorldModel(nn.Module):
         )
         self.hidden_dim = hidden_dim
         self.sigma_dec = sigma_dec
+        self.goal_sigma_dec = goal_sigma_dec
+        var = torch.full((obs_dim,), sigma_dec**2)
+        if goal_sigma_dec is not None:
+            if obs_dim % 2 != 0:
+                raise ValueError("双通道方差要求观测维数为偶数")
+            var[obs_dim // 2 :] = goal_sigma_dec**2
+        self.register_buffer("obs_var", var)
 
     def decoder_mean(self, h: torch.Tensor) -> torch.Tensor:
         """隐状态 (…, H) → 观测均值 (…, obs_dim)，sigmoid 值域 (0,1)。"""
@@ -62,5 +76,5 @@ class S2WorldModel(nn.Module):
         hs = self.hidden_trajectory(obs, act)  # (E, T, H)
         pred = self.decoder_mean(hs)  # (E, T, obs_dim)
         target = obs[:, 1:]  # o_{t+1}
-        nll = ((target - pred) ** 2).sum(-1) / (2 * self.sigma_dec**2)  # (E, T)
+        nll = (((target - pred) ** 2) / self.obs_var).sum(-1) / 2  # (E, T)
         return {"total": nll.mean(), "mse_per_pixel": ((target - pred) ** 2).mean().detach()}

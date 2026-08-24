@@ -33,7 +33,11 @@ class CEMPlanner:
         n_iters: int = 3,
         gamma: float = 0.95,
         smoothing: float = 0.7,
+        binarize_rollout: bool = True,
     ):
+        """binarize_rollout：闭环推演时把预测观测按 0.5 取整后再送编码器。
+        训练观测是二值的，sigmoid 均值直接回灌造成分布偏移并逐步放大；
+        二值化抑制该偏移（开发族诊断实测缓解项，随配置记录）。"""
         self.model = model
         self.view = view
         self.horizon = horizon
@@ -42,6 +46,7 @@ class CEMPlanner:
         self.n_iters = n_iters
         self.gamma = gamma
         self.smoothing = smoothing
+        self.binarize_rollout = binarize_rollout
 
     def _rollout_cost(
         self, h: torch.Tensor, obs: torch.Tensor, actions: torch.Tensor
@@ -57,8 +62,9 @@ class CEMPlanner:
             a_onehot = torch.nn.functional.one_hot(actions[:, t], num_classes=4).float()
             inp = torch.cat([self.model.encoder(obs_b), a_onehot], dim=-1)
             h_b = self.model.gru(inp, h_b)
-            obs_b = self.model.decoder_mean(h_b)
-            cost = cost - discount * obs_b[:, center]
+            pred = self.model.decoder_mean(h_b)
+            cost = cost - discount * pred[:, center]
+            obs_b = (pred > 0.5).float() if self.binarize_rollout else pred
             discount *= self.gamma
         return cost
 

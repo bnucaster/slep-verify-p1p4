@@ -1,6 +1,6 @@
 # S2（GRU 世界模型 / 网格世界）正式开发族训练配置（M2 描述，任务五 5d）。
 # 双通道观测（墙体 + 目标指示）；种子经 guard.family_seeds("development") 解析。
-campaign: dev_v1
+campaign: dev_v2   # dev_v1（等方差）目标通道未学出（导航 sanity 0–5%），逐通道方差重训
 maze_cells: 8
 view: 5
 obs_dim: 50
@@ -8,6 +8,7 @@ action_dim: 4
 embed_dim: 32
 hidden_dim: 16
 sigma_dec: 0.2
+goal_sigma_dec: 0.04   # 目标通道等效权重 ×25；估计器层的对角 Σ 同步取此向量
 episodes: 500
 episode_len: 64
 train_steps: 6000

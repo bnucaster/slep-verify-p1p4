@@ -92,7 +92,8 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
     log(f"  s{seed} 数据采集完成 {tuple(obs.shape)}（{time.time() - t0:.0f}s）")
 
     model = S2WorldModel(
-        cfg["obs_dim"], cfg["action_dim"], cfg["embed_dim"], cfg["hidden_dim"], cfg["sigma_dec"]
+        cfg["obs_dim"], cfg["action_dim"], cfg["embed_dim"], cfg["hidden_dim"],
+        cfg["sigma_dec"], cfg.get("goal_sigma_dec"),
     )
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["lr"]))
     ckpts = set(checkpoint_steps(cfg))
