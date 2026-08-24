@@ -71,9 +71,12 @@ def test_metric_surrogate_speeds_exact_before_bridge_anisotropic():
     def metric(z):
         return torch.diag(scale).expand(z.shape[0], 6, 6)
 
-    # 构造性质自检：关闭桥修正时，代理逐步度量速率恰为观测度量速率的
-    # 置换（排序后逐项相等）。
-    sur, _ = smooth_random_surrogate_metric(traj, metric, _gen(4), pin_endpoint=False)
+    # 构造性质自检：关闭桥修正与度量地板正则时，代理逐步度量速率恰为
+    # 观测度量速率的置换（排序后逐项相等）。地板是奇异区鲁棒性旋钮，
+    # 会引入 O(floor/λ) 的速率偏差，精确性检验须关。
+    sur, _ = smooth_random_surrogate_metric(
+        traj, metric, _gen(4), pin_endpoint=False, metric_floor_rel=0.0
+    )
     d_obs = traj[1:] - traj[:-1]
     d_sur = sur[1:] - sur[:-1]
     s_obs = torch.einsum("ti,tij,tj->t", d_obs, metric(traj[:-1]), d_obs).sqrt()
