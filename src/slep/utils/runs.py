@@ -35,6 +35,47 @@ def git_state() -> dict[str, object]:
         return {"commit": None, "dirty": None, "error": str(exc)}
 
 
+def create_campaign_dir(stage: str, experiment: str, name: str, config: dict) -> Path:
+    """可续跑的战役目录：results/<stage>/<experiment>/<name>/。
+
+    多 run 训练战役须断点续跑（工程约定：长任务拆小步、每步落盘），
+    时间戳目录做不到跨调用复用。首次创建写 config.json；再次进入时校验
+    config 与既有快照一致（不一致报错，防同名目录混入不同配置的产物）。
+    每次调用都追加一份 meta_<时间戳>.json（git 状态、环境）。
+    """
+    if stage not in {"calibration", "description", "confirmation"}:
+        raise ValueError(f"未知阶段 {stage!r}")
+    campaign = RESULTS_ROOT / stage / experiment / name
+    campaign.mkdir(parents=True, exist_ok=True)
+    cfg_path = campaign / "config.json"
+    snapshot = json.dumps(config, ensure_ascii=False, indent=2, sort_keys=True)
+    if cfg_path.exists():
+        if cfg_path.read_text(encoding="utf-8") != snapshot:
+            raise RuntimeError(
+                f"战役目录 {campaign} 已存在且配置不一致；改配置须换战役名"
+            )
+    else:
+        cfg_path.write_text(snapshot, encoding="utf-8")
+
+    meta = {
+        "git": git_state(),
+        "python": sys.version,
+        "platform": platform.platform(),
+        "argv": sys.argv,
+        "created": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+    }
+    try:
+        import torch
+
+        meta["torch"] = torch.__version__
+    except ImportError:
+        meta["torch"] = None
+    (campaign / f"meta_{time.strftime('%Y%m%d-%H%M%S')}.json").write_text(
+        json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return campaign
+
+
 def create_run_dir(stage: str, experiment: str, config: dict) -> Path:
     """建 results/<stage>/<experiment>/<run_id>/，写 config.json 与 meta.json。
 

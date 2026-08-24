@@ -1,0 +1,28 @@
+# S2（GRU 世界模型 / 网格世界）正式开发族训练配置（M2 描述，任务五 5d）。
+# 双通道观测（墙体 + 目标指示）；种子经 guard.family_seeds("development") 解析。
+campaign: dev_v1
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16
+sigma_dec: 0.2
+episodes: 500
+episode_len: 64
+train_steps: 6000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 200
+checkpoint_log2_until: 512   # 前期对数间隔：1,2,4,…,512
+checkpoint_every: 500        # 后期每 500 步
+holdout_episodes: 64
+seed_family: development
+torch_threads: 6             # 与 S1 战役并行（S1 用 8 线程）
+# 末检查点导航 sanity（只记录；正式 Û 曲线属任务六）
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24
+  planner: {horizon: 12, n_samples: 64, n_elites: 8, n_iters: 3}

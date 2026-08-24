@@ -1,0 +1,20 @@
+# S1（β-VAE / dSprites）正式开发族训练配置（M2 描述，任务五 5b）。
+# plan_v2 第 2 节：潜维 8，β∈{1,4}，Adam 1e-3，密集检查点（前期对数
+# 间隔、后期每 2k 步）。种子经 guard.family_seeds("development") 解析。
+campaign: dev_v1
+data_file: data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz
+packed_cache: data/dsprites_packed.npy
+latent_dim: 8
+sigma_dec: 0.2
+channels: [16, 16, 32, 32]   # 基准档；能力阶梯加档属任务六
+fc_dim: 128
+betas: [1.0, 4.0]
+seed_family: development
+train_steps: 20000
+batch_size: 64
+lr: 1.0e-3
+log_every: 200
+checkpoint_log2_until: 2048  # 前期对数间隔：1,2,4,…,2048
+checkpoint_every: 2000       # 后期每 2k 步
+probe_sanity_n: 5000         # 末检查点因子探针 sanity（只记录；正式 Û 曲线属任务六）
+torch_threads: 8             # 给 S2 训练并行留出线程
