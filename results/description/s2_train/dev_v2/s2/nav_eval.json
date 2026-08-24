@@ -1,0 +1,17 @@
+{
+  "planner": "exhaustive_h1_eps0.2",
+  "n_per_bin": 60,
+  "max_steps": 24,
+  "visible": {
+    "mpc": 0.55,
+    "random": 0.5
+  },
+  "bfs2-4": {
+    "mpc": 0.4166666666666667,
+    "random": 0.21666666666666667
+  },
+  "bfs5-6": {
+    "mpc": 0.05,
+    "random": 0.11666666666666667
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "success_rate": 0.0,
+  "n_mazes": 20,
+  "mean_steps": 24.0,
+  "bfs_band": [
+    2,
+    6
+  ]
+}
