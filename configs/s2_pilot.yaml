@@ -1,0 +1,22 @@
+# S2（GRU 世界模型 / 网格世界）短程试点配置（M1 校准，任务二 2c）。
+# 目的：提取访问隐状态处 ĝ 的谱与各向异性，供几何匹配合成系统（plan_v2 第 5 节第 1 条）。
+# 种子不内联：运行时经 guard.family_seeds 从 configs/seeds.yaml 解析。
+maze_cells: 8          # 迷宫 8×8 单元 → 17×17 栅格
+view: 5                # 局部视野 5×5 → 观测 25 维
+episodes: 400
+episode_len: 64
+obs_dim: 25
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16         # plan_v2 第 2 节：潜维 8–16，取上端
+sigma_dec: 0.2
+train_steps: 2000      # 短程试点；完整训练属任务五
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 100
+runs:
+  - {seed_family: calibration, seed_index: 0}
+  - {seed_family: calibration, seed_index: 1}
+n_spectra_points: 256
+burn_in: 8             # 谱提取剔除回合前 8 步（初始零隐态未入流形）
+holdout_episodes: 64   # 谱提取用的留出回合数（不参与训练批采样）

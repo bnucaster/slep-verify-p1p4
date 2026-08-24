@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "7e2d3f79a553e5579a6eb973e2f538607927ee22",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts\\run_s2_pilot.py"
+  ],
+  "created": "2026-08-24T07:30:11+0100",
+  "torch": "2.13.0+cpu"
+}

@@ -1,0 +1,28 @@
+{
+  "maze_cells": 8,
+  "view": 5,
+  "episodes": 400,
+  "episode_len": 64,
+  "obs_dim": 25,
+  "action_dim": 4,
+  "embed_dim": 32,
+  "hidden_dim": 16,
+  "sigma_dec": 0.2,
+  "train_steps": 2000,
+  "batch_episodes": 32,
+  "lr": 0.001,
+  "log_every": 100,
+  "runs": [
+    {
+      "seed_family": "calibration",
+      "seed_index": 0
+    },
+    {
+      "seed_family": "calibration",
+      "seed_index": 1
+    }
+  ],
+  "n_spectra_points": 256,
+  "burn_in": 8,
+  "holdout_episodes": 64
+}
