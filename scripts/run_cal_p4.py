@@ -1,21 +1,24 @@
-"""CAL-P4：合成校准系统上全链恢复仿射律与真温度（任务二 2e，plan_v2 第 5 节第 2 条）。
+"""CAL-P4：合成校准系统上全链恢复仿射律与真温度（任务二 2e 建立，任务三 3b
+扩展密度三口径，plan_v2 第 5 节第 2 条与第 5 条仪器门分支闭环）。
 
-臂位：
-- main：几何匹配 d=16 系统（2d 产物），多链 Langevin 采样 → 观测生成 →
-  V̂（k 近邻）、p̂（kNN 密度）、ĝ（拉回）、Î（体积校正）→ 仿射拟合 →
-  T̂ = 1/斜率。按两个校准种子各跑一遍（链与观测随机性换种子；系统参数
-  固定为 2d 拟合结果）。
-- exact：同系统、不变测度精确采样（区分离散化偏差与估计器误差）。
-- low_dim：同构造 d=6 系统（维数灾对照，链路正确性的低维见证）。
-- null_control：同源噪声对照——采样分布与势失配（u 空间刚度反序 +
-  中心偏移），V̂ 与 ĝ 共用一套带噪解码器副本；管线不得在此拟出仿射。
-- manipulation：观测噪声 σ_x 扫描（状态与解码器冻结，仅重加噪观测、
-  重算 V̂），对 docs/manipulation_signature.md 的预期签名做数值验证。
+臂位（采样按臂位模拟一次，三种密度口径共用）：
+- main：几何匹配 d=16 系统（2d 产物），两个校准种子各一遍；
+- exact：同系统不变测度精确采样（区分离散化偏差与估计器误差）；
+- low_dim：同构造 d=6 系统（维数灾对照）。
 
-产物 results/calibration/cal_p4/<run_id>/：metrics.json（各臂 T̂、
-lack-of-fit、R²、分半一致性）、tolerance_proposal.json（误差带→P4 容差
-公式化提案，冻结前为提案）、manipulation.json、affine_main.png、
-manipulation.png、log.txt。判定字段不在此产生（judge 属任务七）。
+密度口径（Î = −log p̂ + (1/2)log det ĝ 中 p̂ 的路子）：
+- knn：原坐标 kNN（任务二失败口径，保留作对照）；
+- knn_std：标准化坐标 kNN（潜坐标尺度跨约 3 个量级的对策）；
+- flow：RealNVP 流密度（estimators/flow.py），每臂位在参照集上训练。
+
+另有（用 flow 主口径）：
+- null_control：同源噪声对照——采样与势失配 + 共享带噪解码器，管线
+  不得拟出仿射；
+- manipulation：σ_x 扫描验证 docs/manipulation_signature.md 的签名。
+
+产物 results/calibration/cal_p4/<run_id>/：metrics.json（臂位×口径的
+T̂、lack-of-fit、R²、分半）、tolerance_proposal.json、manipulation.json、
+affine_main.png、manipulation.png、log.txt。判定字段不在此产生。
 
 用法：.venv/Scripts/python.exe scripts/run_cal_p4.py
 """
@@ -31,6 +34,7 @@ import yaml
 from slep import guard
 from slep.estimators import potential
 from slep.estimators.density import log_density_knn
+from slep.estimators.flow import fit_flow_density
 from slep.estimators.metric import fisher_pullback_gaussian_batch
 from slep.protocols.affine import affine_fit_report, split_half_temperature
 from slep.systems.cal_langevin import (
@@ -44,49 +48,14 @@ from slep.utils.runs import REPO_ROOT, create_run_dir
 CONFIG_FILE = REPO_ROOT / "configs" / "cal_p4.yaml"
 
 
-def estimate_chain(
-    system: CalLangevinSystem,
-    z_ref: torch.Tensor,
-    x_ref: torch.Tensor,
-    z_query: torch.Tensor,
-    k_potential: int,
-    k_density: int,
-    chunk: int = 256,
-) -> dict[str, torch.Tensor]:
-    """全链估计：V̂、log p̂、log det ĝ、Î。查询点须不在参照集内。"""
-    v_parts, logp_parts = [], []
-    for i in range(0, z_query.shape[0], chunk):
-        zq = z_query[i : i + chunk]
-        v_parts.append(
-            potential.potential_knn(
-                system.decoder_mean, system.sigma_dec**2, zq, z_ref, x_ref, k=k_potential
-            )
-        )
-        logp_parts.append(log_density_knn(zq, z_ref, k=k_density))
-    v_hat = torch.cat(v_parts)
-    log_p = torch.cat(logp_parts)
-    g = fisher_pullback_gaussian_batch(
-        system.decoder_mean, z_query, system.sigma_dec**2, chunk_size=chunk
-    )
-    logdet = torch.linalg.slogdet(g).logabsdet
-    return {"v_hat": v_hat, "log_p": log_p, "logdet_g": logdet, "i_hat": -log_p + 0.5 * logdet}
-
-
-def run_arm(
-    system: CalLangevinSystem,
-    seed: int,
-    cfg: dict,
-    log,
-    label: str,
-    sampling: str = "chain",
-) -> dict:
-    """一个臂位的完整流程：采样 → 观测 → 估计 → 拟合 → 分半。"""
+def sample_arm(system: CalLangevinSystem, seed: int, cfg: dict, sampling: str) -> dict:
+    """臂位采样：状态、观测与切分索引；密度口径共用。"""
     gen = torch.Generator()
     gen.manual_seed(seed)
     if sampling == "chain":
         z = system.simulate_chains(
             cfg["chains"], cfg["steps"], cfg["dt"], cfg["burn_in"], cfg["thin"], gen
-        )  # (C, m, d)
+        )
         n_chains, m, d = z.shape
         chain_idx = torch.arange(n_chains).unsqueeze(1).expand(n_chains, m).reshape(-1)
         time_idx = torch.arange(m).unsqueeze(0).expand(n_chains, m).reshape(-1)
@@ -97,34 +66,85 @@ def run_arm(
         chain_idx = torch.zeros(z.shape[0], dtype=torch.long)
         time_idx = torch.arange(z.shape[0])
     x = system.sample_observations(z, gen)
-
     perm = torch.randperm(z.shape[0], generator=gen)
-    q_idx, r_idx = perm[: cfg["n_queries"]], perm[cfg["n_queries"] :]
-    est = estimate_chain(
-        system, z[r_idx], x[r_idx], z[q_idx], cfg["k_potential"], cfg["k_density"]
-    )
+    return {
+        "z": z, "x": x, "chain_idx": chain_idx, "time_idx": time_idx,
+        "q_idx": perm[: cfg["n_queries"]], "r_idx": perm[cfg["n_queries"] :],
+        "gen": gen, "seed": seed,
+    }
 
+
+def log_density_by_method(
+    z_ref: torch.Tensor, z_query: torch.Tensor, cfg: dict, method: str, seed: int
+) -> torch.Tensor:
+    if method == "knn":
+        parts = [
+            log_density_knn(z_query[i : i + 256], z_ref, k=cfg["k_density"])
+            for i in range(0, z_query.shape[0], 256)
+        ]
+        return torch.cat(parts)
+    if method == "knn_std":
+        parts = [
+            log_density_knn(z_query[i : i + 256], z_ref, k=cfg["k_density"], standardize=True)
+            for i in range(0, z_query.shape[0], 256)
+        ]
+        return torch.cat(parts)
+    if method == "flow":
+        fcfg = cfg["flow"]
+        n_val = max(z_ref.shape[0] // 10, 1000)
+        fd, _ = fit_flow_density(
+            z_ref[n_val:], z_ref[:n_val], seed=seed,
+            n_couplings=fcfg["couplings"], hidden=fcfg["hidden"],
+            epochs=fcfg["epochs"], batch_size=fcfg["batch"],
+        )
+        return fd.log_prob(z_query)
+    raise ValueError(f"未知密度口径 {method!r}")
+
+
+def estimate_arm(
+    system: CalLangevinSystem, samples: dict, cfg: dict, method: str
+) -> dict[str, torch.Tensor]:
+    """全链估计：V̂、log p̂（按口径）、log det ĝ、Î。"""
+    z, x = samples["z"], samples["x"]
+    q_idx, r_idx = samples["q_idx"], samples["r_idx"]
+    z_ref, x_ref, z_query = z[r_idx], x[r_idx], z[q_idx]
+
+    v_parts = [
+        potential.potential_knn(
+            system.decoder_mean, system.sigma_dec**2,
+            z_query[i : i + 256], z_ref, x_ref, k=cfg["k_potential"],
+        )
+        for i in range(0, z_query.shape[0], 256)
+    ]
+    v_hat = torch.cat(v_parts)
+    log_p = log_density_by_method(z_ref, z_query, cfg, method, samples["seed"])
+    g = fisher_pullback_gaussian_batch(system.decoder_mean, z_query, system.sigma_dec**2)
+    logdet = torch.linalg.slogdet(g).logabsdet
+    return {"v_hat": v_hat, "log_p": log_p, "logdet_g": logdet, "i_hat": -log_p + 0.5 * logdet}
+
+
+def fit_and_report(system, samples: dict, est: dict, cfg: dict, log, label: str) -> dict:
     rep = affine_fit_report(est["v_hat"], est["i_hat"])
     t_true = system.temperature
     rep["t_true"] = t_true
     rep["t_rel_err"] = abs(rep["temperature_hat"] - t_true) / t_true
-    rep["split_time"] = split_half_temperature(
-        est["v_hat"], est["i_hat"], time_idx[q_idx] < time_idx[q_idx].median()
-    )
-    if sampling == "chain":
+    q_idx = samples["q_idx"]
+    time_q = samples["time_idx"][q_idx]
+    rep["split_time"] = split_half_temperature(est["v_hat"], est["i_hat"], time_q < time_q.median())
+    if int(samples["chain_idx"].max()) > 0:
         rep["split_chain"] = split_half_temperature(
-            est["v_hat"], est["i_hat"], chain_idx[q_idx] < cfg["chains"] // 2
+            est["v_hat"], est["i_hat"], samples["chain_idx"][q_idx] < cfg["chains"] // 2
         )
     log(
         f"[{label}] T̂={rep['temperature_hat']:.4f} (真值 {t_true}) "
-        f"相对误差 {rep['t_rel_err']:.1%}, R²={rep['r_squared']:.4f}, "
-        f"lack-of-fit p={rep['p_lack_of_fit']:.3g}, ΔBIC={rep['delta_bic_lin_minus_quad']:.2f}, "
-        f"分半(时间)={rep['split_time']['relative_gap']:.1%}"
+        f"误差 {rep['t_rel_err']:.1%}, R²={rep['r_squared']:.4f}, "
+        f"p={rep['p_lack_of_fit']:.3g}, ΔBIC={rep['delta_bic_lin_minus_quad']:.2f}, "
+        f"分半 {rep['split_time']['relative_gap']:.1%}"
     )
-    return {"report": rep, "est": est, "z": z, "x": x, "q_idx": q_idx, "r_idx": r_idx, "gen": gen}
+    return rep
 
 
-def perturbed_decoder_system(system: CalLangevinSystem, scale: float, gen: torch.Generator) -> CalLangevinSystem:
+def perturbed_decoder_system(system, scale: float, gen: torch.Generator) -> CalLangevinSystem:
     """带噪解码器副本：s 与 B 同一实现噪声，V̂ 与 ĝ 共用（同源噪声注入）。"""
     params = system_to_params(system)
     s = torch.tensor(params["s"], dtype=torch.float64)
@@ -137,13 +157,11 @@ def perturbed_decoder_system(system: CalLangevinSystem, scale: float, gen: torch
     return system_from_params(params)
 
 
-def null_control(system: CalLangevinSystem, seed: int, cfg: dict, log) -> dict:
-    """采样与势失配 + 共享解码器噪声：仿射不得被拟出。"""
+def null_control(system, seed: int, cfg: dict, method: str, log) -> dict:
+    """采样与势失配 + 共享解码器噪声：仿射不得被拟出（主口径）。"""
     gen = torch.Generator()
     gen.manual_seed(seed)
-    nc = cfg["null_control"]
     d = system.latent_dim
-    # u 空间刚度反序 + 中心偏移的高斯（与势的 Boltzmann 测度失配）
     w_scr = torch.flip(system.well_w, dims=[0])
     std = torch.sqrt(system.temperature / w_scr)
     offset = 0.8 * torch.ones(d, dtype=torch.float64)
@@ -152,25 +170,27 @@ def null_control(system: CalLangevinSystem, seed: int, cfg: dict, log) -> dict:
     z = system.z_of_u(u)
     x = system.sample_observations(z, gen)
 
-    est_system = perturbed_decoder_system(system, nc["decoder_noise_scale"], gen)
+    est_system = perturbed_decoder_system(system, cfg["null_control"]["decoder_noise_scale"], gen)
     perm = torch.randperm(z.shape[0], generator=gen)
-    q_idx, r_idx = perm[: cfg["n_queries"]], perm[cfg["n_queries"] :]
-    est = estimate_chain(
-        est_system, z[r_idx], x[r_idx], z[q_idx], cfg["k_potential"], cfg["k_density"]
-    )
+    samples = {
+        "z": z, "x": x, "chain_idx": torch.zeros(z.shape[0], dtype=torch.long),
+        "time_idx": torch.arange(z.shape[0]),
+        "q_idx": perm[: cfg["n_queries"]], "r_idx": perm[cfg["n_queries"] :],
+        "gen": gen, "seed": seed,
+    }
+    est = estimate_arm(est_system, samples, cfg, method)
     rep = affine_fit_report(est["v_hat"], est["i_hat"])
     log(
-        f"[null] R²={rep['r_squared']:.4f}, lack-of-fit p={rep['p_lack_of_fit']:.3g}, "
+        f"[null|{method}] R²={rep['r_squared']:.4f}, p={rep['p_lack_of_fit']:.3g}, "
         f"ΔBIC={rep['delta_bic_lin_minus_quad']:.2f}（期望：拒绝仿射或低 R²）"
     )
     return rep
 
 
-def manipulation_sweep(system: CalLangevinSystem, arm: dict, cfg: dict, log) -> dict:
-    """σ_x 扫描：状态冻结、观测重加噪、只重算 V̂；对签名推导做数值验证。"""
-    z, q_idx, r_idx, gen = arm["z"], arm["q_idx"], arm["r_idx"], arm["gen"]
-    i_hat = arm["est"]["i_hat"]
-    base = arm["report"]
+def manipulation_sweep(system, samples: dict, est_base: dict, base_rep: dict, cfg: dict, log) -> dict:
+    """σ_x 扫描：状态冻结、观测重加噪、只重算 V̂（签名数值验证）。"""
+    z, q_idx, r_idx, gen = samples["z"], samples["q_idx"], samples["r_idx"], samples["gen"]
+    i_hat = est_base["i_hat"]
     d_obs = system.obs_dim
     rows = []
     v_true_q = system.potential_estimand(z[q_idx])
@@ -178,18 +198,15 @@ def manipulation_sweep(system: CalLangevinSystem, arm: dict, cfg: dict, log) -> 
     for sigma_x in cfg["sigma_x_sweep"]:
         sys_x = system_from_params({**system_to_params(system), "sigma_x": sigma_x})
         x_new = sys_x.sample_observations(z, gen)
-        v_parts = []
-        for i in range(0, q_idx.shape[0], 256):
-            zq = z[q_idx][i : i + 256]
-            v_parts.append(
-                potential.potential_knn(
-                    system.decoder_mean, system.sigma_dec**2, zq, z[r_idx],
-                    x_new[r_idx], k=cfg["k_potential"],
-                )
+        v_parts = [
+            potential.potential_knn(
+                system.decoder_mean, system.sigma_dec**2,
+                z[q_idx][i : i + 256], z[r_idx], x_new[r_idx], k=cfg["k_potential"],
             )
+            for i in range(0, q_idx.shape[0], 256)
+        ]
         v_hat = torch.cat(v_parts)
         rep = affine_fit_report(v_hat, i_hat)
-        # 预期截距/均值移动 Δ 与斜率衰减 λ（docs/manipulation_signature.md）
         delta_pred = d_obs * (sigma_x**2 - system.sigma_x**2) / (2 * system.sigma_dec**2)
         e_msq = 2 * system.sigma_dec**2 * system.potential_dyn(z[q_idx])
         var_noise = float(
@@ -201,7 +218,7 @@ def manipulation_sweep(system: CalLangevinSystem, arm: dict, cfg: dict, log) -> 
                 "sigma_x": sigma_x,
                 "t_hat": rep["temperature_hat"],
                 "t_pred_attenuation": system.temperature / lam,
-                "v_mean_shift_measured": float(v_hat.mean() - arm["est"]["v_hat"].mean()),
+                "v_mean_shift_measured": float(v_hat.mean() - est_base["v_hat"].mean()),
                 "v_mean_shift_pred": delta_pred,
                 "slope": rep["slope"],
                 "r_squared": rep["r_squared"],
@@ -213,10 +230,10 @@ def manipulation_sweep(system: CalLangevinSystem, arm: dict, cfg: dict, log) -> 
             f"(衰减预测 {system.temperature / lam:.4f}), "
             f"V̂ 移动 {rows[-1]['v_mean_shift_measured']:.3f} (预测 {delta_pred:.3f})"
         )
-    return {"base_t_hat": base["temperature_hat"], "sweep": rows}
+    return {"base_t_hat": base_rep["temperature_hat"], "sweep": rows}
 
 
-def plot_affine(arm: dict, path, t_true: float) -> None:
+def plot_affine(est: dict, rep: dict, path, t_true: float, subtitle: str) -> None:
     import matplotlib
 
     matplotlib.use("Agg")
@@ -225,9 +242,8 @@ def plot_affine(arm: dict, path, t_true: float) -> None:
     plt.rcParams["font.family"] = ["Microsoft YaHei", "SimHei", "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
     surface, ink, ink2, muted = "#fcfcfb", "#0b0b0b", "#52514e", "#898781"
-    v = arm["est"]["v_hat"].numpy()
-    i = arm["est"]["i_hat"].numpy()
-    rep = arm["report"]
+    v = est["v_hat"].numpy()
+    i = est["i_hat"].numpy()
 
     fig, ax = plt.subplots(figsize=(7.2, 4.6), dpi=150)
     fig.patch.set_facecolor(surface)
@@ -238,7 +254,7 @@ def plot_affine(arm: dict, path, t_true: float) -> None:
             label=f"拟合斜率 {rep['slope']:.3f} → T̂={rep['temperature_hat']:.3f}（真值 {t_true}）")
     ax.set_xlabel("V̂（nats）", color=ink2)
     ax.set_ylabel("Î（体积校正后，nats）", color=ink2)
-    ax.set_title("CAL-P4 主臂：Î–V̂ 散点与仿射拟合", color=ink, fontsize=11)
+    ax.set_title(f"CAL-P4 主臂：Î–V̂ 散点与仿射拟合（{subtitle}）", color=ink, fontsize=11)
     ax.grid(True, color=muted, alpha=0.2, linewidth=0.6)
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
@@ -298,19 +314,20 @@ def main() -> None:
     seeds = guard.family_seeds(cfg["seed_family"], purpose="cal-p4")
     params = json.loads((REPO_ROOT / cfg["matched_system"]).read_text(encoding="utf-8"))
     system = system_from_params(params)
-    metrics: dict = {"matched_system": cfg["matched_system"], "arms": {}}
+    methods = cfg["density_methods"]
+    primary = cfg["primary_density_method"]
+    metrics: dict = {
+        "matched_system": cfg["matched_system"],
+        "density_methods": methods,
+        "primary_density_method": primary,
+        "arms": {},
+    }
 
-    main_arms = {}
+    # 低维对照系统
+    arms: list[tuple[str, CalLangevinSystem, dict]] = []
     for seed in seeds:
-        arm = run_arm(system, seed, cfg, log, label=f"main-seed{seed}")
-        main_arms[seed] = arm
-        metrics["arms"][f"main_seed{seed}"] = {
-            k: v for k, v in arm["report"].items() if not isinstance(v, torch.Tensor)
-        }
-
-    arm_exact = run_arm(system, seeds[0], cfg, log, label="exact", sampling="exact")
-    metrics["arms"]["exact"] = arm_exact["report"]
-
+        arms.append((f"main-seed{seed}", system, sample_arm(system, seed, cfg, "chain")))
+    arms.append(("exact", system, sample_arm(system, seeds[0], cfg, "exact")))
     if cfg["low_dim_arm"]["enabled"]:
         gen = torch.Generator()
         gen.manual_seed(seeds[0])
@@ -321,20 +338,27 @@ def main() -> None:
             la["target_eig"], la["target_logdet_std"], la["obs_dim"],
             system.sigma_dec, system.sigma_x, well_w, system.temperature, gen,
         )
-        arm_low = run_arm(low_system, seeds[0], cfg, log, label="low-dim(d=6)")
-        metrics["arms"]["low_dim"] = arm_low["report"]
+        arms.append(("low-dim(d=6)", low_system, sample_arm(low_system, seeds[0], cfg, "chain")))
 
-    metrics["null_control"] = null_control(system, seeds[0], cfg, log)
-    manip = manipulation_sweep(system, main_arms[seeds[0]], cfg, log)
+    primary_main_est, primary_main_rep, primary_main_samples = None, None, None
+    for label, arm_system, samples in arms:
+        for method in methods:
+            est = estimate_arm(arm_system, samples, cfg, method)
+            rep = fit_and_report(arm_system, samples, est, cfg, log, f"{label}|{method}")
+            metrics["arms"][f"{label}|{method}"] = rep
+            if label == f"main-seed{seeds[0]}" and method == primary:
+                primary_main_est, primary_main_rep, primary_main_samples = est, rep, samples
+
+    metrics["null_control"] = null_control(system, seeds[0], cfg, primary, log)
+    manip = manipulation_sweep(system, primary_main_samples, primary_main_est, primary_main_rep, cfg, log)
     (run_dir / "manipulation.json").write_text(
         json.dumps(manip, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
     rel_errs = {
-        name: arm["t_rel_err"]
-        for name, arm in metrics["arms"].items()
-        if "t_rel_err" in arm
+        name: arm["t_rel_err"] for name, arm in metrics["arms"].items() if "t_rel_err" in arm
     }
+    primary_errs = {k: v for k, v in rel_errs.items() if k.endswith(f"|{primary}")}
     tolerance = {
         "observed_t_rel_err": rel_errs,
         "observed_split_time_gap": {
@@ -344,9 +368,10 @@ def main() -> None:
         },
         "observed_r_squared": {name: arm["r_squared"] for name, arm in metrics["arms"].items()},
         "proposal": {
-            "t_rel_err_tolerance": 2.0 * max(rel_errs.values()),
+            "based_on_method": primary,
+            "t_rel_err_tolerance": 2.0 * max(primary_errs.values()),
             "derivation": (
-                "容差 = 2 × 校准各臂位最大相对误差（安全系数 2 为提案值，"
+                "容差 = 2 × 主口径各臂位最大相对误差（安全系数 2 为提案值，"
                 "冻结前与描述阶段种子间方差合并复核；plan_v2 第 5 节第 2 条）"
             ),
             "status": "提案：待任务四仪器门总验收与任务七冻结",
@@ -358,7 +383,10 @@ def main() -> None:
     (run_dir / "metrics.json").write_text(
         json.dumps(metrics, ensure_ascii=False, indent=2, default=float), encoding="utf-8"
     )
-    plot_affine(main_arms[seeds[0]], run_dir / "affine_main.png", system.temperature)
+    plot_affine(
+        primary_main_est, primary_main_rep, run_dir / "affine_main.png",
+        system.temperature, f"密度口径 {primary}",
+    )
     plot_manipulation(manip, system.sigma_x, run_dir / "manipulation.png")
     (run_dir / "log.txt").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
     log(f"产物已写入 {run_dir}")

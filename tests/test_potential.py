@@ -112,6 +112,36 @@ def test_knn_recovers_true_potential(system_and_data, z_query):
     assert torch.all(exceed <= 0), f"超出恢复容差的量:\n{exceed}"
 
 
+def test_knn_standardized_neighborhood_equals_manual_whitening(system_and_data, z_query):
+    """标准化邻域口径的机械等价性：与手工白化输入后的普通口径同邻居同值。
+
+    （标准化只改邻居选取，NLL 计算不变；其对极端各向异性几何的效果在
+    CAL-P4 产物中量化，见 results/calibration/cal_p4/。）
+    """
+    system, z_ref, x_ref = system_and_data
+    scales = torch.tensor([50.0, 1.0], dtype=torch.float64)
+    zq_s, zr_s = z_query * scales, z_ref * scales
+
+    def decoder_mean_scaled(z):
+        return system.decoder_mean(z / scales)
+
+    v_std, info_std = potential.potential_knn(
+        decoder_mean_scaled, SIGMA_DEC**2, zq_s, zr_s, x_ref, k=K,
+        return_info=True, standardize=True,
+    )
+    mean, std = zr_s.mean(dim=0), zr_s.std(dim=0).clamp_min(1e-12)
+
+    def decoder_mean_white(zw):
+        return decoder_mean_scaled(zw * std + mean)
+
+    v_man, info_man = potential.potential_knn(
+        decoder_mean_white, SIGMA_DEC**2, (zq_s - mean) / std, (zr_s - mean) / std, x_ref,
+        k=K, return_info=True,
+    )
+    assert torch.equal(info_std["indices"], info_man["indices"])
+    assert torch.allclose(v_std, v_man, rtol=1e-12)
+
+
 def test_weighted_matches_oracle_within_noise(system_and_data, z_query):
     system, z_ref, x_ref = system_and_data
     v_hat, info = potential.potential_posterior_weighted(

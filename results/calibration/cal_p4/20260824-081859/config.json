@@ -1,0 +1,45 @@
+{
+  "matched_system": "results/calibration/geometry_match/20260824-075955/matched_s2.json",
+  "seed_family": "calibration",
+  "chains": 8,
+  "steps": 200000,
+  "dt": 0.05,
+  "burn_in": 5000,
+  "thin": 25,
+  "n_queries": 4000,
+  "k_potential": 32,
+  "k_density": 64,
+  "density_methods": [
+    "knn",
+    "knn_std",
+    "flow"
+  ],
+  "primary_density_method": "flow",
+  "flow": {
+    "couplings": 10,
+    "hidden": 128,
+    "epochs": 15,
+    "batch": 1024
+  },
+  "low_dim_arm": {
+    "enabled": true,
+    "target_eig": [
+      0.05,
+      0.4,
+      3.0,
+      20.0,
+      120.0,
+      600.0
+    ],
+    "target_logdet_std": 2.0,
+    "obs_dim": 16
+  },
+  "null_control": {
+    "decoder_noise_scale": 0.05
+  },
+  "sigma_x_sweep": [
+    0.05,
+    0.15,
+    0.3
+  ]
+}

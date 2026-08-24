@@ -1,0 +1,50 @@
+{
+  "observed_t_rel_err": {
+    "main-seed99|knn": 0.32956073276855813,
+    "main-seed99|knn_std": 0.29028423765357125,
+    "main-seed99|flow": 0.026111817952258698,
+    "main-seed100|knn": 0.266032830989523,
+    "main-seed100|knn_std": 0.25228944390330144,
+    "main-seed100|flow": 0.012123267171943564,
+    "exact|knn": 0.20835285134988757,
+    "exact|knn_std": 0.19280776206761807,
+    "exact|flow": 0.06029976354145605,
+    "low-dim(d=6)|knn": 0.2469244234828889,
+    "low-dim(d=6)|knn_std": 0.256978085980486,
+    "low-dim(d=6)|flow": 0.21158209732352418
+  },
+  "observed_split_time_gap": {
+    "main-seed99|knn": 0.02185306579657383,
+    "main-seed99|knn_std": 0.037644103903626304,
+    "main-seed99|flow": 0.041198084969305805,
+    "main-seed100|knn": 0.015234887231538924,
+    "main-seed100|knn_std": 0.010416811742588048,
+    "main-seed100|flow": 0.03738449912308093,
+    "exact|knn": 0.06229563456175255,
+    "exact|knn_std": 0.050006611417774044,
+    "exact|flow": 0.07550797533183008,
+    "low-dim(d=6)|knn": 0.04045191236181875,
+    "low-dim(d=6)|knn_std": 0.03089836356117006,
+    "low-dim(d=6)|flow": 0.01186830029661889
+  },
+  "observed_r_squared": {
+    "main-seed99|knn": 0.1731676404717437,
+    "main-seed99|knn_std": 0.2025961603048545,
+    "main-seed99|flow": 0.405075567335238,
+    "main-seed100|knn": 0.18497609203744703,
+    "main-seed100|knn_std": 0.20934279429708103,
+    "main-seed100|flow": 0.4198835686285567,
+    "exact|knn": 0.19047854697017497,
+    "exact|knn_std": 0.21880878357899824,
+    "exact|flow": 0.3149755891528878,
+    "low-dim(d=6)|knn": 0.759612028140825,
+    "low-dim(d=6)|knn_std": 0.7454408104867936,
+    "low-dim(d=6)|flow": 0.6711611700157096
+  },
+  "proposal": {
+    "based_on_method": "flow",
+    "t_rel_err_tolerance": 0.42316419464704835,
+    "derivation": "容差 = 2 × 主口径各臂位最大相对误差（安全系数 2 为提案值，冻结前与描述阶段种子间方差合并复核；plan_v2 第 5 节第 2 条）",
+    "status": "提案：待任务四仪器门总验收与任务七冻结"
+  }
+}

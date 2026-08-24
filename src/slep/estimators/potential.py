@@ -60,18 +60,31 @@ def potential_knn(
     x_ref: torch.Tensor,
     k: int,
     return_info: bool = False,
+    standardize: bool = False,
 ) -> torch.Tensor | tuple[torch.Tensor, dict[str, torch.Tensor]]:
     """主操作化：潜空间 k 近邻球上解码 NLL 的均值。
 
     z_query 形状 (q, d)；z_ref 形状 (N, d)；x_ref 形状 (N, D)，与 z_ref 逐行
     对应。decoder_mean 须支持批量输入（(q, d) → (q, D)）。返回 (q,) 的 V̂。
 
+    standardize 置真时近邻按逐维标准化坐标选取（NLL 的计算不变，只改
+    邻居是谁）。度量各向异性极端时（校准实测条件数达 10^4 以上），
+    欧氏邻域会在陡方向取到度量意义上很远的邻居，把势场量程向均值
+    压缩；标准化邻域是 docs/plan_v2.md 第 4 节预告的度量感知邻域的
+    第一档操作化，其效果在 CAL-P4 产物中量化。
+
     return_info 为真时附带诊断字典：indices（(q, k) 近邻下标）、
-    radius（(q,) 第 k 近邻距离，供支撑度诊断与自检误差界使用）。
+    radius（(q,) 第 k 近邻距离；标准化口径下为标准化坐标距离，供
+    支撑度诊断与自检误差界使用）。
     """
     if not 1 <= k <= z_ref.shape[0]:
         raise ValueError(f"k={k} 超出参照集大小 {z_ref.shape[0]}")
-    dists = torch.cdist(z_query, z_ref)  # (q, N)
+    if standardize:
+        mean = z_ref.mean(dim=0)
+        std = z_ref.std(dim=0).clamp_min(1e-12)
+        dists = torch.cdist((z_query - mean) / std, (z_ref - mean) / std)  # (q, N)
+    else:
+        dists = torch.cdist(z_query, z_ref)  # (q, N)
     knn = dists.topk(k, dim=-1, largest=False)
     idx = knn.indices  # (q, k)
     mu_q = decoder_mean(z_query)  # (q, D)

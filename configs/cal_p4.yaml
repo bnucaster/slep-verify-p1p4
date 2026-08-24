@@ -11,6 +11,13 @@ thin: 25              # 每链保留 (steps−burn_in)/thin ≈ 7800 → 总样�
 n_queries: 4000
 k_potential: 32
 k_density: 64
+density_methods: [knn, knn_std, flow]   # 任务三 3b：三口径对比（knn 为任务二失败口径，保留作对照）
+primary_density_method: flow            # 主口径：对照与操纵扫描用
+flow:
+  couplings: 10
+  hidden: 128
+  epochs: 15
+  batch: 1024
 low_dim_arm:
   enabled: true
   target_eig: [0.05, 0.4, 3.0, 20.0, 120.0, 600.0]  # 维数灾对照臂（d=6）的谱目标，量级取 S1 试点范围
