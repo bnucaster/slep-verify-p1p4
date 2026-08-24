@@ -1,0 +1,50 @@
+{
+  "horizon": 400,
+  "u_max": 0.8,
+  "curves": {
+    "exp_fast": {
+      "kind": "exp",
+      "tau": 40,
+      "group": "two_phase"
+    },
+    "exp_slow": {
+      "kind": "exp",
+      "tau": 100,
+      "group": "two_phase"
+    },
+    "logistic": {
+      "kind": "logistic",
+      "center": 120,
+      "scale": 25,
+      "group": "two_phase"
+    },
+    "piecewise": {
+      "kind": "piecewise",
+      "knee": 150,
+      "group": "two_phase"
+    },
+    "linear": {
+      "kind": "linear",
+      "group": "no_plateau"
+    },
+    "powerlaw": {
+      "kind": "powerlaw",
+      "exponent": 0.3,
+      "group": "borderline"
+    }
+  },
+  "noise_sigmas": [
+    0.005,
+    0.01,
+    0.02,
+    0.04
+  ],
+  "windows": [
+    10,
+    20,
+    30,
+    40
+  ],
+  "replicas": 200,
+  "seed_family": "calibration"
+}

@@ -1,0 +1,8 @@
+run_dir: D:\PythonProjects\slep-verify\slep-p1p4\results\calibration\cal_p1\20260824-085526
+曲线 exp_fast（two_phase）完成
+曲线 exp_slow（two_phase）完成
+曲线 logistic（two_phase）完成
+曲线 piecewise（two_phase）完成
+曲线 linear（no_plateau）完成
+曲线 powerlaw（borderline）完成
+选择表: {"0.005": {"window": 10, "worst_two_phase_err_q90": 80.99999999999994}, "0.01": null, "0.02": null, "0.04": null}

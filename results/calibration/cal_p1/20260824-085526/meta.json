@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "285b5ed5c8ed11aebcb99853f445f591e434d09c",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts\\run_cal_p1.py"
+  ],
+  "created": "2026-08-24T08:55:27+0100",
+  "torch": "2.13.0+cpu"
+}
