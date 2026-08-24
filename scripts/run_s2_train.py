@@ -98,10 +98,25 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["lr"]))
     ckpts = set(checkpoint_steps(cfg))
 
-    with open(run_dir / "losses.csv", "w", newline="", encoding="utf-8") as f:
+    # 段内断点续训（环境后台命令存在 15-60 分钟终止窗口）：resume.pt 随
+    # 检查点滚动保存 模型+优化器+numpy RNG 状态；数据采集用种子流确定性
+    # 重放，训练态 RNG 从保存点恢复。
+    resume_path = run_dir / "resume.pt"
+    start_step = 0
+    if resume_path.exists():
+        payload = torch.load(resume_path, weights_only=False)
+        model.load_state_dict(payload["model"])
+        opt.load_state_dict(payload["opt"])
+        rng.bit_generator.state = payload["np_rng_state"]
+        start_step = payload["step"]
+        log(f"  s{seed} 续训自 step {start_step}")
+
+    mode = "a" if start_step > 0 else "w"
+    with open(run_dir / "losses.csv", mode, newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["step", "total", "mse_per_pixel", "holdout_total"])
-        for step in range(1, cfg["train_steps"] + 1):
+        if start_step == 0:
+            writer.writerow(["step", "total", "mse_per_pixel", "holdout_total"])
+        for step in range(start_step + 1, cfg["train_steps"] + 1):
             idx = rng.integers(0, obs_train.shape[0], size=cfg["batch_episodes"])
             out = model.rollout_loss(obs_train[idx], act_train[idx])
             opt.zero_grad()
@@ -118,6 +133,11 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
                 torch.save(
                     {"model": model.state_dict(), "step": step, "seed": seed},
                     ckpt_dir / f"ckpt_{step:06d}.pt",
+                )
+                torch.save(
+                    {"model": model.state_dict(), "opt": opt.state_dict(), "step": step,
+                     "np_rng_state": rng.bit_generator.state},
+                    resume_path,
                 )
             if step % 2000 == 0:
                 log(

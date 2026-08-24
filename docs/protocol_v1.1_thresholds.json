@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "status": "冻结前草案（与 protocol_v1.1_draft.md 同时冻结；judge 只读本文件取数）",
+    "provenance_rule": "每个数值的推导与产物路径见 protocol_v1.1_draft.md 第 1 节阈值来源表",
+    "pending": ["capability_gate.s2_nav_success_min", "plateau.s2_window"]
+  },
+  "capability_gate": {
+    "s1_u_composite_min": 0.45,
+    "s2_nav_success_min": null,
+    "s2_nav_random_margin": null
+  },
+  "geometry_gate": {
+    "log10_cond_median_max": 6.0,
+    "participation_dim_median_min": 1.5
+  },
+  "stationarity_gate": {
+    "rhat_max": 1.05,
+    "n_chains_min": 4
+  },
+  "geodesic": {
+    "solver_residual_max": 0.003,
+    "uniqueness_energy_gap_min": 0.05,
+    "uniqueness_spread_min": 0.028,
+    "deviation_min_effect": 0.0125,
+    "mannwhitney_p_max": 0.01,
+    "certified_pairs_min": 8
+  },
+  "support_exclusion": {
+    "radius_quantile": 0.99
+  },
+  "plateau": {
+    "theta_rel_slope": 0.01,
+    "consecutive_windows": 3,
+    "s1_window": 3,
+    "s2_window": null,
+    "sigma_u_rule": "σ_Û ≤ θ·sqrt(W)/(3·sqrt(12))，未满足记数据条件不足（未构成检验）"
+  },
+  "p1": {
+    "s_drop_band_multiplier": 2.0,
+    "peak_window_rule": "效用峰值点 = 滑窗(W)均值最大的窗末检查点；分析窗口 = [峰值点, min(2×峰值点, 训练总长)]",
+    "dual_shape_rho_min": 0.9
+  },
+  "p2": {
+    "frac_below_q1_min": 0.75,
+    "n_surrogates_min": 50,
+    "n_traj_min": 1000,
+    "surrogate_kind": "metric",
+    "ablation_wilcoxon_p_max": 0.01,
+    "novelty_logistic_p_max": 0.01
+  },
+  "p4": {
+    "lack_of_fit_p_min": 0.05,
+    "delta_bic_max": 2.0,
+    "r2_min": 0.25,
+    "curvature_effect_ratio_max": 0.17,
+    "t_split_half_rel_max": 0.20,
+    "t_rel_err_context": 0.12,
+    "density_primary": "flow_boosted",
+    "flow_config": {"couplings": 12, "hidden": 128, "epochs": 25, "batch": 512}
+  }
+}

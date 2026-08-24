@@ -1,19 +1,21 @@
-"""S2 效用曲线探测（任务八，选项 4）：逐检查点导航成功率的形状。
+"""S2 效用曲线探测（任务八建立，八点五 8.5b 改确定性口径）。
 
-目的：判断 S2 是否存在效用平台（S1 实测为峰后缓降、无平台），供 P1
-平台前提的协议层决策（选项 2/3）参考。探测口径，非冻结判定：
+口径（可预注册的操作化）：
 
-- 每种子固定 80 个评估任务（迷宫 + 起点 + BFS 2–6 目标），跨检查点
-  配对复用——差异只来自模型，配对设计压方差；
-- 检查点取均匀段全部（每 500 步共 12 个）加早期 {1, 32, 256}；
-- 定稿规划器（穷举视界 1 + ε）；成功率的种子池化曲线附二项标准误。
+- 每种子固定 n_tasks 个评估任务（迷宫 + 起点 + BFS 2–6 目标），跨
+  检查点配对复用；
+- 逐任务固定随机流：规划器的随机数生成器按（种子, 任务号）播种、与
+  检查点无关——同一任务在所有检查点经历同一随机序列，U(检查点) 成为
+  模型的确定函数，σ_Û（重复噪声）为零，平台检测器直接适用；固定
+  任务清单的抽样偏差是常数偏移，不影响形状与平台判定；
+- 检查点取均匀段全部加早期 {1, 32, 256}；定稿规划器（穷举视界 1 + ε）。
 
-细粒度缓存：逐（种子 × 检查点）落 cache/。产物
-results/description/s2_u_curve/<campaign>/：curves.csv、summary.json、
-u_curve.png。
+汇总含冻结版平台检测器（W 见 PLATEAU_W）在种子池化曲线均匀段上的
+判定。细粒度缓存逐（种子 × 检查点）。产物
+results/description/s2_u_curve/<campaign>/。
 
-用法：.venv/Scripts/python.exe scripts/probe_s2_u_curve.py [--seed N]
-（--seed 只算一个种子，供分块执行）
+用法：.venv/Scripts/python.exe scripts/probe_s2_u_curve.py
+  [--config configs/s2_train_long.yaml] [--seed N]
 """
 from __future__ import annotations
 
@@ -27,16 +29,21 @@ import torch
 import yaml
 
 from slep import guard
+from slep.protocols.plateau import detect_plateau
 from slep.systems import s2_gridworld as gw
 from slep.systems.s2_planner import ExhaustiveMPCPlanner, mpc_episode
 from slep.systems.s2_world_model import S2WorldModel
 from slep.utils.runs import REPO_ROOT, create_campaign_dir
 
-CFG_TRAIN = yaml.safe_load((REPO_ROOT / "configs" / "s2_train.yaml").read_text(encoding="utf-8"))
-N_TASKS = 80
+_cfg_file = "configs/s2_train.yaml"
+if "--config" in sys.argv:
+    _cfg_file = sys.argv[sys.argv.index("--config") + 1]
+CFG_TRAIN = yaml.safe_load((REPO_ROOT / _cfg_file).read_text(encoding="utf-8"))
+N_TASKS = 160
 MAX_STEPS = 24
 EARLY_STEPS = [1, 32, 256]
 BFS_BAND = (2, 6)
+PLATEAU_W = 3
 
 
 def eval_steps() -> list[int]:
@@ -95,10 +102,10 @@ def main() -> None:
             t0 = time.time()
             model = load_model(seed, step)
             planner = ExhaustiveMPCPlanner(model, view=CFG_TRAIN["view"])
-            gen = torch.Generator()
-            gen.manual_seed(seed * 131 + step)
             succ = 0
-            for maze, start, goal in tasks:
+            for ti, (maze, start, goal) in enumerate(tasks):
+                gen = torch.Generator()
+                gen.manual_seed(seed * 100_003 + ti)  # 逐任务固定流，与检查点无关
                 env = gw.GridWorld(maze.copy(), start, CFG_TRAIN["view"], goal)
                 succ += int(mpc_episode(model, env, planner, MAX_STEPS, gen)["success"])
             cache.write_text(json.dumps({"success": succ, "n": N_TASKS}), encoding="utf-8")
@@ -129,13 +136,22 @@ def main() -> None:
     uni = [r for r in rows if r["step"] % CFG_TRAIN["checkpoint_every"] == 0]
     peak = max(uni, key=lambda r: r["pooled"])
     tail = uni[-3:]
+    plat = detect_plateau(
+        torch.tensor([r["pooled"] for r in uni], dtype=torch.float64), window=PLATEAU_W
+    )
+    plat_step = (
+        int(uni[plat["plateau_index"] - 1]["step"]) if plat["plateau_index"] is not None else None
+    )
     summary = {
         "pooled_curve": [(r["step"], round(r["pooled"], 4)) for r in rows],
         "uniform_peak": {"step": peak["step"], "pooled": peak["pooled"]},
         "tail_mean_last3": float(np.mean([r["pooled"] for r in tail])),
         "peak_minus_tail": peak["pooled"] - float(np.mean([r["pooled"] for r in tail])),
         "se_binomial_pooled": rows[-1]["se_binomial"],
-        "note": "探测口径（80 任务/种子，配对清单）；平台判定的正式数据条件见 CAL-P1",
+        "plateau_w": PLATEAU_W,
+        "plateau_step_pooled": plat_step,
+        "note": "确定性口径（逐任务固定随机流）：σ_Û 重复噪声为零，二项标准误"
+                "只反映固定清单的抽样偏移；平台检测在种子池化均匀段上执行",
     }
     (campaign / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2),
                                            encoding="utf-8")
