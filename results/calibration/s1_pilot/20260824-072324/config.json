@@ -1,0 +1,31 @@
+{
+  "data_file": "data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz",
+  "packed_cache": "data/dsprites_packed.npy",
+  "latent_dim": 8,
+  "sigma_dec": 0.2,
+  "channels": [
+    16,
+    16,
+    32,
+    32
+  ],
+  "fc_dim": 128,
+  "runs": [
+    {
+      "beta": 1.0,
+      "seed_family": "calibration",
+      "seed_index": 0
+    },
+    {
+      "beta": 4.0,
+      "seed_family": "calibration",
+      "seed_index": 1
+    }
+  ],
+  "train_steps": 2500,
+  "batch_size": 64,
+  "lr": 0.001,
+  "log_every": 100,
+  "n_encode_for_spectra": 4096,
+  "n_spectra_points": 256
+}

@@ -1,0 +1,18 @@
+# S1（β-VAE / dSprites）短程试点配置（M1 校准，任务二 2b）。
+# 目的：提取访问潜点处 ĝ 的谱与各向异性，供几何匹配合成系统（plan_v2 第 5 节第 1 条）。
+# 种子不内联：只写分族名与下标，运行时经 guard.family_seeds 从 configs/seeds.yaml 解析。
+data_file: data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz
+packed_cache: data/dsprites_packed.npy
+latent_dim: 8            # plan_v2 第 2 节：S1 潜维 8
+sigma_dec: 0.2           # 高斯解码器固定标准差；ĝ 闭式拉回的前提（度量整体尺度随 1/σ²，谱形不受影响）
+channels: [16, 16, 32, 32]
+fc_dim: 128
+runs:
+  - {beta: 1.0, seed_family: calibration, seed_index: 0}
+  - {beta: 4.0, seed_family: calibration, seed_index: 1}
+train_steps: 2500        # 短程试点；完整训练属任务五
+batch_size: 64
+lr: 1.0e-3               # plan_v2 第 2 节：Adam 1e-3
+log_every: 100
+n_encode_for_spectra: 4096
+n_spectra_points: 256

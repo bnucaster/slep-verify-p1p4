@@ -1,0 +1,20 @@
+run_dir: D:\PythonProjects\slep-verify\slep-p1p4\results\calibration\s1_pilot\20260824-072324
+数据集: 737280 张图（位打包缓存）
+run: {'beta': 1.0, 'seed_family': 'calibration', 'seed_index': 0}
+  beta=1 step 1/2500 total=12303.8 recon=12303.8 kl=0.01 (0s)
+  beta=1 step 500/2500 total=2064.6 recon=2064.6 kl=0.01 (20s)
+  beta=1 step 1000/2500 total=2283.6 recon=2283.6 kl=0.00 (41s)
+  beta=1 step 1500/2500 total=2301.7 recon=2301.4 kl=0.23 (60s)
+  beta=1 step 2000/2500 total=447.2 recon=419.4 kl=27.71 (85s)
+  beta=1 step 2500/2500 total=389.7 recon=364.7 kl=25.07 (112s)
+  beta=1 检查点: s1_beta1_seed99.pt
+  beta=1 谱: log10 条件数中位 4.51, logdet 30.8±3.8, 参与维数中位 2.57
+run: {'beta': 4.0, 'seed_family': 'calibration', 'seed_index': 1}
+  beta=4 step 1/2500 total=15896.4 recon=15896.4 kl=0.02 (0s)
+  beta=4 step 500/2500 total=2218.6 recon=2218.6 kl=0.00 (18s)
+  beta=4 step 1000/2500 total=2306.1 recon=2306.1 kl=0.00 (37s)
+  beta=4 step 1500/2500 total=2192.8 recon=2192.8 kl=0.00 (55s)
+  beta=4 step 2000/2500 total=2300.8 recon=2300.8 kl=0.00 (75s)
+  beta=4 step 2500/2500 total=2038.5 recon=2038.5 kl=0.00 (94s)
+  beta=4 检查点: s1_beta4_seed100.pt
+  beta=4 谱: log10 条件数中位 4.69, logdet -52.6±0.0, 参与维数中位 1.04
