@@ -51,7 +51,8 @@ def test_flat_metric_recovers_straight_line():
     tau = torch.linspace(0, 1, out["path"].shape[0], dtype=torch.float64).unsqueeze(-1)
     straight = z_a * (1 - tau) + z_b * tau
     assert float((out["path"] - straight).norm(dim=-1).max()) < 1e-6
-    assert out["uniqueness_spread"] < 1e-5
+    assert out["uniqueness_spread"] < 5e-6  # 归一化偏差面积口径（优化器精度回归界）
+    assert out["uniqueness_spread_euclid"] < 1e-5
     assert out["residual"] < 1e-8
 
 
@@ -90,7 +91,9 @@ def test_two_route_geometry_detected_by_multistart():
     z_a = torch.tensor([-1.0, 0.0], dtype=torch.float64)
     z_b = torch.tensor([1.0, 0.0], dtype=torch.float64)
     out = solve_geodesic(z_a, z_b, bump_metric, n_starts=6, generator=gen)
-    assert out["uniqueness_spread"] > 0.2, out["uniqueness_spread"]
+    # 归一化偏差面积口径：两条绕行路径的相互偏差显著非零
+    assert out["uniqueness_spread"] > 0.03, out["uniqueness_spread"]
+    assert out["uniqueness_spread_euclid"] > 0.2
 
 
 def test_deviation_area_matches_analytic_flat():

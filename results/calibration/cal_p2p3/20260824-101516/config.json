@@ -1,0 +1,45 @@
+{
+  "matched_system": "results/calibration/geometry_match/20260824-075955/matched_s2.json",
+  "seed_family": "calibration",
+  "run_blocks": [
+    "p3"
+  ],
+  "p2": {
+    "n_chains": 8,
+    "sim_steps": 8000,
+    "burn_in": 5000,
+    "dt": 0.05,
+    "seg_len": 120,
+    "n_traj": 200,
+    "n_surrogates": 20,
+    "grad_point": "mid",
+    "surrogate_kinds": [
+      "euclid",
+      "metric"
+    ],
+    "est_arm_surrogate_kind": "metric",
+    "est_arm": {
+      "n_traj": 50,
+      "ref_steps": 100000,
+      "ref_thin": 25,
+      "k_potential": 32
+    }
+  },
+  "p3": {
+    "n_pairs": 24,
+    "n_segments": 32,
+    "n_starts": 4,
+    "chord_quantile_band": [
+      0.25,
+      0.75
+    ],
+    "inject_alphas": [
+      0.0,
+      0.02,
+      0.05,
+      0.1,
+      0.2
+    ],
+    "n_inject_reps": 8
+  }
+}

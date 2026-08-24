@@ -2,6 +2,7 @@
 # 在几何匹配 d=16 系统上量 Â_OM 分位分离与测地偏差的噪声地板。
 matched_system: results/calibration/geometry_match/20260824-075955/matched_s2.json
 seed_family: calibration
+run_blocks: [p2, p3]
 p2:
   n_chains: 8
   sim_steps: 8000        # thin=1 连续轨迹，烧入后切段
@@ -11,6 +12,8 @@ p2:
   n_traj: 200
   n_surrogates: 20
   grad_point: mid        # 一般轨迹口径；左点口径的恒等自检见 tests/test_om_action.py
+  surrogate_kinds: [euclid, metric]   # 欧氏口径保留作对照；度量口径为消融判据可用的主候选
+  est_arm_surrogate_kind: metric
   est_arm:               # 全链（估计 V̂）子样本臂
     n_traj: 50
     ref_steps: 100000

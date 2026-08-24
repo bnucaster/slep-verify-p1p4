@@ -34,7 +34,10 @@ from slep import guard
 from slep.estimators import potential
 from slep.estimators.geodesic import geodesic_deviation, solve_geodesic
 from slep.estimators.om_action import om_action
-from slep.protocols.surrogates import smooth_random_surrogate
+from slep.protocols.surrogates import (
+    smooth_random_surrogate,
+    smooth_random_surrogate_metric,
+)
 from slep.systems.cal_langevin import system_from_params
 from slep.utils.runs import REPO_ROOT, create_run_dir
 
@@ -61,9 +64,11 @@ def actions_for(
     gen: torch.Generator,
     label: str,
     log,
+    surrogate_kind: str = "euclid",
 ) -> dict:
     """逐轨迹：观测与代理的 Â_OM；返回分位统计。potential_fn=None 表示
-    常数势（消融）。"""
+    常数势（消融）。surrogate_kind：euclid（欧氏口径）/ metric（度量口径，
+    动能项按构造匹配）。"""
     dt = cfg_p2["dt"]
     t_true = system.temperature
 
@@ -72,15 +77,20 @@ def actions_for(
             return (z * 0.0).sum(dim=-1)  # 常数势；保持与 z 的图连通，梯度为零
         return potential_fn(z)
 
-    ranks, below_q1, null_below_q1, length_ratios = [], [], [], []
+    def make_surrogate(traj):
+        if surrogate_kind == "euclid":
+            return smooth_random_surrogate(traj, gen)
+        return smooth_random_surrogate_metric(traj, system.metric_true, gen)
+
+    ranks, below_q1, null_below_q1, length_ratios, gaps = [], [], [], [], []
     for i, traj in enumerate(trajs):
         a_obs = float(
             om_action(traj, dt, pot, system.metric_true, t_true, cfg_p2["grad_point"])
         )
         a_surr = []
         for _ in range(cfg_p2["n_surrogates"]):
-            sur, info = smooth_random_surrogate(traj, gen)
-            length_ratios.append(info["length_ratio"])
+            sur, info = make_surrogate(traj)
+            length_ratios.append(info.get("length_ratio", info.get("metric_length_ratio")))
             a_surr.append(
                 float(om_action(sur, dt, pot, system.metric_true, t_true, cfg_p2["grad_point"]))
             )
@@ -91,10 +101,15 @@ def actions_for(
         null_below_q1.append(
             a_surr[0] < float(torch.quantile(a_surr_t[1:], 0.25))
         )
+        # 标准化间隙：代理中位数与观测之差按代理 IQR 归一（逐轨迹，供
+        # 势项消融的配对对比——二值比例判据对消融不敏感，CAL 实测）
+        iqr = float(torch.quantile(a_surr_t, 0.75) - torch.quantile(a_surr_t, 0.25))
+        gaps.append((float(a_surr_t.median()) - a_obs) / max(iqr, 1e-30))
         if (i + 1) % 50 == 0:
             log(f"  [{label}] {i + 1}/{trajs.shape[0]}")
 
     n = len(below_q1)
+    gaps_t = torch.tensor(gaps, dtype=torch.float64)
     out = {
         "n_traj": n,
         "rank_median": float(torch.tensor(ranks).median()),
@@ -102,11 +117,13 @@ def actions_for(
         "null_frac_below_q1": sum(null_below_q1) / n,
         "null_binomial_q95": 0.25 + 1.645 * math.sqrt(0.25 * 0.75 / n),
         "surrogate_length_ratio_mean": float(torch.tensor(length_ratios).mean()),
+        "gap_standardized_median": float(gaps_t.median()),
+        "gap_standardized_per_traj": gaps,
     }
     log(
         f"[{label}] 低于Q1比例={out['frac_below_q1']:.2f} "
         f"(空白 {out['null_frac_below_q1']:.2f}, 二项 q95={out['null_binomial_q95']:.2f}), "
-        f"观测分位中位={out['rank_median']:.3f}"
+        f"观测分位中位={out['rank_median']:.3f}, 标准化间隙中位={out['gap_standardized_median']:.2f}"
     )
     return out
 
@@ -118,14 +135,29 @@ def p2_block(system, cfg: dict, seeds, log) -> dict:
     trajs = simulate_continuous(system, cfg_p2, gen)
     log(f"P2 观测轨迹 {tuple(trajs.shape)}")
 
-    results = {
-        "true_chain_with_potential": actions_for(
-            trajs, system, cfg_p2, system.potential_dyn, gen, "真值臂·含势", log
-        ),
-        "true_chain_const_potential": actions_for(
-            trajs, system, cfg_p2, None, gen, "真值臂·常数势", log
-        ),
-    }
+    results = {}
+    for kind in cfg_p2["surrogate_kinds"]:
+        with_pot = actions_for(
+            trajs, system, cfg_p2, system.potential_dyn, gen, f"真值臂·{kind}·含势", log, kind
+        )
+        const_pot = actions_for(
+            trajs, system, cfg_p2, None, gen, f"真值臂·{kind}·常数势", log, kind
+        )
+        results[f"true_{kind}_with_potential"] = with_pot
+        results[f"true_{kind}_const_potential"] = const_pot
+        # 势项消融的配对对比：逐轨迹（含势间隙 − 常数势间隙）
+        diff = torch.tensor(with_pot["gap_standardized_per_traj"]) - torch.tensor(
+            const_pot["gap_standardized_per_traj"]
+        )
+        results[f"ablation_contrast_{kind}"] = {
+            "paired_gap_diff_median": float(diff.median()),
+            "frac_positive": float((diff > 0).double().mean()),
+            "n": int(diff.shape[0]),
+        }
+        log(
+            f"[消融对比·{kind}] 配对间隙差中位={float(diff.median()):.2f}, "
+            f"正向比例={float((diff > 0).double().mean()):.2f}"
+        )
 
     # 全链臂：V̂ 用 k 近邻（对参照集），autograd 经固定近邻可微
     ea = cfg_p2["est_arm"]
@@ -143,11 +175,12 @@ def p2_block(system, cfg: dict, seeds, log) -> dict:
         )
 
     sub = trajs[: ea["n_traj"]]
-    results["estimated_chain_with_potential"] = actions_for(
-        sub, system, cfg_p2, v_hat, gen, "全链臂·含势", log
+    kind = cfg_p2["est_arm_surrogate_kind"]
+    results["estimated_with_potential"] = actions_for(
+        sub, system, cfg_p2, v_hat, gen, f"全链臂·{kind}·含势", log, kind
     )
-    results["estimated_chain_const_potential"] = actions_for(
-        sub, system, cfg_p2, None, gen, "全链臂·常数势", log
+    results["estimated_const_potential"] = actions_for(
+        sub, system, cfg_p2, None, gen, f"全链臂·{kind}·常数势", log, kind
     )
     return results
 
@@ -174,7 +207,7 @@ def p3_block(system, cfg: dict, seeds, log) -> dict:
     )
     selected = [p for p, c in zip(pairs, chords) if lo <= c <= hi][: cfg_p3["n_pairs"]]
 
-    residuals, spreads, floor_devs = [], [], []
+    residuals, spreads, floor_devs, energy_gaps = [], [], [], []
     inject_devs: dict[str, list[float]] = {str(a): [] for a in cfg_p3["inject_alphas"]}
     tau = torch.linspace(0, 1, cfg_p3["n_segments"] + 1, dtype=torch.float64).unsqueeze(-1)
     for n_done, (i, j) in enumerate(selected):
@@ -185,6 +218,10 @@ def p3_block(system, cfg: dict, seeds, log) -> dict:
         )
         residuals.append(out["residual"])
         spreads.append(out["uniqueness_spread"])
+        # 最优路径与最近备选临界路径的相对能量差：区分伪局部极小
+        # （差大，能量惩罚可排除）与近简并竞争类（差小，真非唯一）
+        e_sorted = sorted(out["all_energies"])
+        energy_gaps.append((e_sorted[1] - e_sorted[0]) / max(e_sorted[0], 1e-30))
 
         y_a, y_b = system.phi(z_a), system.phi(z_b)
         chord = y_b - y_a
@@ -229,6 +266,10 @@ def p3_block(system, cfg: dict, seeds, log) -> dict:
         "residual_max": float(res_t.max()),
         "uniqueness_spread_q99": float(torch.quantile(spread_t, 0.99)),
         "uniqueness_spread_max": float(spread_t.max()),
+        "uniqueness_spread_all": sorted(spreads),
+        "energy_gap_all": sorted(energy_gaps),
+        "residual_all": sorted(residuals),
+        "deviation_floor_all": sorted(floor_devs),
         "deviation_floor_median": float(floor_t.median()),
         "deviation_floor_q95": floor_q95,
         "injected_deviation": inject_summary,
@@ -252,21 +293,25 @@ def plot_p2(metrics_p2: dict, path) -> None:
     plt.rcParams["axes.unicode_minus"] = False
     surface, ink, ink2, muted = "#fcfcfb", "#0b0b0b", "#52514e", "#898781"
     labels = {
-        "true_chain_with_potential": "真值·含势",
-        "true_chain_const_potential": "真值·常数势",
-        "estimated_chain_with_potential": "全链·含势",
-        "estimated_chain_const_potential": "全链·常数势",
+        "true_euclid_with_potential": "真值·欧氏代理·含势",
+        "true_euclid_const_potential": "真值·欧氏代理·常数势",
+        "true_metric_with_potential": "真值·度量代理·含势",
+        "true_metric_const_potential": "真值·度量代理·常数势",
+        "estimated_with_potential": "全链·度量代理·含势",
+        "estimated_const_potential": "全链·度量代理·常数势",
     }
+    labels = {k: v for k, v in labels.items() if k in metrics_p2}
     names = list(labels.values())
     fracs = [metrics_p2[k]["frac_below_q1"] for k in labels]
     nulls = [metrics_p2[k]["null_frac_below_q1"] for k in labels]
 
-    fig, ax = plt.subplots(figsize=(7.2, 4.4), dpi=150)
+    fig, ax = plt.subplots(figsize=(9.6, 4.8), dpi=150)
     fig.patch.set_facecolor(surface)
     ax.set_facecolor(surface)
     xpos = np.arange(len(names))
     ax.bar(xpos - 0.18, fracs, width=0.36, color="#2a78d6", label="观测轨迹")
     ax.bar(xpos + 0.18, nulls, width=0.36, color="#eb6834", label="空白（代理充观测）")
+    plt.setp(ax.get_xticklabels(), rotation=15, ha="right")
     ax.axhline(0.25, color=muted, linewidth=1, linestyle="--")
     ax.axhline(0.75, color="#52514e", linewidth=1, linestyle=":")
     ax.text(len(names) - 0.5, 0.76, "判定线 75%", color=ink2, fontsize=9)
@@ -333,15 +378,20 @@ def main() -> None:
     params = json.loads((REPO_ROOT / cfg["matched_system"]).read_text(encoding="utf-8"))
     system = system_from_params(params)
 
-    metrics = {"matched_system": cfg["matched_system"]}
-    metrics["p2"] = p2_block(system, cfg, seeds, log)
-    metrics["p3"] = p3_block(system, cfg, seeds, log)
+    blocks = cfg.get("run_blocks", ["p2", "p3"])
+    metrics = {"matched_system": cfg["matched_system"], "run_blocks": blocks}
+    if "p2" in blocks:
+        metrics["p2"] = p2_block(system, cfg, seeds, log)
+    if "p3" in blocks:
+        metrics["p3"] = p3_block(system, cfg, seeds, log)
 
     (run_dir / "metrics.json").write_text(
         json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-    plot_p2(metrics["p2"], run_dir / "p2_separation.png")
-    plot_p3(metrics["p3"], cfg["p3"]["inject_alphas"], run_dir / "p3_deviation.png")
+    if "p2" in blocks:
+        plot_p2(metrics["p2"], run_dir / "p2_separation.png")
+    if "p3" in blocks:
+        plot_p3(metrics["p3"], cfg["p3"]["inject_alphas"], run_dir / "p3_deviation.png")
     (run_dir / "log.txt").write_text("\n".join(log_lines) + "\n", encoding="utf-8")
     log(f"产物已写入 {run_dir}")
 

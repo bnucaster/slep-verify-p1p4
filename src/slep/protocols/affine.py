@@ -17,6 +17,12 @@
   参数个数（高斯残差下与似然形式等价，去掉公共常数）。plan 判据要求
   ΔBIC < 2（线性不比二次差太多）。
 - R² = 1 − RSS_lin/TSS，TSS 为总平方和。
+- 曲率效应量 ρ = |c|·SD(V̂)/|b|：c 为二次项系数（中心化坐标），
+  SD(V̂) 为横轴标准差；ρ 是"每一个横轴标准差上二次项贡献与线性项
+  贡献之比"，无量纲。动机：样本量大时 F 检验对估计器残余的微小
+  光滑曲率也拒绝（CAL-P4 实测：真仿射系统上 p 普遍 < 0.01），p 值
+  判据须配效应量上限才能区分"统计可检的曲率"与"实质弯曲"；上限
+  数值由校准产物定（thresholds_v1），母论文原文 p 值判据照测照报。
 
 数值注意：二次拟合先把 V̂ 中心化再求解，避免设计矩阵病态；斜率与
 检验统计量不受中心化影响。
@@ -58,16 +64,21 @@ def affine_fit_report(v_hat: torch.Tensor, i_hat: torch.Tensor) -> dict:
     # OLS 斜率标准误（同方差假设）：sqrt( (RSS/(n−2)) / Σ(v−v̄)² )
     se_slope = math.sqrt(rss_lin / (n - 2) / float((vc**2).sum()))
 
+    sd_x = float(vc.std())
     return {
         "n": n,
         "slope": slope,
         "intercept": intercept,
         "se_slope": se_slope,
+        "sd_x": sd_x,
         "r_squared": 1.0 - rss_lin / tss if tss > 0 else float("nan"),
         "f_lack_of_fit": f_stat,
         "p_lack_of_fit": p_lack_of_fit,
         "delta_bic_lin_minus_quad": bic_lin - bic_quad,
         "quad_coeff": float(beta_quad[2]),
+        "curvature_effect_ratio": (
+            abs(float(beta_quad[2])) * sd_x / abs(slope) if slope != 0 else float("nan")
+        ),
         "temperature_hat": 1.0 / slope if slope > 0 else float("nan"),
         "slope_positive": slope > 0,
     }

@@ -141,10 +141,16 @@ def solve_geodesic(
         energies.append(energy)
         residuals.append(resid)
 
-    spread = 0.0
+    # 唯一性散布取度量口径：路径两两的归一化偏差面积（对称化取大者）。
+    # 欧氏逐点距离在强各向异性几何下失真（软方向的大坐标差在度量下
+    # 可忽略，CAL-P3 实测欧氏散布虚高两个量级），降为次要诊断。
+    spread, spread_euclid = 0.0, 0.0
     for i in range(len(paths)):
         for j in range(i + 1, len(paths)):
-            spread = max(spread, float((paths[i] - paths[j]).norm(dim=-1).max()))
+            dev_ij = geodesic_deviation(paths[i], paths[j], metric_fn)["normalized_area"]
+            dev_ji = geodesic_deviation(paths[j], paths[i], metric_fn)["normalized_area"]
+            spread = max(spread, dev_ij, dev_ji)
+            spread_euclid = max(spread_euclid, float((paths[i] - paths[j]).norm(dim=-1).max()))
 
     best = int(torch.tensor(energies).argmin())
     return {
@@ -154,6 +160,7 @@ def solve_geodesic(
         "all_energies": energies,
         "all_paths": paths,
         "uniqueness_spread": spread,
+        "uniqueness_spread_euclid": spread_euclid,
         "length": float(path_length(paths[best], metric_fn)),
         "uniqueness_note": "认证阈值待校准（CAL-P2/P3 残差基准，任务四）",
     }

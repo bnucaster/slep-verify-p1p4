@@ -1,0 +1,70 @@
+{
+  "matched_system": "results/calibration/geometry_match/20260824-075955/matched_s2.json",
+  "p2": {
+    "true_chain_with_potential": {
+      "n_traj": 192,
+      "rank_median": 0.0,
+      "frac_below_q1": 1.0,
+      "null_frac_below_q1": 0.19791666666666666,
+      "null_binomial_q95": 0.30140625,
+      "surrogate_length_ratio_mean": 1.0015616416931152
+    },
+    "true_chain_const_potential": {
+      "n_traj": 192,
+      "rank_median": 0.0,
+      "frac_below_q1": 1.0,
+      "null_frac_below_q1": 0.265625,
+      "null_binomial_q95": 0.30140625,
+      "surrogate_length_ratio_mean": 1.0015742778778076
+    },
+    "estimated_chain_with_potential": {
+      "n_traj": 50,
+      "rank_median": 0.0,
+      "frac_below_q1": 1.0,
+      "null_frac_below_q1": 0.3,
+      "null_binomial_q95": 0.35073526567195823,
+      "surrogate_length_ratio_mean": 1.001656174659729
+    },
+    "estimated_chain_const_potential": {
+      "n_traj": 50,
+      "rank_median": 0.0,
+      "frac_below_q1": 1.0,
+      "null_frac_below_q1": 0.3,
+      "null_binomial_q95": 0.35073526567195823,
+      "surrogate_length_ratio_mean": 1.001680612564087
+    }
+  },
+  "p3": {
+    "n_pairs": 24,
+    "residual_q95": 0.0002995399056437469,
+    "residual_max": 0.0003477384399394127,
+    "uniqueness_spread_q99": 142.68731273153165,
+    "uniqueness_spread_max": 153.53606200782082,
+    "deviation_floor_median": 0.000357828317219862,
+    "deviation_floor_q95": 0.0027708437576834323,
+    "injected_deviation": {
+      "0.0": {
+        "median": 0.0003578283067326993,
+        "q05": 0.00015474458632525057
+      },
+      "0.02": {
+        "median": 0.012808161787688732,
+        "q05": 0.012503406032919884
+      },
+      "0.05": {
+        "median": 0.032406799495220184,
+        "q05": 0.030672647058963776
+      },
+      "0.1": {
+        "median": 0.06774920225143433,
+        "q05": 0.06079329550266266
+      },
+      "0.2": {
+        "median": 0.1616969257593155,
+        "q05": 0.1297147423028946
+      }
+    },
+    "minimal_detectable_alpha": 0.02,
+    "mde_rule": "实测偏差 q05 超过零注入地板 q95 的最小注入幅度（q05 口径使检出以 ≥95% 概率超地板）"
+  }
+}

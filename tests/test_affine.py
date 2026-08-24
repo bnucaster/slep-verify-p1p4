@@ -35,6 +35,8 @@ def test_linear_recovery_and_no_false_rejection():
     assert rep["delta_bic_lin_minus_quad"] < 2.0
     assert rep["r_squared"] > 0.9
     assert abs(rep["temperature_hat"] - 0.5) < 0.01  # 1/slope，斜率误差 <0.4% 时成立
+    # 纯线性数据的曲率效应量应接近零（二次系数仅噪声，量级 ~SE）
+    assert rep["curvature_effect_ratio"] < 0.02
 
 
 def test_quadratic_rejected():
