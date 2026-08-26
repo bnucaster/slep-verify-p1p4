@@ -1,0 +1,17 @@
+{
+  "git": {
+    "commit": "288971ad4807abe62aa91854f93a0aa0c9c3046f",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_s1_train.py",
+    "--config",
+    "configs/s1_train_eval.yaml",
+    "--budget-seconds",
+    "480"
+  ],
+  "created": "2026-08-26T20:56:32+0100",
+  "torch": "2.13.0+cpu"
+}

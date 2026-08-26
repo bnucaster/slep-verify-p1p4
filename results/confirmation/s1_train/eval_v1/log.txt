@@ -1,1 +1,165 @@
 [19:05:06] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[19:08:21]   b1_s5 5000/20000 total=2152.9 kl=0.00 (192s)
+[19:11:32]   b1_s5 10000/20000 total=2014.1 kl=0.00 (383s)
+[19:14:43]   b1_s5 15000/20000 total=2397.5 kl=0.00 (574s)
+[19:17:53]   b1_s5 20000/20000 total=267.6 kl=27.61 (764s)
+[19:17:56] 完成 b1_s5：767s，探针 sanity 形状精度 0.451，posX R² 0.900
+[19:21:08]   b1_s6 5000/20000 total=2036.3 kl=0.00 (191s)
+[19:24:19]   b1_s6 10000/20000 total=2191.4 kl=0.00 (382s)
+[19:27:30]   b1_s6 15000/20000 total=2002.9 kl=0.00 (574s)
+[19:30:42]   b1_s6 20000/20000 total=295.4 kl=27.90 (765s)
+[19:30:42] 完成 b1_s6：766s，探针 sanity 形状精度 0.474，posX R² 0.923
+[19:33:54]   b1_s7 5000/20000 total=2334.2 kl=0.00 (192s)
+[19:37:06]   b1_s7 10000/20000 total=2129.7 kl=0.00 (384s)
+[19:40:18]   b1_s7 15000/20000 total=2219.3 kl=0.00 (575s)
+[19:43:29]   b1_s7 20000/20000 total=2213.9 kl=0.00 (767s)
+[19:43:30] 完成 b1_s7：767s，探针 sanity 形状精度 0.329，posX R² -0.001
+[19:46:41]   b1_s8 5000/20000 total=2217.0 kl=0.00 (191s)
+[19:48:56] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[19:48:56] 跳过已完成 run b1_s5
+[19:48:56] 跳过已完成 run b1_s6
+[19:48:56] 跳过已完成 run b1_s7
+[19:52:11]   b1_s8 5000/20000 total=2217.0 kl=0.00 (192s)
+[19:55:24]   b1_s8 10000/20000 total=2175.0 kl=0.00 (385s)
+[19:58:37]   b1_s8 15000/20000 total=2047.9 kl=0.00 (578s)
+[20:01:50]   b1_s8 20000/20000 total=2425.8 kl=0.00 (771s)
+[20:01:53] 完成 b1_s8：774s，探针 sanity 形状精度 0.356，posX R² -0.000
+[20:05:05]   b1_s9 5000/20000 total=281.8 kl=25.54 (192s)
+[20:08:17]   b1_s9 10000/20000 total=207.4 kl=27.99 (384s)
+[20:11:00] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:11:00] 跳过已完成 run b1_s5
+[20:11:00] 跳过已完成 run b1_s6
+[20:11:00] 跳过已完成 run b1_s7
+[20:11:00] 跳过已完成 run b1_s8
+[20:13:32] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:13:33] 跳过已完成 run b1_s5
+[20:13:33] 跳过已完成 run b1_s6
+[20:13:33] 跳过已完成 run b1_s7
+[20:13:33] 跳过已完成 run b1_s8
+[20:14:24] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:14:24] 跳过已完成 run b1_s5
+[20:14:24] 跳过已完成 run b1_s6
+[20:14:24] 跳过已完成 run b1_s7
+[20:14:24] 跳过已完成 run b1_s8
+[20:15:07] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:15:07] 跳过已完成 run b1_s5
+[20:15:07] 跳过已完成 run b1_s6
+[20:15:07] 跳过已完成 run b1_s7
+[20:15:07] 跳过已完成 run b1_s8
+[20:18:24]   b1_s9 5000/20000 total=281.8 kl=25.54 (195s)
+[20:21:37]   b1_s9 10000/20000 total=207.4 kl=27.99 (387s)
+[20:23:13]   b1_s9 预算耗尽，暂停于 step 12500
+[20:23:23] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:23:23] 跳过已完成 run b1_s5
+[20:23:23] 跳过已完成 run b1_s6
+[20:23:23] 跳过已完成 run b1_s7
+[20:23:23] 跳过已完成 run b1_s8
+[20:23:26]   b1_s9 续训自 step 12500
+[20:25:04]   b1_s9 15000/20000 total=174.1 kl=29.95 (98s)
+[20:28:18]   b1_s9 20000/20000 total=172.5 kl=30.42 (292s)
+[20:28:33] 完成 b1_s9：308s，探针 sanity 形状精度 0.413，posX R² 0.866
+[20:31:28]   b4_s5 预算耗尽，暂停于 step 4500
+[20:31:41] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:31:41] 跳过已完成 run b1_s5
+[20:31:41] 跳过已完成 run b1_s6
+[20:31:41] 跳过已完成 run b1_s7
+[20:31:41] 跳过已完成 run b1_s8
+[20:31:41] 跳过已完成 run b1_s9
+[20:31:43]   b4_s5 续训自 step 4500
+[20:32:03]   b4_s5 5000/20000 total=2152.9 kl=0.00 (19s)
+[20:35:15]   b4_s5 10000/20000 total=2014.1 kl=0.00 (212s)
+[20:38:28]   b4_s5 15000/20000 total=2397.5 kl=0.00 (404s)
+[20:39:44]   b4_s5 预算耗尽，暂停于 step 17000
+[20:39:55] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:39:55] 跳过已完成 run b1_s5
+[20:39:55] 跳过已完成 run b1_s6
+[20:39:55] 跳过已完成 run b1_s7
+[20:39:55] 跳过已完成 run b1_s8
+[20:39:55] 跳过已完成 run b1_s9
+[20:39:57]   b4_s5 续训自 step 17000
+[20:41:54]   b4_s5 20000/20000 total=1919.3 kl=0.00 (116s)
+[20:41:57] 完成 b4_s5：119s，探针 sanity 形状精度 0.338，posX R² -0.000
+[20:45:09]   b4_s6 5000/20000 total=2036.3 kl=0.00 (193s)
+[20:48:02]   b4_s6 预算耗尽，暂停于 step 9500
+[20:48:13] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:48:13] 跳过已完成 run b1_s5
+[20:48:13] 跳过已完成 run b1_s6
+[20:48:13] 跳过已完成 run b1_s7
+[20:48:13] 跳过已完成 run b1_s8
+[20:48:13] 跳过已完成 run b1_s9
+[20:48:13] 跳过已完成 run b4_s5
+[20:48:15]   b4_s6 续训自 step 9500
+[20:48:35]   b4_s6 10000/20000 total=2191.4 kl=0.00 (19s)
+[20:51:47]   b4_s6 15000/20000 total=2002.9 kl=0.00 (211s)
+[20:54:59]   b4_s6 20000/20000 total=2305.3 kl=0.00 (404s)
+[20:55:02] 完成 b4_s6：407s，探针 sanity 形状精度 0.342，posX R² -0.000
+[20:56:20]   b4_s7 预算耗尽，暂停于 step 2000
+[20:56:32] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[20:56:32] 跳过已完成 run b1_s5
+[20:56:32] 跳过已完成 run b1_s6
+[20:56:32] 跳过已完成 run b1_s7
+[20:56:32] 跳过已完成 run b1_s8
+[20:56:32] 跳过已完成 run b1_s9
+[20:56:32] 跳过已完成 run b4_s5
+[20:56:32] 跳过已完成 run b4_s6
+[20:56:34]   b4_s7 续训自 step 2000
+[20:58:31]   b4_s7 5000/20000 total=2334.2 kl=0.00 (116s)
+[21:01:44]   b4_s7 10000/20000 total=2129.7 kl=0.00 (310s)
+[21:04:38]   b4_s7 预算耗尽，暂停于 step 14500
+[21:04:49] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[21:04:49] 跳过已完成 run b1_s5
+[21:04:49] 跳过已完成 run b1_s6
+[21:04:49] 跳过已完成 run b1_s7
+[21:04:49] 跳过已完成 run b1_s8
+[21:04:49] 跳过已完成 run b1_s9
+[21:04:49] 跳过已完成 run b4_s5
+[21:04:49] 跳过已完成 run b4_s6
+[21:04:52]   b4_s7 续训自 step 14500
+[21:05:12]   b4_s7 15000/20000 total=2219.3 kl=0.00 (20s)
+[21:08:30]   b4_s7 20000/20000 total=2213.9 kl=0.00 (219s)
+[21:08:33] 完成 b4_s7：222s，探针 sanity 形状精度 0.329，posX R² -0.001
+[21:11:47]   b4_s8 5000/20000 total=2217.0 kl=0.00 (194s)
+[21:13:05]   b4_s8 预算耗尽，暂停于 step 7000
+[21:13:29] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[21:13:29] 跳过已完成 run b1_s5
+[21:13:29] 跳过已完成 run b1_s6
+[21:13:29] 跳过已完成 run b1_s7
+[21:13:29] 跳过已完成 run b1_s8
+[21:13:29] 跳过已完成 run b1_s9
+[21:13:29] 跳过已完成 run b4_s5
+[21:13:29] 跳过已完成 run b4_s6
+[21:13:29] 跳过已完成 run b4_s7
+[21:13:32]   b4_s8 续训自 step 7000
+[21:15:28]   b4_s8 10000/20000 total=2175.0 kl=0.00 (116s)
+[21:18:42]   b4_s8 15000/20000 total=2047.9 kl=0.00 (310s)
+[21:21:37]   b4_s8 预算耗尽，暂停于 step 19500
+[21:21:48] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[21:21:48] 跳过已完成 run b1_s5
+[21:21:48] 跳过已完成 run b1_s6
+[21:21:48] 跳过已完成 run b1_s7
+[21:21:48] 跳过已完成 run b1_s8
+[21:21:48] 跳过已完成 run b1_s9
+[21:21:48] 跳过已完成 run b4_s5
+[21:21:48] 跳过已完成 run b4_s6
+[21:21:48] 跳过已完成 run b4_s7
+[21:21:51]   b4_s8 续训自 step 19500
+[21:22:10]   b4_s8 20000/20000 total=2425.8 kl=0.00 (19s)
+[21:22:13] 完成 b4_s8：22s，探针 sanity 形状精度 0.356，posX R² -0.000
+[21:25:28]   b4_s9 5000/20000 total=1736.1 kl=0.01 (195s)
+[21:28:42]   b4_s9 10000/20000 total=1831.0 kl=0.00 (389s)
+[21:29:59]   b4_s9 预算耗尽，暂停于 step 12000
+[21:30:10] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]
+[21:30:10] 跳过已完成 run b1_s5
+[21:30:10] 跳过已完成 run b1_s6
+[21:30:10] 跳过已完成 run b1_s7
+[21:30:10] 跳过已完成 run b1_s8
+[21:30:10] 跳过已完成 run b1_s9
+[21:30:10] 跳过已完成 run b4_s5
+[21:30:10] 跳过已完成 run b4_s6
+[21:30:10] 跳过已完成 run b4_s7
+[21:30:10] 跳过已完成 run b4_s8
+[21:30:13]   b4_s9 续训自 step 12000
+[21:32:08]   b4_s9 15000/20000 total=1823.0 kl=0.00 (115s)
+[21:35:19]   b4_s9 20000/20000 total=1917.9 kl=0.00 (306s)
+[21:35:21] 完成 b4_s9：309s，探针 sanity 形状精度 0.323，posX R² -0.004
+[21:35:21] S1 战役完成
