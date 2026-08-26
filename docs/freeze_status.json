@@ -1,7 +1,12 @@
 {
-  "frozen": false,
-  "frozen_at": null,
-  "protocol_hash": null,
-  "external_timestamp_url": null,
-  "note": "置位 frozen 之前须完成 docs/protocol_v1.1_draft.md 全部占位并取得外部时间戳（OSF 或公开仓库提交哈希）"
+  "frozen": true,
+  "frozen_at": "2026-08-26",
+  "protocol_hash": {
+    "docs/protocol_v1.1_draft.md": "65aa694176115b98c89f1ea6fd8f9ebc7df0d93a958f12f430519fe99417afc3",
+    "docs/protocol_v1.1_thresholds.json": "815ba82c507a061139b9ed004dd2b5e96ee3669512114cd7767a2837d333cc62"
+  },
+  "external_timestamp_url": "https://github.com/bnucaster/slep-verify-p1p4",
+  "anchor_commit": "f7f7910323964e61b672f5f83900d0d24df71e81",
+  "manifest": "docs/freeze_manifest.json",
+  "note": "用户于 2026-08-26 确认冻结；冻结清单内 17 个文件此后不得修改（协议 v1.1 第 8 节第 4 条）；哈希按 LF 字节计算，审计用 git show 取原始内容"
 }
