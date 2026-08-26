@@ -8,3 +8,8 @@ results/**/checkpoints/
 .DS_Store
 # metrics.json 与校准产物必须入库（审计需要），不要加入忽略
 *.egg-info/
+
+# EXP 中间态缓存（确定性可重算；判定证据为 json 与 scatter.npz）
+results/confirmation/**/chain_*.npz
+results/confirmation/**/swap_chain_*.npz
+results/confirmation/**/refsets.npz

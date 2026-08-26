@@ -1,0 +1,28 @@
+{
+  "batch_size": 64,
+  "betas": [
+    1.0,
+    4.0
+  ],
+  "campaign": "eval_v1",
+  "channels": [
+    16,
+    16,
+    32,
+    32
+  ],
+  "checkpoint_every": 500,
+  "checkpoint_log2_until": 2048,
+  "data_file": "data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz",
+  "fc_dim": 128,
+  "latent_dim": 8,
+  "log_every": 200,
+  "lr": 0.001,
+  "packed_cache": "data/dsprites_packed.npy",
+  "probe_sanity_n": 5000,
+  "seed_family": "evaluation",
+  "sigma_dec": 0.2,
+  "stage": "confirmation",
+  "torch_threads": 8,
+  "train_steps": 20000
+}

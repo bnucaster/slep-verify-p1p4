@@ -1,0 +1,1 @@
+[19:05:06] campaign: D:\PythonProjects\slep-verify\slep-p1p4\results\confirmation\s1_train\eval_v1，betas=[1.0, 4.0]，seeds=[5, 6, 7, 8, 9]

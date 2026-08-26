@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "a8898a56cb78199698384c70988c8e540d7b113b",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_exp_p4.py"
+  ],
+  "created": "2026-08-26T18:48:51+0100",
+  "torch": "2.13.0+cpu"
+}

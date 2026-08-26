@@ -1,0 +1,239 @@
+{
+  "thresholds_file": "protocol_v1.1_thresholds.json",
+  "systems": {
+    "S2:s5": {
+      "gates": {
+        "ok": false,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": false,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    },
+    "S2:s6": {
+      "gates": {
+        "ok": false,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": false,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    },
+    "S2:s7": {
+      "gates": {
+        "ok": false,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": false,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    },
+    "S2:s8": {
+      "gates": {
+        "ok": false,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": false,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    },
+    "S2:s9": {
+      "gates": {
+        "ok": false,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": false,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    }
+  },
+  "input_echo": {
+    "systems": {
+      "S2:s5": {
+        "gates": {
+          "capability": {
+            "value": 0.3375,
+            "system": "S2",
+            "per_seed_rate": 0.34375
+          },
+          "geometry": {
+            "log10_cond_median": 9.413582317693914,
+            "participation_median": 1.8907148357593044
+          },
+          "stationarity": {
+            "rhat": 0.9996898561553247,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 3.493105066132053e-85,
+          "delta_bic": 375.563061283101,
+          "r_squared": 0.20482021176147192,
+          "curvature_effect_ratio": 0.470339247094679,
+          "slope": 0.11679348584991556,
+          "t_split_rel": 0.13055028477007447,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.01874747983536908,
+            "policy_swap_slope_shift_rel": 0.019810830455604042
+          },
+          "temperature_hat": 8.56212136081837
+        }
+      },
+      "S2:s6": {
+        "gates": {
+          "capability": {
+            "value": 0.3375,
+            "system": "S2",
+            "per_seed_rate": 0.3375
+          },
+          "geometry": {
+            "log10_cond_median": 9.69512739381022,
+            "participation_median": 1.8712041035735065
+          },
+          "stationarity": {
+            "rhat": 0.9994124219025915,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 2.623055260252346e-52,
+          "delta_bic": 224.40625852077028,
+          "r_squared": 0.13405681294290606,
+          "curvature_effect_ratio": 0.3442499375818369,
+          "slope": 0.1347931288217206,
+          "t_split_rel": 0.07955885030575162,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.13460462075510798,
+            "policy_swap_slope_shift_rel": 0.03449833668392002
+          },
+          "temperature_hat": 7.418775784354817
+        }
+      },
+      "S2:s7": {
+        "gates": {
+          "capability": {
+            "value": 0.3375,
+            "system": "S2",
+            "per_seed_rate": 0.36875
+          },
+          "geometry": {
+            "log10_cond_median": 9.261858629118345,
+            "participation_median": 1.997834993126644
+          },
+          "stationarity": {
+            "rhat": 1.0003197258449954,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 3.9163740771341834e-31,
+          "delta_bic": 127.2667374369521,
+          "r_squared": 0.18708403386794537,
+          "curvature_effect_ratio": 0.23076501090663423,
+          "slope": 0.10934106684050458,
+          "t_split_rel": 0.2137498910949112,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.005352105234249373,
+            "policy_swap_slope_shift_rel": 0.10277103549270702
+          },
+          "temperature_hat": 9.145694558282447
+        }
+      },
+      "S2:s8": {
+        "gates": {
+          "capability": {
+            "value": 0.3375,
+            "system": "S2",
+            "per_seed_rate": 0.325
+          },
+          "geometry": {
+            "log10_cond_median": 9.184351267685,
+            "participation_median": 2.015015085128759
+          },
+          "stationarity": {
+            "rhat": 0.9993802137255359,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 4.055527148142366e-30,
+          "delta_bic": 122.61836361211135,
+          "r_squared": 0.15443640293747962,
+          "curvature_effect_ratio": 0.34316041593523106,
+          "slope": 0.08742085318876372,
+          "t_split_rel": 0.13024199888801055,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.03785635835044352,
+            "policy_swap_slope_shift_rel": 0.046280093918653224
+          },
+          "temperature_hat": 11.43891833039821
+        }
+      },
+      "S2:s9": {
+        "gates": {
+          "capability": {
+            "value": 0.3375,
+            "system": "S2",
+            "per_seed_rate": 0.3125
+          },
+          "geometry": {
+            "log10_cond_median": 9.201032517447143,
+            "participation_median": 2.0379354368482763
+          },
+          "stationarity": {
+            "rhat": 1.0030042257689267,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 1.5661326153565868e-26,
+          "delta_bic": 106.20518197830825,
+          "r_squared": 0.1658734991463705,
+          "curvature_effect_ratio": 0.29231004267518607,
+          "slope": 0.11422249108181332,
+          "t_split_rel": 0.12218697420052624,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.12816178742197343,
+            "policy_swap_slope_shift_rel": 0.005165508354056077
+          },
+          "temperature_hat": 8.754843205824825
+        }
+      }
+    }
+  }
+}
