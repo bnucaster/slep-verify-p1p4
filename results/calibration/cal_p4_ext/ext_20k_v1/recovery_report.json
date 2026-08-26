@@ -1,0 +1,81 @@
+{
+  "true_temperature": 0.5,
+  "matched_log10_cond": 9.62750764728235,
+  "matched_logdet_std": 5.005625003746431,
+  "target_logdet_std": 36.440940703210885,
+  "arms": [
+    {
+      "arm": "chains",
+      "n_queries": 4000,
+      "log10_cond_median_est": 9.627015466955294,
+      "wall_seconds": 32,
+      "flow": {
+        "slope": 0.7128551312696759,
+        "temperature_hat": 1.4028095697633354,
+        "t_rel_err": 1.8056191395266707,
+        "r_squared": 0.037936243806080405,
+        "p_lack_of_fit": 0.13522718414408888,
+        "delta_bic_lin_minus_quad": -6.060648806964309,
+        "curvature_effect_ratio": 0.07764624605561521,
+        "n": 4000,
+        "split_time": {
+          "t_first": 1.456555929107427,
+          "t_second": 1.3557119051758886,
+          "relative_gap": 0.07171722600684495
+        },
+        "split_chain": {
+          "t_first": 1.4637025281256573,
+          "t_second": 1.3486568678329978,
+          "relative_gap": 0.08181433742641818
+        }
+      },
+      "knn_std": {
+        "slope": 0.47896046499530887,
+        "temperature_hat": 2.0878549965701123,
+        "t_rel_err": 3.1757099931402246,
+        "r_squared": 0.01736462722211718,
+        "p_lack_of_fit": 0.6425317102463171,
+        "delta_bic_lin_minus_quad": -8.078414632747808,
+        "curvature_effect_ratio": 0.036044601528083614,
+        "n": 4000,
+        "split_time": {
+          "t_first": 2.0811752667474845,
+          "t_second": 2.09416276210217,
+          "relative_gap": 0.006221050973572911
+        },
+        "split_chain": {
+          "t_first": 2.0151545807929794,
+          "t_second": 2.1602689232056744,
+          "relative_gap": 0.06950880181314506
+        }
+      }
+    },
+    {
+      "arm": "exact",
+      "n_queries": 4000,
+      "log10_cond_median_est": 9.626160936306885,
+      "wall_seconds": 29,
+      "flow": {
+        "slope": 0.5869964506484734,
+        "temperature_hat": 1.7035878136831468,
+        "t_rel_err": 2.4071756273662936,
+        "r_squared": 0.0102877332881961,
+        "p_lack_of_fit": 0.12332048911779914,
+        "delta_bic_lin_minus_quad": -5.917335942129284,
+        "curvature_effect_ratio": 0.14258783689910967,
+        "n": 4000
+      },
+      "knn_std": {
+        "slope": 0.5481304824324842,
+        "temperature_hat": 1.8243831205340322,
+        "t_rel_err": 2.6487662410680644,
+        "r_squared": 0.01951779686106936,
+        "p_lack_of_fit": 0.8931355985340277,
+        "delta_bic_lin_minus_quad": -8.27598723682604,
+        "curvature_effect_ratio": 0.008983708764386115,
+        "n": 4000
+      }
+    }
+  ],
+  "reading": "对照原可行域（5.74 下 flow 误差 1.2–6.0%）与温度容差语境 12% 读数；logdet_std 匹配缺口沿用 v1 记录的构造族上限，位置变率引起的误差在本检验中可能被低估，扩门论证须计入该限定"
+}

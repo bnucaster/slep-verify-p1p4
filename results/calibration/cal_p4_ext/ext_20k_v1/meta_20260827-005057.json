@@ -1,0 +1,15 @@
+{
+  "git": {
+    "commit": "0692524f3ff58200cae3c89df4b1671c41775c2b",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_cal_p4_ext.py",
+    "--stage",
+    "simulate"
+  ],
+  "created": "2026-08-27T00:50:57+0100",
+  "torch": "2.13.0+cpu"
+}

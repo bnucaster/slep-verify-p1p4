@@ -1,0 +1,35 @@
+# CAL-P4-EXT（选项 B：扩展校准可行域）。目标：在与 20k 步 S2 实测谱
+# 匹配的合成系统（log10 条件数中位 ~9.4）上检验全链恢复。判据与原
+# CAL-P4 同构：T̂ 相对误差、R²、lack-of-fit 结构；不预设通过阈值，
+# 数字直接对照原可行域（flow 主口径 1.2–6.0%）与温度容差语境 12%。
+# 匹配目标取开发族 dev_v3（20k 步）——不接触评估族数据。
+target_campaign: dev_v3          # results/description/s2_train/dev_v3
+target_train_config: configs/s2_train_long.yaml
+target_n_episodes: 200           # 每开发种子的状态采集量
+target_n_query: 1024             # 每种子谱查询点
+# 合成系统参数（与原 geometry_match 一致，仅谱目标换 20k 步实测）
+obs_dim: 32
+sigma_dec: 0.2
+sigma_x: 0.05
+temperature: 0.5
+well_w_min: 0.5
+well_w_max: 2.0
+warp_tau: 2.0
+seed_family: calibration
+seed_index: 0
+# 主链模拟（白化坐标 Euler–Maruyama）
+chains: 8
+steps: 200000
+dt: 0.05
+burn_in: 5000
+thin: 25
+# 估计集合
+n_ref: 16000
+n_queries: 4000
+k_potential: 32
+k_density: 64
+n_flow_train: 16000
+n_flow_val: 2000
+# 密度口径：flow 参数直读 docs/protocol_v1.1_thresholds.json p4.flow_config
+# （冻结主口径 12/128/25/512）；kNN 标准化为消融
+torch_threads: 10
