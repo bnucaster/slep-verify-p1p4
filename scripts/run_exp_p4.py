@@ -150,9 +150,14 @@ def run_main(cfg, train_cfg, model, ckpt_rel: str, seed: int, seed_dir, log) -> 
     # ĝ 于 query 点：logdet 供体积校正；谱供几何门（10e 取用）
     g_q = fisher_pullback_gaussian_batch(dec, h_q, obs_var).detach()
     eig = torch.linalg.eigvalsh(g_q)
-    logdet_g = torch.log(eig).sum(dim=-1)
-    log10_cond = torch.log10(eig[:, -1] / eig[:, 0])
-    participation = eig.sum(-1) ** 2 / (eig**2).sum(-1)
+    # logdet 用 slogdet（与描述阶段/对照同口径）：解码器饱和点的最小
+    # 特征值数值上可为 ±1e-14，log(eig) 会产生 NaN，slogdet 给出有限大
+    # 负数；条件数/参与维统计对特征值取 1e-30 数值下限（门为中位数，
+    # 单点极值不影响）。
+    logdet_g = torch.linalg.slogdet(g_q).logabsdet
+    eig_c = eig.clamp_min(1e-30)
+    log10_cond = torch.log10(eig_c[:, -1] / eig_c[:, 0])
+    participation = eig_c.sum(-1) ** 2 / (eig_c**2).sum(-1)
     log(f"  s{seed} ĝ 完成（{time.time() - t0:.0f}s）")
 
     # V̂ 于 query 点

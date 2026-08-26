@@ -11,6 +11,8 @@ meta_*.json、b<β>_s<种子>/（losses.csv、probe_sanity.json、DONE、
 checkpoints/ 为 git 忽略）。
 
 用法：.venv/Scripts/python.exe scripts/run_s1_train.py [--smoke]
+  [--budget-seconds N]  # 前台分块运行：超预算即在检查点处干净退出，
+                        # 下次调用经 resume.pt 续训（终止窗口对策）
 """
 from __future__ import annotations
 
@@ -82,7 +84,12 @@ def probe_sanity(model: S1BetaVAE, packed: np.ndarray, cfg: dict, rng) -> dict:
     return {"shape_acc_holdout": shape_acc, "posx_r2_holdout": posx_r2, "n": n}
 
 
-def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, log) -> None:
+class BudgetExhausted(Exception):
+    pass
+
+
+def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, log,
+              deadline: float | None = None) -> None:
     run_dir = campaign / f"b{beta:g}_s{seed}"
     if (run_dir / "DONE").exists():
         log(f"跳过已完成 run b{beta:g}_s{seed}")
@@ -140,6 +147,9 @@ def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, l
                      "torch_rng_state": torch.get_rng_state()},
                     resume_path,
                 )
+                if deadline is not None and time.time() > deadline:
+                    log(f"  b{beta:g}_s{seed} 预算耗尽，暂停于 step {step}")
+                    raise BudgetExhausted
             if step % 5000 == 0:
                 log(
                     f"  b{beta:g}_s{seed} {step}/{cfg['train_steps']} "
@@ -181,12 +191,18 @@ def main() -> None:
     seeds = guard.family_seeds(cfg["seed_family"], purpose="s1-train-dev")
     if smoke:
         seeds = seeds[:1]
+    deadline = None
+    if "--budget-seconds" in sys.argv:
+        deadline = time.time() + float(sys.argv[sys.argv.index("--budget-seconds") + 1])
     log(f"campaign: {campaign}，betas={cfg['betas']}，seeds={seeds}")
     packed = load_packed(cfg)
-    for beta in cfg["betas"]:
-        for seed in seeds:
-            guard.assert_seed_allowed(seed, purpose=f"s1-train-b{beta:g}")
-            train_one(cfg, float(beta), seed, packed, campaign, log)
+    try:
+        for beta in cfg["betas"]:
+            for seed in seeds:
+                guard.assert_seed_allowed(seed, purpose=f"s1-train-b{beta:g}")
+                train_one(cfg, float(beta), seed, packed, campaign, log, deadline)
+    except BudgetExhausted:
+        return
     log("S1 战役完成")
 
 
