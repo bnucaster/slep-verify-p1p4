@@ -1,0 +1,20 @@
+# EXP-P4（仿射律与温度；S2 主）确证配置。协议 v1.1 第 5 节 P4 与
+# plan_v2 第 8 节 EXP-P4 第 1–4、7 条的操作化；flow 主口径参数不在此
+# 配置——脚本直接读 docs/protocol_v1.1_thresholds.json 的 p4.flow_config。
+train_config: configs/s2_train_eval.yaml
+out_campaign: eval_v1
+# 长程自由运行：4 链 × 4096 episode × 64 步 ≈ 1.05e6 环境步/种子（≥1e6）
+n_chains: 4
+episodes_per_chain: 4096
+burn_in: 8                  # 与描述阶段诊断一致：剔除初始零隐态段
+chain_stream_offset: 500000 # 链 RNG：default_rng(seed*7919 + 链号 + offset)，与训练/诊断/评估流分离
+reservoir_per_chain: 14000  # 每链均匀子采样存档（时间标签保留）
+rhat_series_n: 600          # 每链 V̂ 平稳性序列点数（时间序等距）
+# 估计集合（从 4 链汇合的 56k 态中不相交抽取）
+n_ref: 16000
+n_query: 2048
+k_potential: 32             # 与描述阶段诊断一致
+k_knn_density: 32           # kNN 消融口径（标准化），并报不判定
+# 能力门（冻结口径：probe 同构确定性评估，池化）
+capability: {n_tasks: 160, max_steps: 24, bfs_band: [2, 6], task_stream_offset: 313000}
+torch_threads: 10

@@ -1,0 +1,21 @@
+# S1 评估族训练（确证阶段）。与 dev_v1 的差异：均匀段检查点加密到每
+# 500 步（协议 v1.1 EXP-P1 检查点节奏约束），阶段与种子族改评估；
+# 其余口径原样。种子经 guard 解析（冻结置位后评估族放行）。
+campaign: eval_v1
+stage: confirmation
+data_file: data/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz
+packed_cache: data/dsprites_packed.npy
+latent_dim: 8
+sigma_dec: 0.2
+channels: [16, 16, 32, 32]
+fc_dim: 128
+betas: [1.0, 4.0]
+seed_family: evaluation
+train_steps: 20000
+batch_size: 64
+lr: 1.0e-3
+log_every: 200
+checkpoint_log2_until: 2048
+checkpoint_every: 500
+probe_sanity_n: 5000
+torch_threads: 8

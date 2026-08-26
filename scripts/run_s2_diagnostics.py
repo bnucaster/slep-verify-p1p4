@@ -71,8 +71,12 @@ def diagnose_seed(cfg, train_cfg, seed: int, out_dir, log) -> dict:
     with torch.no_grad():
         hs = model.hidden_trajectory(obs, act)  # (E, T, H)
     bi = cfg["burn_in"]
+    # 配对约定：hs[:, i] 解码预测 obs[:, i+1]；三切片每回合等长（T−1−bi），
+    # 展平后逐行对齐。2026-08-25 前版本 o_next 切片多一元素/回合，展平后
+    # (h, o_next) 跨回合错位——dev_v2 诊断产物受此影响（探索性，不进裁决；
+    # 冻结阈值溯源不经本脚本），修正记录见 PROGRESS.md 事件日志。
     h_pool = hs[:, bi:-1].reshape(-1, model.hidden_dim).double()
-    o_next_pool = obs[:, bi + 1 :].reshape(-1, train_cfg["obs_dim"]).double()
+    o_next_pool = obs[:, bi + 1 : -1].reshape(-1, train_cfg["obs_dim"]).double()
     h_next_pool = hs[:, bi + 1 :].reshape(-1, model.hidden_dim).double()
 
     perm = torch.from_numpy(rng.permutation(h_pool.shape[0]))

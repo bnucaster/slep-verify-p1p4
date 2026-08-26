@@ -170,7 +170,7 @@ def main() -> None:
                "sanity_nav": {**cfg["sanity_nav"], "n_mazes": 4, "max_steps": 10,
                               "planner": {"horizon": 6, "n_samples": 24, "n_elites": 4, "n_iters": 2}}}
     torch.set_num_threads(int(cfg["torch_threads"]))
-    campaign = create_campaign_dir("description", "s2_train", cfg["campaign"], cfg)
+    campaign = create_campaign_dir(cfg.get("stage", "description"), "s2_train", cfg["campaign"], cfg)
     log_path = campaign / "log.txt"
 
     def log(msg: str) -> None:

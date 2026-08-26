@@ -1,0 +1,29 @@
+# S2 评估族训练（确证阶段，任务八前置）。冻结配置 = dev_v3 口径原样
+# （20k 步、均匀段每 500 步检查点，满足协议 v1.1 EXP-P1 检查点节奏约束），
+# 仅换战役名、阶段与种子族。种子经 guard 解析（冻结置位后评估族放行）。
+campaign: eval_v1
+stage: confirmation
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+episodes: 500
+episode_len: 64
+train_steps: 20000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 500
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: evaluation
+torch_threads: 10
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24

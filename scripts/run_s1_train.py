@@ -147,7 +147,7 @@ def main() -> None:
         cfg = {**cfg, "campaign": "smoke_v1", "train_steps": 60, "checkpoint_log2_until": 16,
                "checkpoint_every": 30, "probe_sanity_n": 400, "log_every": 20}
     torch.set_num_threads(int(cfg["torch_threads"]))
-    campaign = create_campaign_dir("description", "s1_train", cfg["campaign"], cfg)
+    campaign = create_campaign_dir(cfg.get("stage", "description"), "s1_train", cfg["campaign"], cfg)
     log_path = campaign / "log.txt"
 
     def log(msg: str) -> None:
