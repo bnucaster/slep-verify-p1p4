@@ -1,0 +1,462 @@
+{
+  "s0": {
+    "500": {
+      "per_channel": {
+        "log10_cond_median": 2.7404031914115476,
+        "participation_median": 2.344760847795532
+      },
+      "isotropic": {
+        "log10_cond_median": 2.8473126607584978,
+        "participation_median": 1.977794344828614
+      }
+    },
+    "1000": {
+      "per_channel": {
+        "log10_cond_median": 3.4128341614695215,
+        "participation_median": 1.4062232126489305
+      },
+      "isotropic": {
+        "log10_cond_median": 3.5029393651270873,
+        "participation_median": 1.3397624628226041
+      }
+    },
+    "2000": {
+      "per_channel": {
+        "log10_cond_median": 3.811495007333953,
+        "participation_median": 2.7051579156000045
+      },
+      "isotropic": {
+        "log10_cond_median": 3.8908242575200647,
+        "participation_median": 2.6552666951490096
+      }
+    },
+    "4000": {
+      "per_channel": {
+        "log10_cond_median": 5.18836453452988,
+        "participation_median": 2.3783546692936706
+      },
+      "isotropic": {
+        "log10_cond_median": 5.486165593691789,
+        "participation_median": 2.343578289652704
+      }
+    },
+    "6000": {
+      "per_channel": {
+        "log10_cond_median": 5.820530077529057,
+        "participation_median": 2.374597524839347
+      },
+      "isotropic": {
+        "log10_cond_median": 6.076220834361555,
+        "participation_median": 2.401113759725647
+      }
+    },
+    "8000": {
+      "per_channel": {
+        "log10_cond_median": 6.553662517289465,
+        "participation_median": 2.525645016047608
+      },
+      "isotropic": {
+        "log10_cond_median": 6.707830496582854,
+        "participation_median": 2.576419050017692
+      }
+    },
+    "12000": {
+      "per_channel": {
+        "log10_cond_median": 7.648196902523585,
+        "participation_median": 2.391484532504474
+      },
+      "isotropic": {
+        "log10_cond_median": 7.732971223806736,
+        "participation_median": 2.413448219371785
+      }
+    },
+    "16000": {
+      "per_channel": {
+        "log10_cond_median": 8.708923829654378,
+        "participation_median": 2.2341579963757225
+      },
+      "isotropic": {
+        "log10_cond_median": 8.733098643795909,
+        "participation_median": 2.2663716098466344
+      }
+    },
+    "20000": {
+      "per_channel": {
+        "log10_cond_median": 9.490851657486692,
+        "participation_median": 2.1048180110187067
+      },
+      "isotropic": {
+        "log10_cond_median": 9.575765452543957,
+        "participation_median": 2.138155710336682
+      }
+    }
+  },
+  "s1": {
+    "500": {
+      "per_channel": {
+        "log10_cond_median": 2.6774881502721626,
+        "participation_median": 5.3773440664205845
+      },
+      "isotropic": {
+        "log10_cond_median": 2.642395696344874,
+        "participation_median": 7.0218093215035235
+      }
+    },
+    "1000": {
+      "per_channel": {
+        "log10_cond_median": 3.6192328990292024,
+        "participation_median": 1.8484558646467717
+      },
+      "isotropic": {
+        "log10_cond_median": 3.8060731372694057,
+        "participation_median": 1.7058549581910696
+      }
+    },
+    "2000": {
+      "per_channel": {
+        "log10_cond_median": 4.284894175537762,
+        "participation_median": 2.870890840003344
+      },
+      "isotropic": {
+        "log10_cond_median": 4.481276032769099,
+        "participation_median": 2.8097271548633547
+      }
+    },
+    "4000": {
+      "per_channel": {
+        "log10_cond_median": 5.535904901005476,
+        "participation_median": 2.5769818426449658
+      },
+      "isotropic": {
+        "log10_cond_median": 5.800122186243148,
+        "participation_median": 2.5571016180451465
+      }
+    },
+    "6000": {
+      "per_channel": {
+        "log10_cond_median": 6.4319591274268095,
+        "participation_median": 2.4956179802757377
+      },
+      "isotropic": {
+        "log10_cond_median": 6.6752997536016805,
+        "participation_median": 2.513662846345842
+      }
+    },
+    "8000": {
+      "per_channel": {
+        "log10_cond_median": 6.935790386719383,
+        "participation_median": 2.440110546335059
+      },
+      "isotropic": {
+        "log10_cond_median": 7.033176139002864,
+        "participation_median": 2.4745319732935247
+      }
+    },
+    "12000": {
+      "per_channel": {
+        "log10_cond_median": 8.044374678984935,
+        "participation_median": 2.4441581580550826
+      },
+      "isotropic": {
+        "log10_cond_median": 8.15042925981263,
+        "participation_median": 2.452875766409851
+      }
+    },
+    "16000": {
+      "per_channel": {
+        "log10_cond_median": 8.891682784925347,
+        "participation_median": 2.2476109608850274
+      },
+      "isotropic": {
+        "log10_cond_median": 8.982194413872875,
+        "participation_median": 2.271849768586848
+      }
+    },
+    "20000": {
+      "per_channel": {
+        "log10_cond_median": 9.610863137846275,
+        "participation_median": 2.1365370097597065
+      },
+      "isotropic": {
+        "log10_cond_median": 9.757005822429099,
+        "participation_median": 2.151698505548447
+      }
+    }
+  },
+  "s2": {
+    "500": {
+      "per_channel": {
+        "log10_cond_median": 2.391577699723499,
+        "participation_median": 4.044230462563408
+      },
+      "isotropic": {
+        "log10_cond_median": 2.1342107697797457,
+        "participation_median": 6.317335521604587
+      }
+    },
+    "1000": {
+      "per_channel": {
+        "log10_cond_median": 2.2764364767584278,
+        "participation_median": 5.279253988093439
+      },
+      "isotropic": {
+        "log10_cond_median": 2.1234570028288227,
+        "participation_median": 6.503139902260007
+      }
+    },
+    "2000": {
+      "per_channel": {
+        "log10_cond_median": 3.385846064973617,
+        "participation_median": 2.199800966906787
+      },
+      "isotropic": {
+        "log10_cond_median": 3.570024856026642,
+        "participation_median": 2.041369952056837
+      }
+    },
+    "4000": {
+      "per_channel": {
+        "log10_cond_median": 5.032368135142947,
+        "participation_median": 2.5868425233004935
+      },
+      "isotropic": {
+        "log10_cond_median": 5.234576549377653,
+        "participation_median": 2.5262458424553755
+      }
+    },
+    "6000": {
+      "per_channel": {
+        "log10_cond_median": 6.121935898782161,
+        "participation_median": 2.280858734378529
+      },
+      "isotropic": {
+        "log10_cond_median": 6.341303429772286,
+        "participation_median": 2.2805320587124225
+      }
+    },
+    "8000": {
+      "per_channel": {
+        "log10_cond_median": 6.569409290971012,
+        "participation_median": 2.2596548252690214
+      },
+      "isotropic": {
+        "log10_cond_median": 6.784082912619147,
+        "participation_median": 2.24561510341944
+      }
+    },
+    "12000": {
+      "per_channel": {
+        "log10_cond_median": 7.499306275533364,
+        "participation_median": 2.0350528009757287
+      },
+      "isotropic": {
+        "log10_cond_median": 7.594971800386126,
+        "participation_median": 2.069007612342805
+      }
+    },
+    "16000": {
+      "per_channel": {
+        "log10_cond_median": 8.711080880933874,
+        "participation_median": 2.0328590918931386
+      },
+      "isotropic": {
+        "log10_cond_median": 8.797389545653234,
+        "participation_median": 2.068252315898833
+      }
+    },
+    "20000": {
+      "per_channel": {
+        "log10_cond_median": 9.49244977269742,
+        "participation_median": 1.903755868840451
+      },
+      "isotropic": {
+        "log10_cond_median": 9.59935700489724,
+        "participation_median": 1.9193807583878881
+      }
+    }
+  },
+  "s3": {
+    "500": {
+      "per_channel": {
+        "log10_cond_median": 2.8470838218850028,
+        "participation_median": 3.1156850691510645
+      },
+      "isotropic": {
+        "log10_cond_median": 3.015163470328024,
+        "participation_median": 2.6645792460938695
+      }
+    },
+    "1000": {
+      "per_channel": {
+        "log10_cond_median": 3.815604361506512,
+        "participation_median": 1.900645837326576
+      },
+      "isotropic": {
+        "log10_cond_median": 3.8770262536256577,
+        "participation_median": 1.84865153124599
+      }
+    },
+    "2000": {
+      "per_channel": {
+        "log10_cond_median": 3.929899489590561,
+        "participation_median": 2.811904509394977
+      },
+      "isotropic": {
+        "log10_cond_median": 4.051873068723306,
+        "participation_median": 2.7653247742087497
+      }
+    },
+    "4000": {
+      "per_channel": {
+        "log10_cond_median": 5.079660056673726,
+        "participation_median": 2.494269747172928
+      },
+      "isotropic": {
+        "log10_cond_median": 5.268605855888477,
+        "participation_median": 2.4715592615901816
+      }
+    },
+    "6000": {
+      "per_channel": {
+        "log10_cond_median": 5.889513716334407,
+        "participation_median": 2.554240948314161
+      },
+      "isotropic": {
+        "log10_cond_median": 6.090423842627779,
+        "participation_median": 2.5654460368063208
+      }
+    },
+    "8000": {
+      "per_channel": {
+        "log10_cond_median": 6.690020905019058,
+        "participation_median": 2.56420488192813
+      },
+      "isotropic": {
+        "log10_cond_median": 6.795253026362197,
+        "participation_median": 2.617740080189796
+      }
+    },
+    "12000": {
+      "per_channel": {
+        "log10_cond_median": 7.522462734519374,
+        "participation_median": 2.3312474353258517
+      },
+      "isotropic": {
+        "log10_cond_median": 7.643706150072372,
+        "participation_median": 2.36309642118419
+      }
+    },
+    "16000": {
+      "per_channel": {
+        "log10_cond_median": 8.1952113068566,
+        "participation_median": 2.0936547364186096
+      },
+      "isotropic": {
+        "log10_cond_median": 8.278543268689026,
+        "participation_median": 2.174825865742647
+      }
+    },
+    "20000": {
+      "per_channel": {
+        "log10_cond_median": 9.049391791193068,
+        "participation_median": 1.9720858372455083
+      },
+      "isotropic": {
+        "log10_cond_median": 9.189203145637485,
+        "participation_median": 1.9897890727347072
+      }
+    }
+  },
+  "s4": {
+    "500": {
+      "per_channel": {
+        "log10_cond_median": 2.5740257495247763,
+        "participation_median": 4.917012575188349
+      },
+      "isotropic": {
+        "log10_cond_median": 2.659474334478182,
+        "participation_median": 5.752945939024757
+      }
+    },
+    "1000": {
+      "per_channel": {
+        "log10_cond_median": 3.6961437855005768,
+        "participation_median": 1.374875417211805
+      },
+      "isotropic": {
+        "log10_cond_median": 3.7687323904716763,
+        "participation_median": 1.2951938370493252
+      }
+    },
+    "2000": {
+      "per_channel": {
+        "log10_cond_median": 4.227389450713439,
+        "participation_median": 2.458085724857549
+      },
+      "isotropic": {
+        "log10_cond_median": 4.518948496354672,
+        "participation_median": 2.397298967698291
+      }
+    },
+    "4000": {
+      "per_channel": {
+        "log10_cond_median": 5.304385675520326,
+        "participation_median": 2.1777990382504018
+      },
+      "isotropic": {
+        "log10_cond_median": 5.57413194807666,
+        "participation_median": 2.1357737516331
+      }
+    },
+    "6000": {
+      "per_channel": {
+        "log10_cond_median": 5.8925547235502655,
+        "participation_median": 2.2804811435719303
+      },
+      "isotropic": {
+        "log10_cond_median": 6.063213168160434,
+        "participation_median": 2.2762779907485626
+      }
+    },
+    "8000": {
+      "per_channel": {
+        "log10_cond_median": 6.353815507226646,
+        "participation_median": 2.4185346400129966
+      },
+      "isotropic": {
+        "log10_cond_median": 6.540224205491926,
+        "participation_median": 2.4185343951570903
+      }
+    },
+    "12000": {
+      "per_channel": {
+        "log10_cond_median": 7.501279918626331,
+        "participation_median": 2.2316789310474268
+      },
+      "isotropic": {
+        "log10_cond_median": 7.644558151850435,
+        "participation_median": 2.250968666544751
+      }
+    },
+    "16000": {
+      "per_channel": {
+        "log10_cond_median": 8.368056901226273,
+        "participation_median": 2.232420945169216
+      },
+      "isotropic": {
+        "log10_cond_median": 8.467688071057331,
+        "participation_median": 2.252392318227048
+      }
+    },
+    "20000": {
+      "per_channel": {
+        "log10_cond_median": 9.420233719946449,
+        "participation_median": 1.9719767326946018
+      },
+      "isotropic": {
+        "log10_cond_median": 9.50707155824269,
+        "participation_median": 1.984431977231615
+      }
+    }
+  }
+}

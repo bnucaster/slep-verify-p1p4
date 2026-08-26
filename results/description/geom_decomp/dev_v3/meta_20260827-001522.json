@@ -1,0 +1,13 @@
+{
+  "git": {
+    "commit": "104e2dd3e30800473d4d7956423a92aaee86c5cd",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_geom_decomposition.py"
+  ],
+  "created": "2026-08-27T00:15:22+0100",
+  "torch": "2.13.0+cpu"
+}
