@@ -97,11 +97,27 @@ def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, l
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["lr"]))
     ckpts = set(checkpoint_steps(cfg))
 
+    # 段内断点续训（与 run_s2_train 同机制）：resume.pt 随检查点滚动保存
+    # 模型 + 优化器 + numpy/torch RNG 状态。环境后台命令终止窗口实测可
+    # 短至分钟级（2026-08-26），run 级粒度不够。
+    resume_path = run_dir / "resume.pt"
+    start_step = 0
+    if resume_path.exists():
+        payload = torch.load(resume_path, weights_only=False)
+        model.load_state_dict(payload["model"])
+        opt.load_state_dict(payload["opt"])
+        rng.bit_generator.state = payload["np_rng_state"]
+        torch.set_rng_state(payload["torch_rng_state"])
+        start_step = payload["step"]
+        log(f"  b{beta:g}_s{seed} 续训自 step {start_step}")
+
     t0 = time.time()
-    with open(run_dir / "losses.csv", "w", newline="", encoding="utf-8") as f:
+    mode = "a" if start_step > 0 else "w"
+    with open(run_dir / "losses.csv", mode, newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
-        writer.writerow(["step", "total", "recon", "kl"])
-        for step in range(1, cfg["train_steps"] + 1):
+        if start_step == 0:
+            writer.writerow(["step", "total", "recon", "kl"])
+        for step in range(start_step + 1, cfg["train_steps"] + 1):
             idx = rng.integers(0, packed.shape[0], size=cfg["batch_size"])
             out = model.loss(batch_from_packed(packed, idx))
             opt.zero_grad()
@@ -117,6 +133,12 @@ def train_one(cfg: dict, beta: float, seed: int, packed: np.ndarray, campaign, l
                     {"model": model.state_dict(), "step": step, "beta": beta, "seed": seed,
                      "kl_per_dim": out["kl_per_dim"].tolist()},
                     ckpt_dir / f"ckpt_{step:06d}.pt",
+                )
+                torch.save(
+                    {"model": model.state_dict(), "opt": opt.state_dict(), "step": step,
+                     "np_rng_state": rng.bit_generator.state,
+                     "torch_rng_state": torch.get_rng_state()},
+                    resume_path,
                 )
             if step % 5000 == 0:
                 log(
