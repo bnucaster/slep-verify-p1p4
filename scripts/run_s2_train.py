@@ -191,7 +191,10 @@ def main() -> None:
     seeds = guard.family_seeds(cfg["seed_family"], purpose="s2-train-dev")
     if smoke:
         seeds = seeds[:1]
-    if cfg.get("max_seeds"):
+    if "--seeds" in sys.argv:  # 显式种子清单（初筛通过后补齐余种子用）
+        want = {int(x) for x in sys.argv[sys.argv.index("--seeds") + 1].split(",")}
+        seeds = [s for s in seeds if s in want]
+    elif cfg.get("max_seeds"):
         seeds = seeds[: int(cfg["max_seeds"])]  # 变体初筛：只跑前 N 个种子
     deadline = None
     if "--budget-seconds" in sys.argv:
