@@ -1,0 +1,103 @@
+{
+  "prediction": "P1",
+  "system": "S1",
+  "judge": {
+    "verdict": "未构成检验",
+    "reason": "构成判定的种子不足两个",
+    "per_seed": {
+      "b1_s5": {
+        "verdict": "未构成检验",
+        "reason": "效用平台未检出（母论文层前提）",
+        "supplement_peak_window": false
+      },
+      "b1_s6": {
+        "verdict": "未构成检验",
+        "reason": "Ŝ 双路形状判据未过（仪器）"
+      },
+      "b1_s7": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b1_s8": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b1_s9": {
+        "verdict": "未构成检验",
+        "reason": "Ŝ 双路形状判据未过（仪器）"
+      },
+      "b4_s5": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b4_s6": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b4_s7": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b4_s8": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      },
+      "b4_s9": {
+        "verdict": "未构成检验",
+        "reason": "入域门未过"
+      }
+    }
+  },
+  "analyses": {
+    "b1_s5": {
+      "name": "b1_s5",
+      "w_run": 725,
+      "sigma_rel": 0.17373838212069842,
+      "w_feasible": false,
+      "plateau_step": null,
+      "peak_step": 18500,
+      "s_drop_peak_window": 1.3048991270611188,
+      "v_drop_peak_window": 50.71495317862127,
+      "dual_shape": {
+        "rho": 0.9211132929223937,
+        "delta_same_sign": true,
+        "delta_flow": 1.3048991270611188,
+        "delta_knn": 1.2617268608133942
+      }
+    },
+    "b1_s6": {
+      "name": "b1_s6",
+      "w_run": 461,
+      "sigma_rel": 0.13849938590397026,
+      "w_feasible": false,
+      "plateau_step": null,
+      "peak_step": 17500,
+      "s_drop_peak_window": 1.912205040958039,
+      "v_drop_peak_window": 56.79389625108979,
+      "dual_shape": {
+        "rho": 0.8781695551950823,
+        "delta_same_sign": true,
+        "delta_flow": 1.912205040958039,
+        "delta_knn": 1.6585935484744012
+      }
+    },
+    "b1_s9": {
+      "name": "b1_s9",
+      "w_run": 3,
+      "sigma_rel": 0.0007447249515577577,
+      "w_feasible": true,
+      "plateau_step": 18500,
+      "peak_step": 4000,
+      "s_drop_peak_window": 2.634706495653226,
+      "v_drop_peak_window": 150.79708708036537,
+      "s_drop": 0.05432750042063894,
+      "v_drop": 12.173968962103118,
+      "dual_shape": {
+        "rho": 0.9978656193972509,
+        "delta_same_sign": false,
+        "delta_flow": 0.05432750042063894,
+        "delta_knn": -0.01787563267334935
+      }
+    }
+  }
+}

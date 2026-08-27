@@ -300,13 +300,22 @@ def analyze_run(cfg, train_cfg, name: str, out_dir) -> dict:
     steps_u = [r["step"] for r in uni]
     u = torch.tensor([r["u_composite"] for r in uni], dtype=torch.float64)
     w_run, sigma_rel = w_run_rule(u)
-    det = detect_plateau(u, window=w_run, smoothing=5)
-    plateau_step = steps_u[det["plateau_index"] - 1] if det["plateau_index"] is not None else None
+    # W_run 超视界（平滑序列容不下连续 3 窗）即数据条件不足：平台记
+    # 未检出（协议降级预案 2），照走峰值窗口增补层
+    n_smoothed = len(uni) - 4
+    w_feasible = n_smoothed // w_run >= 3
+    plateau_step = None
+    if w_feasible:
+        det = detect_plateau(u, window=w_run, smoothing=5)
+        if det["plateau_index"] is not None:
+            plateau_step = steps_u[det["plateau_index"] - 1]
 
-    # 峰值点：滑窗 W 均值最大的窗末检查点（thresholds p1.peak_window_rule）
-    win = torch.tensor([float(u[i - w_run + 1: i + 1].mean())
-                        for i in range(w_run - 1, len(uni))])
-    peak_step = steps_u[int(win.argmax()) + w_run - 1]
+    # 峰值点：滑窗均值最大的窗末检查点（thresholds p1.peak_window_rule）；
+    # 定位窗取 s1_window_min=3（argmax 对窗长稳健，非斜率检验）
+    w_peak = 3
+    win = torch.tensor([float(u[i - w_peak + 1: i + 1].mean())
+                        for i in range(w_peak - 1, len(uni))])
+    peak_step = steps_u[int(win.argmax()) + w_peak - 1]
 
     def window_delta(anchor_step: int, key: str) -> float:
         end_step = min(2 * anchor_step, steps_u[-1])
@@ -317,6 +326,7 @@ def analyze_run(cfg, train_cfg, name: str, out_dir) -> dict:
 
     out = {
         "name": name, "w_run": w_run, "sigma_rel": sigma_rel,
+        "w_feasible": w_feasible,
         "plateau_step": plateau_step, "peak_step": peak_step,
         "curve": {"steps": [r["step"] for r in rows],
                   "u": [r["u_composite"] for r in rows],
