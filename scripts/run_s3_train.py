@@ -48,6 +48,7 @@ def build_model(cfg: dict) -> S3TransformerWM:
         cfg["obs_dim"], cfg["action_dim"], cfg["d_model"], cfg["n_layers"],
         cfg["n_heads"], cfg["ff_dim"], max_len=cfg["episode_len"] + 4,
         sigma_dec=cfg["sigma_dec"], goal_sigma_dec=cfg.get("goal_sigma_dec"),
+        multi_step_k=cfg.get("multi_step_k", 1),
     )
 
 

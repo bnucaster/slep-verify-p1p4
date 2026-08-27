@@ -39,7 +39,12 @@ class S3TransformerWM(nn.Module):
         max_len: int = 128,
         sigma_dec: float = 0.2,
         goal_sigma_dec: float | None = None,
+        multi_step_k: int = 1,
     ):
+        """multi_step_k > 1：多步解码头（S2' V1 同机制）。初版 S3 实测
+        残差流几何退化（log10 条件数 ~28、参与维 ~1.0，dev 试点
+        geom_decomp/s3_dev_v1），未来 k 步预测头让更多隐维对观测几何
+        可见；decoder_mean 保持单步语义，估计器走 decoder_mean_ext。"""
         super().__init__()
         self.obs_embed = nn.Linear(obs_dim, d_model)
         self.act_embed = nn.Linear(action_dim, d_model)
@@ -55,20 +60,26 @@ class S3TransformerWM(nn.Module):
             dropout=0.0, norm_first=True)
         self.blocks = nn.TransformerEncoder(layer, n_layers)
         self.decoder = nn.Sequential(
-            nn.Linear(d_model, 64), nn.ReLU(), nn.Linear(64, obs_dim))
+            nn.Linear(d_model, 64), nn.ReLU(), nn.Linear(64, obs_dim * multi_step_k))
         self.hidden_dim = d_model
         self.obs_dim = obs_dim
         self.sigma_dec = sigma_dec
         self.goal_sigma_dec = goal_sigma_dec
+        self.multi_step_k = multi_step_k
         var = torch.full((obs_dim,), sigma_dec**2)
         if goal_sigma_dec is not None:
             if obs_dim % 2 != 0:
                 raise ValueError("双通道方差要求观测维数为偶数")
             var[obs_dim // 2:] = goal_sigma_dec**2
         self.register_buffer("obs_var", var)
+        self.register_buffer("obs_var_ext", var.repeat(multi_step_k))
 
     def decoder_mean(self, h: torch.Tensor) -> torch.Tensor:
         """隐状态 (…, d_model) → 下一步观测均值 (…, obs_dim)。"""
+        return torch.sigmoid(self.decoder(h))[..., : self.obs_dim]
+
+    def decoder_mean_ext(self, h: torch.Tensor) -> torch.Tensor:
+        """扩展解码头 (…, d_model) → (…, k·obs_dim)；k=1 时同 decoder_mean。"""
         return torch.sigmoid(self.decoder(h))
 
     def decoder_mean_flat(self, h: torch.Tensor) -> torch.Tensor:
@@ -87,11 +98,20 @@ class S3TransformerWM(nn.Module):
         return self.blocks(tok, mask=mask, is_causal=True)
 
     def rollout_loss(self, obs: torch.Tensor, act: torch.Tensor) -> dict[str, torch.Tensor]:
-        """下一步预测 NLL（配分常数略去），逐样本逐步平均。"""
+        """预测 NLL（配分常数略去），逐样本逐步平均。k>1 时多步目标拼接，
+        只在 t+k ≤ T 位置计损失（口径同 S2WorldModel）。"""
         hs = self.hidden_trajectory(obs, act)
-        pred = self.decoder_mean(hs)
-        target = obs[:, 1:]
-        nll = (((target - pred) ** 2) / self.obs_var).sum(-1) / 2
+        k = self.multi_step_k
+        n_steps = act.shape[1]
+        if k == 1:
+            pred = self.decoder_mean(hs)
+            target = obs[:, 1:]
+        else:
+            n_pos = n_steps - k + 1
+            pred = self.decoder_mean_ext(hs[:, :n_pos])
+            target = torch.cat([obs[:, 1 + j: 1 + j + n_pos] for j in range(k)], dim=-1)
+        var = self.obs_var if k == 1 else self.obs_var_ext
+        nll = (((target - pred) ** 2) / var).sum(-1) / 2
         return {"total": nll.mean(), "mse_per_pixel": ((target - pred) ** 2).mean().detach()}
 
 
