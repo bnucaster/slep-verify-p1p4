@@ -14,10 +14,13 @@ n_query 点算两种度量的谱。产物 results/description/geom_decomp/
 <campaign>/summary.json 与 decomp.png。
 
 用法：.venv/Scripts/python.exe scripts/run_geom_decomposition.py
+  [--config configs/<训练配置>.yaml]   # 变体筛查：S2' 用扩展解码口径
+  [--max-seeds N]
 """
 from __future__ import annotations
 
 import json
+import sys
 import time
 
 import numpy as np
@@ -31,13 +34,15 @@ from slep.systems.s2_world_model import S2WorldModel
 from slep.utils.runs import REPO_ROOT, create_campaign_dir
 
 TRAIN_CONFIG = REPO_ROOT / "configs" / "s2_train_long.yaml"  # dev_v3
-CAMPAIGN = "dev_v3"
 CKPT_STEPS = [500, 1000, 2000, 4000, 6000, 8000, 12000, 16000, 20000]
 N_EPISODES, N_QUERY, BURN_IN = 200, 512, 8
 
 
 def spectra(model: S2WorldModel, h_q: torch.Tensor, obs_var) -> dict:
     def dec(z):
+        # S2' 变体（multi_step_k>1）：度量取扩展解码口径（预测性观测几何）
+        if getattr(model, "multi_step_k", 1) > 1:
+            return model.decoder_mean_ext(z.float()).double()
         return model.decoder_mean(z.float()).double()
 
     g = fisher_pullback_gaussian_batch(dec, h_q, obs_var).detach()
@@ -49,14 +54,29 @@ def spectra(model: S2WorldModel, h_q: torch.Tensor, obs_var) -> dict:
 
 
 def main() -> None:
-    cfg = yaml.safe_load(TRAIN_CONFIG.read_text(encoding="utf-8"))
+    config_file = TRAIN_CONFIG
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
+    campaign_name = cfg["campaign"]
+    train_stage = cfg.get("stage", "description")
     torch.set_num_threads(10)
+    max_seeds = None
+    if "--max-seeds" in sys.argv:
+        max_seeds = int(sys.argv[sys.argv.index("--max-seeds") + 1])
+    elif cfg.get("max_seeds"):
+        max_seeds = int(cfg["max_seeds"])
     out_dir = create_campaign_dir(
-        "description", "geom_decomp", CAMPAIGN,
+        "description", "geom_decomp", campaign_name,
         {"ckpt_steps": CKPT_STEPS, "n_episodes": N_EPISODES, "n_query": N_QUERY,
-         "burn_in": BURN_IN, "train_campaign": CAMPAIGN})
+         "burn_in": BURN_IN, "train_campaign": campaign_name,
+         "multi_step_k": cfg.get("multi_step_k", 1)})
     results = {}
-    for seed in guard.family_seeds("development", purpose="geom-decomp"):
+    seeds = guard.family_seeds(cfg.get("seed_family", "development"),
+                               purpose="geom-decomp")
+    if max_seeds:
+        seeds = seeds[:max_seeds]
+    for seed in seeds:
         t0 = time.time()
         rng = np.random.default_rng(seed + 960_000)
         obs_np, act_np = gw.collect_rollouts(N_EPISODES, cfg["episode_len"],
@@ -64,12 +84,14 @@ def main() -> None:
         obs, act = torch.from_numpy(obs_np), torch.from_numpy(act_np)
         per_ckpt = {}
         for step in CKPT_STEPS:
-            ck = torch.load(REPO_ROOT / "results/description/s2_train/dev_v3"
-                            / f"s{seed}" / "checkpoints" / f"ckpt_{step:06d}.pt",
-                            weights_only=True)
+            ck = torch.load(REPO_ROOT / "results" / train_stage / "s2_train"
+                            / campaign_name / f"s{seed}" / "checkpoints"
+                            / f"ckpt_{step:06d}.pt", weights_only=True)
             model = S2WorldModel(cfg["obs_dim"], cfg["action_dim"], cfg["embed_dim"],
                                  cfg["hidden_dim"], cfg["sigma_dec"],
-                                 cfg.get("goal_sigma_dec"))
+                                 cfg.get("goal_sigma_dec"),
+                                 multi_step_k=cfg.get("multi_step_k", 1),
+                                 label_smooth_eps=cfg.get("label_smooth_eps", 0.0))
             model.load_state_dict(ck["model"])
             model.eval()
             with torch.no_grad():
@@ -77,8 +99,10 @@ def main() -> None:
             h_pool = hs[:, BURN_IN:].reshape(-1, cfg["hidden_dim"]).double()
             idx = torch.from_numpy(rng.permutation(h_pool.shape[0])[:N_QUERY])
             h_q = h_pool[idx]
+            var = (model.obs_var_ext if getattr(model, "multi_step_k", 1) > 1
+                   else model.obs_var).double()
             per_ckpt[step] = {
-                "per_channel": spectra(model, h_q, model.obs_var.double()),
+                "per_channel": spectra(model, h_q, var),
                 "isotropic": spectra(model, h_q, 1.0),
             }
         results[f"s{seed}"] = per_ckpt
