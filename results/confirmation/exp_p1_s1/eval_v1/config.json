@@ -1,0 +1,17 @@
+{
+  "k_entropy_knn": 1,
+  "k_potential": 32,
+  "n_entropy_eval": 8000,
+  "n_flow_train": 12000,
+  "n_flow_val": 2000,
+  "n_geometry_query": 1024,
+  "n_probe_test": 24000,
+  "n_probe_train": 24000,
+  "n_query": 1024,
+  "n_ref": 10000,
+  "out_campaign": "eval_v1",
+  "sigma_u_folds": 8,
+  "torch_threads": 10,
+  "train_campaign": "eval_v1",
+  "train_config": "configs/s1_train_eval.yaml"
+}

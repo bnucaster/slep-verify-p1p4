@@ -157,8 +157,14 @@ def stage_gates(cfg, train_cfg, packed, classes, values, out_dir, log) -> dict:
         return json.loads(out_file.read_text(encoding="utf-8"))
     th = json.loads(THRESHOLDS_FILE.read_text(encoding="utf-8"))
     final_step = train_cfg["train_steps"]
+    cache_dir = out_dir / "gates_cache"
+    cache_dir.mkdir(exist_ok=True)
     gates = {}
     for name in run_names(train_cfg):
+        cache = cache_dir / f"{name}.json"
+        if cache.exists():
+            gates[name] = json.loads(cache.read_text(encoding="utf-8"))
+            continue
         beta, seed = parse_run(name)
         ckpt = (REPO_ROOT / "results/confirmation/s1_train" / cfg["train_campaign"]
                 / name / "checkpoints" / f"ckpt_{final_step:06d}.pt")
@@ -175,9 +181,12 @@ def stage_gates(cfg, train_cfg, packed, classes, values, out_dir, log) -> dict:
                                      values[sets["probe_test"]], cfg["sigma_u_folds"])
         z_g = encode(model, packed, sets["query"][: cfg["n_geometry_query"]], gen,
                      sample=True).double()
+        d_lat = train_cfg["latent_dim"]
 
-        def dec(z, m=model):
-            return m.decoder(z.float()).reshape(z.shape[0], -1).double()
+        def dec(z, m=model, d=d_lat):
+            # 形状鲁棒：单点 (d,) 与批量 (…, d) 皆可（jacfwd 逐点求导需要）
+            flat = m.decoder(z.reshape(-1, d).float())
+            return flat.reshape(*z.shape[:-1], -1).double()
 
         eig_parts = []
         for i in range(0, z_g.shape[0], 128):
@@ -197,6 +206,7 @@ def stage_gates(cfg, train_cfg, packed, classes, values, out_dir, log) -> dict:
             "capability_ok": bool(cap_ok), "geometry_ok": bool(geo_ok),
             "gate_ok": bool(cap_ok and geo_ok),
         }
+        cache.write_text(json.dumps(gates[name], ensure_ascii=False), encoding="utf-8")
         log(f"gates {name}: Û={pr['u_composite']:.3f} σ_Û={sigma_u:.4f} "
             f"cond={log10_cond:.2f} 参与维={part:.2f} → "
             f"{'过门' if gates[name]['gate_ok'] else '未过门'}（{time.time() - t0:.0f}s）")
@@ -347,9 +357,11 @@ def static_temperature(cfg, train_cfg, packed, name: str, log) -> dict:
     z_ft = encode(model, packed, sets["flow_train"], gen, sample=True).double()
     z_fv = encode(model, packed, sets["flow_val"], gen, sample=True).double()
     x_ref = batch_imgs(packed, sets["ref"]).reshape(len(sets["ref"]), -1).double()
+    d_lat = train_cfg["latent_dim"]
 
-    def dec(z, m=model):
-        return m.decoder(z.float()).reshape(z.shape[0], -1).double()
+    def dec(z, m=model, d=d_lat):
+        flat = m.decoder(z.reshape(-1, d).float())
+        return flat.reshape(*z.shape[:-1], -1).double()
 
     v_parts = []
     for i in range(0, z_q.shape[0], 256):
