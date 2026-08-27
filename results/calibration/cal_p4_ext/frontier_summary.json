@@ -1,0 +1,27 @@
+{
+  "purpose": "仪器可行域边界细化（计划 11.0）：几何匹配合成系统的条件数梯度上全链恢复",
+  "conventions": {
+    "well_w": "对数等距梯子 [0.5, 2.0]（v1 geometry_match 惯例；移植实验 hyb_* 证明随机抽取的刚度谱单独可把 5.74 档恢复从 ~8% 打到 ~39%，失效走 V̂ 环节）",
+    "allocation": "参照集 = 全部非查询样本（v1 run_cal_p4 口径）；flow 冻结主口径 12/128/25/512",
+    "spectrum": "dev_v3 20k 步秩谱围绕 log 中位数压缩至目标条件数；logdet std 目标 36.4，构造族达成上限 ~5.0（缺口与 v1 同源，位置变率误差可能被低估）"
+  },
+  "arms": [
+    {"name": "lad574", "log10_cond": 5.70, "flow_err_chains": 0.075, "flow_err_exact": 0.084, "r2_chains": 0.501, "r2_exact": 0.430},
+    {"name": "lad63",  "log10_cond": 6.26, "flow_err_chains": 0.013, "flow_err_exact": 0.052, "r2_chains": 0.394, "r2_exact": 0.384},
+    {"name": "lad70",  "log10_cond": 6.97, "flow_err_chains": 0.061, "flow_err_exact": 0.031, "r2_chains": 0.287, "r2_exact": 0.335},
+    {"name": "lad75",  "log10_cond": 7.47, "flow_err_chains": 0.172, "flow_err_exact": 0.100, "r2_chains": 0.158, "r2_exact": 0.265},
+    {"name": "lad80",  "log10_cond": 7.97, "flow_err_chains": 0.201, "flow_err_exact": 0.179, "r2_chains": 0.133, "r2_exact": 0.187},
+    {"name": "lad963", "log10_cond": 9.61, "flow_err_chains": 0.687, "flow_err_exact": 0.766, "r2_chains": 0.076, "r2_exact": 0.050}
+  ],
+  "boundary": {
+    "validated_max_log10_cond": 7.0,
+    "criterion": "主链臂与精确臂 flow 误差均 ≤ 0.12（温度容差语境）且 R² > 0.25（仪器分辨力下限）",
+    "first_failing": "7.47（主链臂 17.2% 超容差、R² 0.158 低于下限）",
+    "v12_gate_candidate": 7.0
+  },
+  "corrections_to_earlier_runs": [
+    "ext_20k_v1（9.63 档首跑）与 ext_c*_v1/v2 各臂使用了两处偏离 v1 校准惯例的配置：参照集 1.6 万（v1 为全部非查询样本）与随机抽取的 well_w（v1 为对数等距梯子）；其数值（如 9.63 档误差 181–241%）作废，以 lad963（69–77%）为准。结论方向不变：9.6 量级几何下全链恢复失败。",
+    "对照复现 ext_v1sys_v2：v1 系统原参数在本管线恢复 0.8%/7.5%，管线效力经对照确认。"
+  ],
+  "limitation": "可行性不只由度量条件数决定：hyb_well 移植显示采样各向异性结构（势阱刚度谱形）在同一条件数下可翻转恢复成败。条件数门是必要性筛查，充分性证书仍是逐系统的几何匹配校准恢复。v1.2 修订须写明该局限。"
+}

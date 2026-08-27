@@ -17,11 +17,18 @@
    （flow 冻结主口径 / kNN 标准化消融）：ĝ（Fisher 拉回估计）→ V̂
    （kNN）→ Î → 仿射拟合 → T̂ 对真值 0.5；主链臂另报分半双口径。
 
-用法：.venv/Scripts/python.exe scripts/run_cal_p4_ext.py [--stage target|match|simulate|estimate]
+用法：.venv/Scripts/python.exe scripts/run_cal_p4_ext.py
+  [--stage target|match|simulate|estimate|isolation]
+  [--name <战役名>] [--cond-log10 <目标>]
+
+--cond-log10：可行域边界细化档（阶段 11.0）。把 dev_v3 秩谱的 log
+特征值围绕 log 中位数按比例压缩到目标 log10 条件数，其余参数不变；
+边界 = 最高恢复通过档。目标谱直接复用 ext_20k_v1 的 target_spectra.json。
 """
 from __future__ import annotations
 
 import json
+import math
 import sys
 import time
 
@@ -89,6 +96,22 @@ def stage_target(cfg, out_dir, log) -> dict:
     return out
 
 
+def compress_target(target: dict, cond_log10: float) -> dict:
+    """秩谱 log 压缩：log λ ← log中位 + α·(log λ − log中位)，α 使
+    log10(λ_max/λ_min) 命中目标。logdet std 目标不变。"""
+    eig = torch.tensor(target["eig_median_by_rank"], dtype=torch.float64)
+    log_eig = torch.log10(eig)
+    med = log_eig.median()
+    span = float(log_eig.max() - log_eig.min())
+    alpha = cond_log10 / span
+    eig_c = 10 ** (med + alpha * (log_eig - med))
+    out = dict(target)
+    out["eig_median_by_rank"] = eig_c.tolist()
+    out["log10_cond_of_target"] = float(torch.log10(eig_c[-1] / eig_c[0]))
+    out["compress_alpha"] = alpha
+    return out
+
+
 def stage_match(cfg, target, out_dir, log) -> dict:
     out_file = out_dir / "matched_ext.json"
     if out_file.exists():
@@ -97,8 +120,13 @@ def stage_match(cfg, target, out_dir, log) -> dict:
     gen = torch.Generator()
     gen.manual_seed(seed)
     d = len(target["eig_median_by_rank"])
-    log_w = torch.rand(d, generator=gen, dtype=torch.float64)
-    well_w = (cfg["well_w_min"] * (cfg["well_w_max"] / cfg["well_w_min"]) ** log_w).tolist()
+    # 刚度取对数等距梯子（v1 geometry_match 惯例）。2026-08-27 移植实验：
+    # 随机抽取的 w（含近重复值）单独就把 5.74 档恢复从 ~2% 打到 ~39%
+    # （hyb_well），失效走 V̂ 环节；边界细化各档必须沿用 v1 构造惯例，
+    # 只变谱目标。该敏感性本身记录为几何门局限（可行性不只由度量谱决定）。
+    well_w = torch.logspace(
+        math.log10(cfg["well_w_min"]), math.log10(cfg["well_w_max"]), d,
+        dtype=torch.float64).tolist()
     system, report = build_matched_system(
         target_eig_median_by_rank=target["eig_median_by_rank"],
         target_logdet_std=target["logdet_std_median"],
@@ -133,17 +161,20 @@ def stage_simulate(cfg, matched, out_dir, log) -> None:
 
 
 def estimate_arm(cfg, system, z_flat, tags, arm, gen, log) -> dict:
-    """单臂估计链：ĝ → V̂ → Î（flow 主 / kNN 消融）→ 仿射与分半。"""
+    """单臂估计链：ĝ → V̂ → Î（flow 主 / kNN 消融）→ 仿射与分半。
+
+    样本分配沿用 v1 run_cal_p4 口径（2026-08-27 修正）：参照集 = 全部
+    非查询样本（≈5.8 万），flow 在参照集上留验训练。早先版本只配 1.6 万
+    参照，估计器被削弱，各档（含 9.63）结论均以本口径重跑为准。
+    """
     t0 = time.time()
     th_p4 = json.loads(THRESHOLDS_FILE.read_text(encoding="utf-8"))["p4"]
     obs_var = torch.full((cfg["obs_dim"],), float(cfg["sigma_dec"]) ** 2,
                          dtype=torch.float64)
     n = z_flat.shape[0]
     perm = torch.randperm(n, generator=gen)
-    idx_ref = perm[: cfg["n_ref"]]
-    idx_q = perm[cfg["n_ref"]: cfg["n_ref"] + cfg["n_queries"]]
-    idx_flow = perm[cfg["n_ref"] + cfg["n_queries"]:
-                    cfg["n_ref"] + cfg["n_queries"] + cfg["n_flow_train"] + cfg["n_flow_val"]]
+    idx_q = perm[: cfg["n_queries"]]
+    idx_ref = perm[cfg["n_queries"]:]
     z_ref = z_flat[idx_ref]
     o_ref = system.sample_observations(z_ref, gen)
     z_q = z_flat[idx_q]
@@ -160,13 +191,15 @@ def estimate_arm(cfg, system, z_flat, tags, arm, gen, log) -> dict:
     v_q = torch.cat(v_parts)
 
     fc = th_p4["flow_config"]
-    nft = cfg["n_flow_train"]
-    fd, _ = fit_flow_density(z_flat[idx_flow[:nft]], z_flat[idx_flow[nft:]],
-                             seed=99, n_couplings=fc["couplings"], hidden=fc["hidden"],
+    n_val = max(z_ref.shape[0] // 10, 1000)
+    fd, _ = fit_flow_density(z_ref[n_val:], z_ref[:n_val], seed=99,
+                             n_couplings=fc["couplings"], hidden=fc["hidden"],
                              epochs=fc["epochs"], batch_size=fc["batch"])
     i_flow = -fd.log_prob(z_q) + 0.5 * logdet_est
-    i_knn = -log_density_knn(z_q, z_flat[idx_flow[:nft]], k=cfg["k_density"],
-                             standardize=True) + 0.5 * logdet_est
+    knn_parts = [log_density_knn(z_q[i: i + 256], z_ref, k=cfg["k_density"],
+                                 standardize=True)
+                 for i in range(0, z_q.shape[0], 256)]
+    i_knn = -torch.cat(knn_parts) + 0.5 * logdet_est
 
     t_true = float(cfg["temperature"])
     out = {"arm": arm, "n_queries": int(z_q.shape[0]),
@@ -241,11 +274,9 @@ def stage_isolation(cfg, matched, out_dir, log) -> None:
     gen.manual_seed(seed + 3)
     obs_var = torch.full((cfg["obs_dim"],), float(cfg["sigma_dec"]) ** 2, dtype=torch.float64)
     perm = torch.randperm(z_flat.shape[0], generator=gen)
-    z_ref = z_flat[perm[: cfg["n_ref"]]]
+    z_q = z_flat[perm[:2000]]
+    z_ref = z_flat[perm[2000:]]
     o_ref = system.sample_observations(z_ref, gen)
-    z_q = z_flat[perm[cfg["n_ref"]: cfg["n_ref"] + 2000]]
-    nft = cfg["n_flow_train"]
-    idx_flow = perm[cfg["n_ref"] + 2000: cfg["n_ref"] + 2000 + nft + cfg["n_flow_val"]]
 
     v_true = system.potential_estimand(z_q)
     i_true = system.self_information_true(z_q)
@@ -263,7 +294,8 @@ def stage_isolation(cfg, matched, out_dir, log) -> None:
     v_hat = torch.cat(v_parts)
     th_p4 = json.loads(THRESHOLDS_FILE.read_text(encoding="utf-8"))["p4"]
     fc = th_p4["flow_config"]
-    fd, _ = fit_flow_density(z_flat[idx_flow[:nft]], z_flat[idx_flow[nft:]], seed=99,
+    n_val = max(z_ref.shape[0] // 10, 1000)
+    fd, _ = fit_flow_density(z_ref[n_val:], z_ref[:n_val], seed=99,
                              n_couplings=fc["couplings"], hidden=fc["hidden"],
                              epochs=fc["epochs"], batch_size=fc["batch"])
     logp_est = fd.log_prob(z_q)
@@ -300,7 +332,18 @@ def main() -> None:
     stage = None
     if "--stage" in sys.argv:
         stage = sys.argv[sys.argv.index("--stage") + 1]
-    out_dir = create_campaign_dir("calibration", "cal_p4_ext", OUT_NAME, cfg)
+    name = OUT_NAME
+    if "--name" in sys.argv:
+        name = sys.argv[sys.argv.index("--name") + 1]
+    cond_log10 = None
+    if "--cond-log10" in sys.argv:
+        cond_log10 = float(sys.argv[sys.argv.index("--cond-log10") + 1])
+    shift_log10 = 0.0
+    if "--eig-shift-log10" in sys.argv:
+        shift_log10 = float(sys.argv[sys.argv.index("--eig-shift-log10") + 1])
+    out_dir = create_campaign_dir("calibration", "cal_p4_ext", name,
+                                  {**cfg, "cond_log10": cond_log10,
+                                   "eig_shift_log10": shift_log10})
     log_path = out_dir / "log.txt"
 
     def log(msg: str) -> None:
@@ -309,8 +352,44 @@ def main() -> None:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(line + "\n")
 
+    system_json = None
+    if "--system-json" in sys.argv:
+        system_json = REPO_ROOT / sys.argv[sys.argv.index("--system-json") + 1]
+    if system_json is not None:
+        # 直接加载既有系统参数（对照复现用），跳过 target/match
+        params = json.loads(system_json.read_text(encoding="utf-8"))
+        params = params.get("params", params)
+        mf = out_dir / "matched_ext.json"
+        if not mf.exists():
+            mf.write_text(json.dumps(
+                {"params": params,
+                 "match_report": {"achieved_log10_cond_median": None,
+                                  "achieved_logdet_std": None,
+                                  "target_logdet_std": None,
+                                  "source": str(system_json)}},
+                ensure_ascii=False, indent=2), encoding="utf-8")
+        matched = json.loads(mf.read_text(encoding="utf-8"))
+        stage_simulate(cfg, matched, out_dir, log)
+        stage_estimate(cfg, matched, out_dir, log)
+        stage_isolation(cfg, matched, out_dir, log)
+        log("CAL-P4-EXT（外部系统参数）批次完成")
+        return
+
+    base_target = REPO_ROOT / "results/calibration/cal_p4_ext" / OUT_NAME / "target_spectra.json"
+    if not (out_dir / "target_spectra.json").exists() and base_target.exists():
+        (out_dir / "target_spectra.json").write_text(
+            base_target.read_text(encoding="utf-8"), encoding="utf-8")
     target = stage_target(cfg, out_dir, log) if stage in (None, "target") else (
         json.loads((out_dir / "target_spectra.json").read_text(encoding="utf-8")))
+    if cond_log10 is not None:
+        target = compress_target(target, cond_log10)
+        log(f"谱压缩：目标 log10 条件数 {target['log10_cond_of_target']:.2f}"
+            f"（α={target['compress_alpha']:.3f}）")
+    if shift_log10 != 0.0:
+        target = dict(target)
+        target["eig_median_by_rank"] = [
+            e * 10**shift_log10 for e in target["eig_median_by_rank"]]
+        log(f"谱位平移：全部特征值 ×10^{shift_log10:g}（条件数不变）")
     if stage in (None, "match", "simulate", "estimate", "isolation"):
         matched = stage_match(cfg, target, out_dir, log)
     if stage in (None, "simulate", "estimate"):

@@ -1,0 +1,29 @@
+{
+  "baseline_true_on_true": {
+    "slope": 2.000000000000001,
+    "expected": 2.0
+  },
+  "v_hat_vs_estimand": {
+    "corr": 0.8257590912071165,
+    "slope_est_on_true": 0.6343731442059305,
+    "bias_mean": 4.577216710448316,
+    "rmse": 4.6457265636200535
+  },
+  "logp_flow_vs_true": {
+    "corr": 0.40960000265949115,
+    "slope_est_on_true": 0.5145888860453219,
+    "bias_mean": -2.2924393356726167,
+    "rmse": 2.8883023611387904
+  },
+  "logdet_ghat_vs_true": {
+    "corr": 1.0,
+    "slope_est_on_true": 1.0000000000000133,
+    "bias_mean": 2.653397501717336e-13,
+    "rmse": 8.646337920203395e-12
+  },
+  "spread_nats": {
+    "v_true_sd": 1.4024121946962806,
+    "logdet_true_sd": 4.7971379806657435,
+    "logp_true_sd": 1.4119820199950122
+  }
+}
