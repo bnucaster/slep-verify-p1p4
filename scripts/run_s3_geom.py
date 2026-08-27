@@ -6,10 +6,10 @@ results/description/geom_decomp/<campaign>/summary.json。
 
 用法：.venv/Scripts/python.exe scripts/run_s3_geom.py [--config configs/s3_train_v2.yaml]
 """
-import sys
 from __future__ import annotations
 
 import json
+import sys
 import time
 
 import numpy as np

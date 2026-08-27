@@ -68,11 +68,14 @@ def build_tasks(seed: int):
 
 def load_model(seed: int, step: int) -> S2WorldModel:
     ck = torch.load(
-        REPO_ROOT / "results" / "description" / "s2_train" / CFG_TRAIN["campaign"]
-        / f"s{seed}" / "checkpoints" / f"ckpt_{step:06d}.pt", weights_only=True)
+        REPO_ROOT / "results" / CFG_TRAIN.get("stage", "description") / "s2_train"
+        / CFG_TRAIN["campaign"] / f"s{seed}" / "checkpoints" / f"ckpt_{step:06d}.pt",
+        weights_only=True)
     model = S2WorldModel(CFG_TRAIN["obs_dim"], CFG_TRAIN["action_dim"], CFG_TRAIN["embed_dim"],
                          CFG_TRAIN["hidden_dim"], CFG_TRAIN["sigma_dec"],
-                         CFG_TRAIN.get("goal_sigma_dec"))
+                         CFG_TRAIN.get("goal_sigma_dec"),
+                         multi_step_k=CFG_TRAIN.get("multi_step_k", 1),
+                         label_smooth_eps=CFG_TRAIN.get("label_smooth_eps", 0.0))
     model.load_state_dict(ck["model"])
     model.eval()
     return model
