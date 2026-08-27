@@ -1,0 +1,28 @@
+{
+  "created": "2026-08-28T00:09:18+0100",
+  "protocol_version": "1.2",
+  "files": {
+    "docs/protocol_v1.1_draft.md": "65aa694176115b98c89f1ea6fd8f9ebc7df0d93a958f12f430519fe99417afc3",
+    "docs/protocol_v1.1_thresholds.json": "815ba82c507a061139b9ed004dd2b5e96ee3669512114cd7767a2837d333cc62",
+    "docs/manipulation_signature.md": "32325f7ab7dfb94c3be903a9f7b5468df1a18fb362bc65ba43e8c85af255359f",
+    "configs/seeds.yaml": "a2099458898cade6849368d983ad62d39cb573c6351c60163d8cb2152c086844",
+    "src/slep/guard.py": "bf597d4a015b12ec0892934da134fcb06b55cd18f4224c59dc26aecfab3e68cd",
+    "src/slep/protocols/judge.py": "07c6052a4adbfa3c1fbc1dfa13cbffc9d491109e32abb43e1f0978370a96d5da",
+    "src/slep/protocols/affine.py": "fcada8343d14083a8f95dad1f0be88343942ff5193200444636a2c420f938884",
+    "src/slep/protocols/plateau.py": "9390ac0a0b342b348c17d3c6049e8fc2cedfb6e88aed2621905b46a4d114b07c",
+    "src/slep/protocols/surrogates.py": "4871a34f11742f15e680fd87001f6adcae38d43e5a7c25afb5d3d1e35ce1bab7",
+    "src/slep/estimators/metric.py": "2001ab2cc3de2aa3ef3039b9a348dfa4b3a5d8a51aa9e391e41417fecfa28232",
+    "src/slep/estimators/potential.py": "64799e5a74e28475365273a395a07ab2500fbad9eda9c2a7925c4bdd2203fd7a",
+    "src/slep/estimators/density.py": "1a8d6bee863d4e4197dd6e3bd98ef6c37bdd70eca7f14f32d9fce101305a326b",
+    "src/slep/estimators/flow.py": "986933004fcd1f21a78d54e7edbabd8d76c1a27dbd7dc06d1a9996b915b84e7d",
+    "src/slep/estimators/entropy.py": "e6b4ac00a2f68d58d51044d71736a05cce6ca841008a08691d2d6ffc7379f710",
+    "src/slep/estimators/om_action.py": "5a6d646e135c636b53b5c682992b9872c493c97e04fded6ca9454256abd4431e",
+    "src/slep/estimators/geodesic.py": "a1fcb27073a31260013ffd97a755bc802ed800c2562664bfdd6fe2d0763132a7",
+    "src/slep/estimators/drift.py": "908d82fca2752ce70740eec38ffec111ec1a40d55712ec02578d718da7d0f658",
+    "docs/protocol_v1.2_amendment.md": "c4fadeaebec33971f7e66c0c592d48c7fb769aa89533c6e0b19ca91caf56d89e",
+    "docs/protocol_v1.2_thresholds.json": "f1fcf8447524ca4256c77b8b492d4ac5c50a9d2645d61d32b0bd8c45fd25877a",
+    "src/slep/protocols/judge_v12.py": "e647b0c49d537dbba7f0417014efd9dc76dd0f02bc94727ff3572c692bb73a18",
+    "src/slep/systems/s2_world_model.py": "bb66da8c022c506c59877181a39a88476028c5d68d90a249588c0c21266e6276",
+    "src/slep/systems/s3_transformer.py": "0807cbbc8c513e2da1de700c0c882742e1f95adfeb12f825cd06554333e9f642"
+  }
+}

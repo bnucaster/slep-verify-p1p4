@@ -2,20 +2,20 @@
   "_meta": {
     "status": "v1.2 冻结前草案（与 protocol_v1.2_amendment.md 同时冻结；judge_v12 只读本文件取数）",
     "provenance_rule": "修订项推导见 protocol_v1.2_amendment.md；未修订项逐字继承 v1.1（docs/protocol_v1.1_thresholds.json，锚点 f7f7910）",
-    "pending": ["capability_gate.by_system.S3", "plateau.s3_window"]
+    "pending": []
   },
   "capability_gate": {
     "by_system": {
       "S1": 0.45,
       "S2": 0.29,
       "S2P": 0.29,
-      "S3": null
+      "S3": 0.28
     },
     "notes": {
       "S1": "继承 v1.1（因子探针复合 Û）",
       "S2": "继承 v1.1（确定性近距导航池化）",
       "S2P": "同口径同推导：随机基线池化 0.254 与 s2p_v1 训练水平（末三均值 0.326、峰值 0.344）中点取整，与 S2 一致为 0.29；results/description/s2_u_curve/s2p_v1/summary.json",
-      "S3": "待 s3_u_curve 探针（同口径推导）"
+      "S3": "同口径同推导：随机基线池化 0.254 与 s3_dev_v2 训练水平（末三均值 0.302、峰值 0.310）中点取整 0.28；results/description/s3_u_curve/s3_dev_v2/summary.json"
     }
   },
   "geometry_gate": {
@@ -45,10 +45,11 @@
     "s1_window_min": 3,
     "s2_window": 3,
     "s2p_window": 3,
-    "s3_window": null,
+    "s3_window": 3,
     "window_runtime_rule": "W_run = max(W_min, ceil(12·σ̂_rel²/(smoothing·θ²)))；σ̂_rel 取平滑曲线末 16 检查点一阶差分标准差除以 sqrt(2)；W_run 使平滑序列容不下连续 3 窗时记数据条件不足（平台未检出，走峰值窗口增补层）",
     "sigma_u_rule": "评估噪声另须 σ_Û ≤ θ·sqrt(W)/(3·sqrt(12))；确定性评估口径该项为零",
-    "s2p_expectation_note": "开发族 s2p_v1 池化曲线在全部平滑档均无平台（峰后系统性缓降，S1 型曲线），P1 × S2P 预期走峰值窗口增补层——有风险预注册，照测照报"
+    "s2p_expectation_note": "开发族 s2p_v1 池化曲线在全部平滑档均无平台（峰后系统性缓降，S1 型曲线），P1 × S2P 预期走峰值窗口增补层——有风险预注册，照测照报",
+    "s3_expectation_note": "开发族 s3_dev_v2 池化曲线尾段安静（σ̂_rel 0.0037，W 规则=3）但逐窗波动 ±1–3.4% 无连续三平窗，平台未检出；P1 × S3 同样预期走峰值窗口增补层"
   },
   "p1": {
     "s_drop_band_multiplier": 2.0,
