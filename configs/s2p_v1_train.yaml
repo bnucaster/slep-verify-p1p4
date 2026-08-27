@@ -1,0 +1,31 @@
+# S2' 变体 V1（选项 D，计划 11.2）：多步解码头初筛，开发族前 2 种子。
+# 与 dev_v3 的差异：multi_step_k=4（解码未来 4 步观测），其余口径不变。
+# 初筛判据：平台区（≈15500 步）条件数中位 ≤ 7.0（可行域验证上限，
+# results/calibration/cal_p4_ext/frontier_summary.json）且导航 sanity 不塌。
+campaign: s2p_v1
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+multi_step_k: 4
+episodes: 500
+episode_len: 64
+train_steps: 20000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 500
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: development
+max_seeds: 2
+torch_threads: 10
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24

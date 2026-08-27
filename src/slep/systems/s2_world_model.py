@@ -29,27 +29,48 @@ class S2WorldModel(nn.Module):
         hidden_dim: int = 16,
         sigma_dec: float = 0.2,
         goal_sigma_dec: float | None = None,
+        multi_step_k: int = 1,
+        label_smooth_eps: float = 0.0,
     ):
         """goal_sigma_dec 非空时观测视为双通道（前半墙体 σ=sigma_dec，
-        后半目标 σ=goal_sigma_dec）；空时各维同方差 sigma_dec。"""
+        后半目标 σ=goal_sigma_dec）；空时各维同方差 sigma_dec。
+
+        multi_step_k > 1 为 S2' 多步解码头变体（协议 v1.2 附录，选项 D）：
+        解码器输出未来 k 步观测 (o_{t+1}…o_{t+k}) 拼接，动机是让承载
+        记忆的隐维对（预测性）观测几何可见——瞬时观测不依赖它们，
+        Fisher 拉回在这些方向退化（dev/eval 20k 步实测 eig 数值零，
+        results/description/geom_decomp/）。decoder_mean 保持单步语义
+        （首段切片，规划器与旧管线不动），估计器用 decoder_mean_ext
+        与 obs_var_ext。label_smooth_eps > 0 时训练目标夹到
+        [ε, 1−ε]，压 sigmoid 饱和深度（V2 变体用）。
+        """
         super().__init__()
         self.encoder = nn.Sequential(nn.Linear(obs_dim, embed_dim), nn.ReLU())
         self.gru = nn.GRUCell(embed_dim + action_dim, hidden_dim)
         self.decoder = nn.Sequential(
-            nn.Linear(hidden_dim, 64), nn.ReLU(), nn.Linear(64, obs_dim)
+            nn.Linear(hidden_dim, 64), nn.ReLU(), nn.Linear(64, obs_dim * multi_step_k)
         )
         self.hidden_dim = hidden_dim
+        self.obs_dim = obs_dim
         self.sigma_dec = sigma_dec
         self.goal_sigma_dec = goal_sigma_dec
+        self.multi_step_k = multi_step_k
+        self.label_smooth_eps = label_smooth_eps
         var = torch.full((obs_dim,), sigma_dec**2)
         if goal_sigma_dec is not None:
             if obs_dim % 2 != 0:
                 raise ValueError("双通道方差要求观测维数为偶数")
             var[obs_dim // 2 :] = goal_sigma_dec**2
         self.register_buffer("obs_var", var)
+        self.register_buffer("obs_var_ext", var.repeat(multi_step_k))
 
     def decoder_mean(self, h: torch.Tensor) -> torch.Tensor:
-        """隐状态 (…, H) → 观测均值 (…, obs_dim)，sigmoid 值域 (0,1)。"""
+        """隐状态 (…, H) → 下一步观测均值 (…, obs_dim)，sigmoid 值域 (0,1)。"""
+        return torch.sigmoid(self.decoder(h))[..., : self.obs_dim]
+
+    def decoder_mean_ext(self, h: torch.Tensor) -> torch.Tensor:
+        """扩展解码头 (…, H) → (…, k·obs_dim)；k=1 时与 decoder_mean 一致。
+        估计器（ĝ 拉回、V̂）在 S2' 变体上用本口径 + obs_var_ext。"""
         return torch.sigmoid(self.decoder(h))
 
     def decoder_mean_flat(self, h: torch.Tensor) -> torch.Tensor:
@@ -72,9 +93,24 @@ class S2WorldModel(nn.Module):
         return torch.stack(hs, dim=1)
 
     def rollout_loss(self, obs: torch.Tensor, act: torch.Tensor) -> dict[str, torch.Tensor]:
-        """下一步预测 NLL（与 z 无关的配分常数略去），逐样本逐步平均。"""
+        """预测 NLL（与 z 无关的配分常数略去），逐样本逐步平均。
+
+        k=1：hs[:, t] 预测 obs[:, t+1]。k>1：hs[:, t] 预测拼接目标
+        obs[:, t+1…t+k]，只在 t+k ≤ T 的位置计损失（每回合弃末 k−1 位）。
+        label_smooth_eps > 0 时目标夹到 [ε, 1−ε]。
+        """
         hs = self.hidden_trajectory(obs, act)  # (E, T, H)
-        pred = self.decoder_mean(hs)  # (E, T, obs_dim)
-        target = obs[:, 1:]  # o_{t+1}
-        nll = (((target - pred) ** 2) / self.obs_var).sum(-1) / 2  # (E, T)
+        k = self.multi_step_k
+        n_steps = act.shape[1]
+        if k == 1:
+            pred = self.decoder_mean(hs)
+            target = obs[:, 1:]
+        else:
+            n_pos = n_steps - k + 1
+            pred = self.decoder_mean_ext(hs[:, :n_pos])  # (E, n_pos, k·D)
+            target = torch.cat([obs[:, 1 + j: 1 + j + n_pos] for j in range(k)], dim=-1)
+        if self.label_smooth_eps > 0:
+            target = target.clamp(self.label_smooth_eps, 1.0 - self.label_smooth_eps)
+        var = self.obs_var if k == 1 else self.obs_var_ext
+        nll = (((target - pred) ** 2) / var).sum(-1) / 2
         return {"total": nll.mean(), "mse_per_pixel": ((target - pred) ** 2).mean().detach()}

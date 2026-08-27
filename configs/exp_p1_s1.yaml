@@ -1,0 +1,21 @@
+# EXP-P1 × S1（确证，计划 11.1）。协议 v1.1 第 5 节 P1 + 第 7 节契约。
+# 训练产物：results/confirmation/s1_train/eval_v1（β∈{1,4} × 种子 5–9）。
+train_config: configs/s1_train_eval.yaml
+train_campaign: eval_v1
+out_campaign: eval_v1
+# 样本集（互不重叠，逐 run 以种子派生流抽取；探针测试 2.4 万 →
+# σ_Û ≈ 0.0016 ≤ θ√W/(3√12)|W=3 ≈ 0.0017，W_run>3 时余量更大）
+n_ref: 10000
+n_query: 1024
+n_probe_train: 24000
+n_probe_test: 24000
+n_flow_train: 12000
+n_flow_val: 2000
+n_entropy_eval: 8000
+k_potential: 32
+# Ŝ 双路（协议 §2.5）：flow 主口径取加强档（修复循环定档，参数直读
+# 冻结阈值表 p4.flow_config）；互证 kNN 标准化 k=1
+k_entropy_knn: 1
+n_geometry_query: 1024   # 几何门谱查询点（末检查点，后验采样潜态）
+sigma_u_folds: 8
+torch_threads: 10

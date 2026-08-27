@@ -70,7 +70,11 @@ def nav_sanity(model: S2WorldModel, cfg: dict, seed: int) -> dict:
     }
 
 
-def train_one(cfg: dict, seed: int, campaign, log) -> None:
+class BudgetExhausted(Exception):
+    pass
+
+
+def train_one(cfg: dict, seed: int, campaign, log, deadline: float | None = None) -> None:
     run_dir = campaign / f"s{seed}"
     if (run_dir / "DONE").exists():
         log(f"跳过已完成 run s{seed}")
@@ -94,6 +98,8 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
     model = S2WorldModel(
         cfg["obs_dim"], cfg["action_dim"], cfg["embed_dim"], cfg["hidden_dim"],
         cfg["sigma_dec"], cfg.get("goal_sigma_dec"),
+        multi_step_k=cfg.get("multi_step_k", 1),
+        label_smooth_eps=cfg.get("label_smooth_eps", 0.0),
     )
     opt = torch.optim.Adam(model.parameters(), lr=float(cfg["lr"]))
     ckpts = set(checkpoint_steps(cfg))
@@ -139,6 +145,9 @@ def train_one(cfg: dict, seed: int, campaign, log) -> None:
                      "np_rng_state": rng.bit_generator.state},
                     resume_path,
                 )
+                if deadline is not None and time.time() > deadline:
+                    log(f"  s{seed} 预算耗尽，暂停于 step {step}")
+                    raise BudgetExhausted
             if step % 2000 == 0:
                 log(
                     f"  s{seed} {step}/{cfg['train_steps']} nll={out['total'].item():.2f} "
@@ -182,10 +191,18 @@ def main() -> None:
     seeds = guard.family_seeds(cfg["seed_family"], purpose="s2-train-dev")
     if smoke:
         seeds = seeds[:1]
+    if cfg.get("max_seeds"):
+        seeds = seeds[: int(cfg["max_seeds"])]  # 变体初筛：只跑前 N 个种子
+    deadline = None
+    if "--budget-seconds" in sys.argv:
+        deadline = time.time() + float(sys.argv[sys.argv.index("--budget-seconds") + 1])
     log(f"campaign: {campaign}，seeds={seeds}")
-    for seed in seeds:
-        guard.assert_seed_allowed(seed, purpose="s2-train")
-        train_one(cfg, seed, campaign, log)
+    try:
+        for seed in seeds:
+            guard.assert_seed_allowed(seed, purpose="s2-train")
+            train_one(cfg, seed, campaign, log, deadline)
+    except BudgetExhausted:
+        return
     log("S2 战役完成")
 
 
