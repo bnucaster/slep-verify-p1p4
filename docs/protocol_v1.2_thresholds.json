@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "status": "v1.2 冻结前草案（与 protocol_v1.2_amendment.md 同时冻结；judge_v12 只读本文件取数）",
+    "provenance_rule": "修订项推导见 protocol_v1.2_amendment.md；未修订项逐字继承 v1.1（docs/protocol_v1.1_thresholds.json，锚点 f7f7910）",
+    "pending": ["capability_gate.by_system.S3", "plateau.s3_window"]
+  },
+  "capability_gate": {
+    "by_system": {
+      "S1": 0.45,
+      "S2": 0.29,
+      "S2P": 0.29,
+      "S3": null
+    },
+    "notes": {
+      "S1": "继承 v1.1（因子探针复合 Û）",
+      "S2": "继承 v1.1（确定性近距导航池化）",
+      "S2P": "同口径同推导：随机基线池化 0.254 与 s2p_v1 训练水平（末三均值 0.326、峰值 0.344）中点取整，与 S2 一致为 0.29；results/description/s2_u_curve/s2p_v1/summary.json",
+      "S3": "待 s3_u_curve 探针（同口径推导）"
+    }
+  },
+  "geometry_gate": {
+    "log10_cond_median_max": 7.0,
+    "participation_dim_median_min": 1.5,
+    "note": "7.0 为直接验证的可行域上限（cal_p4_ext/frontier_summary.json：≤7.0 全链恢复 1.3–8.4%，7.5 主链臂 17.2% 越容差）；v1.1 的 6.0 溯源自 5.74 加外推余量。局限（必要非充分）：hyb_well 移植实验证明同条件数下采样各向异性结构可翻转恢复成败，充分性证书是逐系统几何匹配校准"
+  },
+  "stationarity_gate": {
+    "rhat_max": 1.05,
+    "n_chains_min": 4
+  },
+  "geodesic": {
+    "solver_residual_max": 0.003,
+    "uniqueness_energy_gap_min": 0.05,
+    "uniqueness_spread_min": 0.028,
+    "deviation_min_effect": 0.0125,
+    "mannwhitney_p_max": 0.01,
+    "certified_pairs_min": 8
+  },
+  "support_exclusion": {
+    "radius_quantile": 0.99
+  },
+  "plateau": {
+    "theta_rel_slope": 0.01,
+    "consecutive_windows": 3,
+    "smoothing": 5,
+    "s1_window_min": 3,
+    "s2_window": 3,
+    "s2p_window": 3,
+    "s3_window": null,
+    "window_runtime_rule": "W_run = max(W_min, ceil(12·σ̂_rel²/(smoothing·θ²)))；σ̂_rel 取平滑曲线末 16 检查点一阶差分标准差除以 sqrt(2)；W_run 使平滑序列容不下连续 3 窗时记数据条件不足（平台未检出，走峰值窗口增补层）",
+    "sigma_u_rule": "评估噪声另须 σ_Û ≤ θ·sqrt(W)/(3·sqrt(12))；确定性评估口径该项为零",
+    "s2p_expectation_note": "开发族 s2p_v1 池化曲线在全部平滑档均无平台（峰后系统性缓降，S1 型曲线），P1 × S2P 预期走峰值窗口增补层——有风险预注册，照测照报"
+  },
+  "p1": {
+    "s_drop_band_multiplier": 2.0,
+    "peak_window_rule": "效用峰值点 = 滑窗(W_min)均值最大的窗末检查点；分析窗口 = [峰值点, min(2×峰值点, 训练总长)]",
+    "dual_shape_rho_min": 0.9,
+    "dual_delta_floor_frac": 0.25,
+    "dual_delta_floor_note": "v1.2 修订（披露）：max(|Δ_flow|, |Δ_knn|) < frac × s_band 时变化量与零不可分，符号分歧不记仪器未过，进入实质判定（近零降幅按 s_drop 判据自然失败）。方向使检验更严；v1.1 下 b1_s9 因此记 NA 的情形在 v1.2 复判中转为实质判定"
+  },
+  "p2": {
+    "frac_below_q1_min": 0.75,
+    "n_surrogates_min": 50,
+    "n_traj_min": 1000,
+    "surrogate_kind": "metric",
+    "ablation_wilcoxon_p_max": 0.01,
+    "novelty_logistic_p_max": 0.01
+  },
+  "p4": {
+    "lack_of_fit_p_min": 0.05,
+    "delta_bic_max": 2.0,
+    "r2_min": 0.25,
+    "curvature_effect_ratio_max": 0.17,
+    "t_split_half_rel_max": 0.20,
+    "t_rel_err_context": 0.12,
+    "density_primary": "flow_boosted",
+    "flow_config": {"couplings": 12, "hidden": 128, "epochs": 25, "batch": 512}
+  },
+  "systems_v12": {
+    "S2P": "S2 GRU 世界模型 + 多步解码头（multi_step_k=4，未来 4 步观测拼接解码）；估计器度量/势取扩展解码口径（decoder_mean_ext + obs_var_ext）；规划与效用口径不变（decoder_mean 单步语义）；覆盖 P4/P1/P3/P2",
+    "S3": "小型因果 Transformer 序列世界模型（d_model 32、2 层、2 头）+ 多步解码头（k=4）；隐状态取末层残差流；只跑 P1（plan_v2 第 2 节）；初版（无多步头）残差流几何退化（cond 10^28）记录在 geom_decomp/s3_dev_v1"
+  }
+}
