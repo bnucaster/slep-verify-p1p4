@@ -1,0 +1,24 @@
+{
+  "burn_in": 8,
+  "capability": {
+    "bfs_band": [
+      2,
+      6
+    ],
+    "max_steps": 24,
+    "n_tasks": 160,
+    "task_stream_offset": 313000
+  },
+  "chain_stream_offset": 500000,
+  "episodes_per_chain": 4096,
+  "k_knn_density": 32,
+  "k_potential": 32,
+  "n_chains": 4,
+  "n_query": 2048,
+  "n_ref": 16000,
+  "out_campaign": "s2p_eval_v1",
+  "reservoir_per_chain": 14000,
+  "rhat_series_n": 600,
+  "torch_threads": 10,
+  "train_config": "configs/s2p_train_eval.yaml"
+}

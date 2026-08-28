@@ -79,15 +79,38 @@ def collect_rollouts_pos(n_episodes, episode_len, n_cells, view, rng, p_sticky=N
 
 def load_frozen_model(train_cfg: dict, seed: int) -> S2WorldModel:
     ck = torch.load(
-        REPO_ROOT / "results" / "confirmation" / "s2_train" / train_cfg["campaign"]
-        / f"s{seed}" / "checkpoints" / f"ckpt_{train_cfg['train_steps']:06d}.pt",
-        weights_only=True)
+        REPO_ROOT / "results" / train_cfg.get("stage", "confirmation") / "s2_train"
+        / train_cfg["campaign"] / f"s{seed}" / "checkpoints"
+        / f"ckpt_{train_cfg['train_steps']:06d}.pt", weights_only=True)
     model = S2WorldModel(
         train_cfg["obs_dim"], train_cfg["action_dim"], train_cfg["embed_dim"],
-        train_cfg["hidden_dim"], train_cfg["sigma_dec"], train_cfg.get("goal_sigma_dec"))
+        train_cfg["hidden_dim"], train_cfg["sigma_dec"], train_cfg.get("goal_sigma_dec"),
+        multi_step_k=train_cfg.get("multi_step_k", 1),
+        label_smooth_eps=train_cfg.get("label_smooth_eps", 0.0))
     model.load_state_dict(ck["model"])
     model.eval()
     return model
+
+
+def model_io(model: S2WorldModel):
+    """估计器口径（与 run_exp_p4 同构）：S2P 走扩展解码头与扩展方差。"""
+    ext = getattr(model, "multi_step_k", 1) > 1
+    obs_var = (model.obs_var_ext if ext else model.obs_var).double()
+
+    def dec(z):
+        return (model.decoder_mean_ext(z.float()).double() if ext
+                else model.decoder_mean(z.float()).double())
+
+    return dec, obs_var, ext
+
+
+def pool_pairs(model, train_cfg, obs, hs, bi: int):
+    """(h_t, 目标观测) 对：k>1 时目标为未来 k 步拼接（run_exp_p4 同构）。"""
+    k = getattr(model, "multi_step_k", 1)
+    n_pos = hs.shape[1] - k + 1
+    h = hs[:, bi:n_pos].reshape(-1, model.hidden_dim)
+    o_ext = torch.cat([obs[:, bi + 1 + j: 1 + j + n_pos] for j in range(k)], dim=-1)
+    return h, o_ext.reshape(-1, o_ext.shape[-1])
 
 
 def vhat(dec, obs_var, h_q, h_ref, o_ref, k):
@@ -110,11 +133,11 @@ def uniform_decoder_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
     with torch.no_grad():
         hs = model.hidden_trajectory(obs, act)
     bi = cfg["burn_in"]
-    # 配对约定同 run_exp_p4：hs[:, i] ↔ obs[:, i+1] ↔ pos[:, i+1]，
-    # 三切片每回合等长，展平后逐行对齐。
-    h_all = hs[:, bi:].reshape(-1, model.hidden_dim)
-    o_all = obs[:, bi + 1:].reshape(-1, train_cfg["obs_dim"])
-    p_all = pos_np[:, bi + 1:].reshape(-1, 2)
+    # 配对约定同 run_exp_p4；S2P 目标为未来 k 步拼接，位置取 t+1 格
+    k = getattr(model, "multi_step_k", 1)
+    n_pos = hs.shape[1] - k + 1
+    h_all, o_all = pool_pairs(model, train_cfg, obs, hs, bi)
+    p_all = pos_np[:, bi + 1: 1 + n_pos].reshape(-1, 2)
 
     # 逆占据频次权重（位置格）
     size = 2 * train_cfg["maze_cells"] + 1
@@ -128,7 +151,8 @@ def uniform_decoder_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
 
     dec_ctrl = copy.deepcopy(model.decoder)
     opt = torch.optim.Adam(dec_ctrl.parameters(), lr=DEC_LR)
-    obs_var = model.obs_var
+    _, obs_var_d, _ = model_io(model)
+    obs_var = obs_var_d.float()
     n = h_all.shape[0]
     n_hold = n // 10
     gen = torch.Generator()
@@ -158,7 +182,7 @@ def uniform_decoder_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
     def dec_fn(z):
         return torch.sigmoid(dec_ctrl(z.float())).double()
 
-    v_ctrl = vhat(dec_fn, obs_var.double(), h_q, h_ref, o_ref, cfg["k_potential"])
+    v_ctrl = vhat(dec_fn, obs_var_d, h_q, h_ref, o_ref, cfg["k_potential"])
     fit_ctrl = affine_fit_report(v_ctrl, torch.from_numpy(sc["i_corr"]))
     slope_main = json.loads((seed_dir / "main.json").read_text(encoding="utf-8"))[
         "affine_main"]["slope"]
@@ -181,7 +205,7 @@ def policy_swap_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
     """对照二：粘滞策略重采链，冻结解码器全链重算。逐链缓存。"""
     t0 = time.time()
     th_p4 = json.loads(THRESHOLDS_FILE.read_text(encoding="utf-8"))["p4"]
-    obs_var = model.obs_var.double()
+    dec, obs_var, _ = model_io(model)
     pools_h, pools_o = [], []
     for c in range(SWAP_CHAINS):
         cache = seed_dir / f"swap_chain_{c}.npz"
@@ -193,9 +217,7 @@ def policy_swap_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
             obs, act = torch.from_numpy(obs_np), torch.from_numpy(act_np)
             with torch.no_grad():
                 hs = model.hidden_trajectory(obs, act)
-            bi = cfg["burn_in"]
-            h_pool = hs[:, bi:].reshape(-1, model.hidden_dim)  # 配对约定同上
-            o_next = obs[:, bi + 1:].reshape(-1, train_cfg["obs_dim"])
+            h_pool, o_next = pool_pairs(model, train_cfg, obs, hs, cfg["burn_in"])
             idx = np.sort(rng.choice(h_pool.shape[0], size=SWAP_RESERVOIR, replace=False))
             np.savez_compressed(cache, h=h_pool[idx].numpy().astype(np.float32),
                                 o_next=o_next[idx].numpy().astype(np.float32))
@@ -212,9 +234,6 @@ def policy_swap_control(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
     h_ref, o_ref = h_pool[perm[:n_ref]], o_pool[perm[:n_ref]]
     h_q = h_pool[perm[n_ref: n_ref + n_q]]
     idx_flow = perm[n_ref + n_q: n_ref + n_q + n_ft + n_fv]
-
-    def dec(z):
-        return model.decoder_mean(z.float()).double()
 
     g_q = fisher_pullback_gaussian_batch(dec, h_q, obs_var).detach()
     logdet_g = torch.linalg.slogdet(g_q).logabsdet
@@ -305,11 +324,8 @@ def manipulation_check(cfg, train_cfg, model, seed, seed_dir, log) -> dict:
     h_q = torch.from_numpy(refs["h_q"]).double()
     i_corr = torch.from_numpy(sc["i_corr"])
     v_base = torch.from_numpy(sc["v"])
-    obs_var = model.obs_var.double()
+    dec, obs_var, _ = model_io(model)
     fit_base = affine_fit_report(v_base, i_corr)
-
-    def dec(z):
-        return model.decoder_mean(z.float()).double()
 
     gen = torch.Generator()
     gen.manual_seed(seed + 940_000)
@@ -348,10 +364,7 @@ def cross_seed_metric(cfg, train_cfg, seed, seeds_all, seed_dir, log) -> dict:
     refs = np.load(seed_dir / "refsets.npz")
     sc = np.load(seed_dir / "scatter.npz")
     h_q = torch.from_numpy(refs["h_q"]).double()
-    obs_var_o = model_o.obs_var.double()
-
-    def dec_o(z):
-        return model_o.decoder_mean(z.float()).double()
+    dec_o, obs_var_o, _ = model_io(model_o)
 
     g_o = fisher_pullback_gaussian_batch(dec_o, h_q, obs_var_o).detach()
     logdet_o = torch.linalg.slogdet(g_o).logabsdet
@@ -368,7 +381,10 @@ def cross_seed_metric(cfg, train_cfg, seed, seeds_all, seed_dir, log) -> dict:
 
 
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     train_cfg = yaml.safe_load((REPO_ROOT / cfg["train_config"]).read_text(encoding="utf-8"))
     torch.set_num_threads(int(cfg["torch_threads"]))
     only_seed = None
