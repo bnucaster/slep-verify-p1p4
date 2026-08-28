@@ -8,5 +8,17 @@
   "external_timestamp_url": "https://github.com/bnucaster/slep-verify-p1p4",
   "anchor_commit": "f7f7910323964e61b672f5f83900d0d24df71e81",
   "manifest": "docs/freeze_manifest.json",
-  "note": "用户于 2026-08-26 确认冻结；冻结清单内 17 个文件此后不得修改（协议 v1.1 第 8 节第 4 条）；哈希按 LF 字节计算，审计用 git show 取原始内容"
+  "note": "用户于 2026-08-26 确认冻结；冻结清单内 17 个文件此后不得修改（协议 v1.1 第 8 节第 4 条）；哈希按 LF 字节计算，审计用 git show 取原始内容",
+  "v1_2": {
+    "frozen": true,
+    "frozen_at": "2026-08-28",
+    "protocol_hash": {
+      "docs/protocol_v1.2_amendment.md": "c4fadeaebec33971f7e66c0c592d48c7fb769aa89533c6e0b19ca91caf56d89e",
+      "docs/protocol_v1.2_thresholds.json": "f1fcf8447524ca4256c77b8b492d4ac5c50a9d2645d61d32b0bd8c45fd25877a"
+    },
+    "external_timestamp_url": "https://github.com/bnucaster/slep-verify-p1p4",
+    "anchor_commit": "27df5af38e4aa675aaa88422d71fde395ef5598b",
+    "manifest": "docs/freeze_manifest_v12.json",
+    "note": "用户于 2026-08-28 确认（检查点 3）；v1.2 清单 22 文件此后不得修改（amendment 第 6 节第 4 条）；判定自此由 judge_v12 写入 metrics.json 并带 protocol_version；S2P/S3 评估族运行自此解禁"
+  }
 }
