@@ -97,6 +97,33 @@ def make_field_fns(model, cfg, h_ref, o_ref):
     return dec, v_fn, g_fn
 
 
+def make_geo_metric(dec, obs_var):
+    """测地求解用的可微度量：与冻结估计器同一数学对象 g = JᵀΣ⁻¹J，
+    J 经 JVP（create_graph）逐基向量构造——冻结批量版显式 detach 输入
+    （metric.py 第 84 行，估计口径不面向路径优化），求解器需要对路径点
+    的梯度。数值等价性在 stage_geo 首次调用时与冻结版对拍断言。"""
+    def g_geo(z):
+        d = z.shape[-1]
+        own_graph = not z.requires_grad and z.grad_fn is None
+        zd = z.detach().requires_grad_(True) if own_graph else z
+        out = dec(zd)
+        dummy = torch.zeros_like(out, requires_grad=True)
+        g1 = torch.autograd.grad(out, zd, grad_outputs=dummy, create_graph=True)[0]
+        cols = []
+        for i in range(d):
+            e = torch.zeros_like(g1)
+            e[..., i] = 1.0
+            cols.append(torch.autograd.grad(g1, dummy, grad_outputs=e,
+                                            create_graph=True, retain_graph=True)[0])
+        jac = torch.stack(cols, dim=-1)  # (..., D, d)
+        g = torch.einsum("...ja,...jb->...ab", jac / obs_var.unsqueeze(-1), jac)
+        # 无梯度链输入（端点/预条件等一次性计算）返回脱图值：求解器会跨
+        # 迭代复用这些量，带图会在首次反传后成为已释放的共享子图
+        return g.detach() if own_graph else g
+
+    return g_geo
+
+
 def grad_norms(v_fn, g_fn, z: torch.Tensor, chunk: int = 256) -> torch.Tensor:
     """‖∇_ĝV̂‖_ĝ = sqrt(∂V̂ᵀ ĝ⁻¹ ∂V̂) 逐点。"""
     outs = []
@@ -246,6 +273,30 @@ def stage_geo(cfg, train_cfg, model, seed: int, seed_dir, log, deadline=None) ->
     h_ref = torch.from_numpy(refs["h_ref"]).double()
     o_ref = torch.from_numpy(refs["o_ref"]).double()
     dec, v_fn, g_fn = make_field_fns(model, cfg, h_ref, o_ref)
+    obs_var = (model.obs_var_ext if getattr(model, "multi_step_k", 1) > 1
+               else model.obs_var).double()
+    # float64 解码器副本：float32 前向的量化噪声在度量 1e5 量纲下形成
+    # 粗糙微地形，把残差卡在 O(1)；双精度将其压约一个量级（实测
+    # 2.7 → 0.26，geo_effort_test）。残差仍高于校准阈值 3e-3——校准
+    # 定标于解析光滑度量，估计 MLP 度量的空间变化幅度使线搜索停滞，
+    # 该量表差距作为仪器发现入档，QC 剔除照冻结判据执行。
+    import copy
+
+    model_d = copy.deepcopy(model).double()
+    for p in model_d.parameters():
+        p.requires_grad_(False)
+    ext = getattr(model, "multi_step_k", 1) > 1
+
+    def dec_d(z):
+        return (model_d.decoder_mean_ext if ext else model_d.decoder_mean)(z)
+
+    g_geo = make_geo_metric(dec_d, obs_var)
+    # 数值等价性对拍：可微度量（float64 权重副本）与冻结估计器（float32
+    # 前向）同点同值到 f32 精度（相对差 ~1e-6 级，被度量量纲放大）
+    z_chk = h_ref[:4]
+    g_a, g_b = g_geo(z_chk), g_fn(z_chk)
+    rel = float(((g_a - g_b).abs() / g_b.abs().clamp_min(1e-12)).max())
+    assert rel < 1e-3, f"可微度量与冻结估计器相对差 {rel:.2e} 超精度解释范围"
     rng = np.random.default_rng(seed + 995_000)
     picked = match_and_select(segs_meta["kept"], cfg["distance_match_bins"],
                               cfg["max_pairs_per_group"] * 2, rng)
@@ -259,7 +310,24 @@ def stage_geo(cfg, train_cfg, model, seed: int, seed_dir, log, deadline=None) ->
             continue
         t0 = time.time()
         seg = torch.from_numpy(seg_data[f"seg_{k['idx']}"])
-        out = solve_geodesic(seg[0], seg[-1], g_fn,
+        # 逐对能量归一：测地对度量的常数缩放不变（归一化偏差面积、能量
+        # 差比、散布均为尺度不变量），把直线路径能量归一到 O(1) 使残差
+        # 质检与校准定标的能量量纲可比（校准系统能量为 O(1) 量级；真实
+        # 估计度量的原始能量高多个数量级，绝对残差阈值失去可比性）
+        tau = torch.linspace(0, 1, cfg["geo_n_segments"] + 1,
+                             dtype=torch.float64).unsqueeze(-1)
+        straight = seg[0] + tau * (seg[-1] - seg[0])
+        mids0 = 0.5 * (straight[1:] + straight[:-1])
+        d0 = straight[1:] - straight[:-1]
+        g0 = g_geo(mids0)
+        e0 = float(cfg["geo_n_segments"]
+                   * torch.einsum("ti,tij,tj->", d0, g0, d0))
+        e0 = max(e0, 1e-30)
+
+        def g_solve(z, _e0=e0):
+            return g_geo(z) / _e0
+
+        out = solve_geodesic(seg[0], seg[-1], g_solve,
                              n_segments=cfg["geo_n_segments"],
                              n_starts=cfg["geo_n_starts"], generator=gen,
                              n_adam=cfg["geo_n_adam"], n_lbfgs=cfg["geo_n_lbfgs"])
@@ -269,12 +337,13 @@ def stage_geo(cfg, train_cfg, model, seed: int, seed_dir, log, deadline=None) ->
         non_unique = (energy_gap < th["uniqueness_energy_gap_min"]
                       and out["uniqueness_spread"] > th["uniqueness_spread_min"])
         rec = {"idx": k["idx"], "group": k["group"], "chord": k["chord"],
-               "residual": out["residual"], "energy_gap": energy_gap,
+               "residual": out["residual"], "energy_scale_e0": e0,
+               "energy_gap": energy_gap,
                "uniqueness_spread": out["uniqueness_spread"],
                "qc_pass": bool(qc_pass), "non_unique": bool(non_unique)}
         if qc_pass and not non_unique:
-            dev = geodesic_deviation(seg, out["path"], g_fn)
-            rec["deviation"] = dev["normalized_area"]
+            dev = geodesic_deviation(seg, out["path"], g_solve)
+            rec["deviation"] = dev["normalized_area"]  # 尺度不变量
         cache.write_text(json.dumps(rec, ensure_ascii=False), encoding="utf-8")
         log(f"  s{seed} geo seg{k['idx']} [{k['group']}] 残差 {out['residual']:.1e} "
             f"{'认证' if rec.get('deviation') is not None else '剔除'}"

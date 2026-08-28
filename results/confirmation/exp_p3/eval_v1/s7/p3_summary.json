@@ -1,0 +1,16 @@
+{
+  "terrain_ratio_ci_low": 1.9373009042882532,
+  "n_certified_pairs": 3,
+  "n_low": 2,
+  "n_high": 1,
+  "attrition": {
+    "solved": 74,
+    "qc_fail": 70,
+    "non_unique": 7
+  },
+  "mw_p": 0.3333333333333333,
+  "effect": 42976.56134955402,
+  "low_lt_high": true,
+  "deviation_median_low": 1887.3079531086644,
+  "deviation_median_high": 44863.86930266268
+}

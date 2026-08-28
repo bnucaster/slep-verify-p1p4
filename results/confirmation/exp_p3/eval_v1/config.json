@@ -1,0 +1,26 @@
+{
+  "bfs_band": [
+    2,
+    6
+  ],
+  "bootstrap": 500,
+  "burn_in": 8,
+  "distance_match_bins": 4,
+  "episode_len": 64,
+  "geo_n_adam": 800,
+  "geo_n_lbfgs": 300,
+  "geo_n_segments": 12,
+  "geo_n_starts": 3,
+  "k_potential": 32,
+  "max_pairs_per_group": 20,
+  "max_steps": 24,
+  "n_episodes": 800,
+  "n_field_query": 2048,
+  "n_nav_tasks": 300,
+  "n_ref": 16000,
+  "out_campaign": "eval_v1",
+  "segment_len": 8,
+  "system_class": "S2P",
+  "torch_threads": 10,
+  "train_config": "configs/s2p_train_eval.yaml"
+}
