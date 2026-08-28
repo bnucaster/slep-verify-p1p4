@@ -71,7 +71,8 @@ def main() -> None:
     only_seed = None
     if "--seed" in sys.argv:
         only_seed = int(sys.argv[sys.argv.index("--seed") + 1])
-    campaign = create_campaign_dir("description", "s3_u_curve", CFG["campaign"],
+    campaign = create_campaign_dir(CFG.get("stage", "description"), "s3_u_curve",
+                                   CFG["campaign"],
                                    {"n_tasks": N_TASKS, "max_steps": MAX_STEPS,
                                     "bfs_band": list(BFS_BAND), "steps": eval_steps()})
     cache_dir = campaign / "cache"

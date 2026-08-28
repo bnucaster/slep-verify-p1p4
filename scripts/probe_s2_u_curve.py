@@ -86,13 +86,15 @@ def main() -> None:
     only_seed = None
     if "--seed" in sys.argv:
         only_seed = int(sys.argv[sys.argv.index("--seed") + 1])
-    campaign = create_campaign_dir("description", "s2_u_curve", CFG_TRAIN["campaign"],
+    campaign = create_campaign_dir(CFG_TRAIN.get("stage", "description"), "s2_u_curve",
+                                   CFG_TRAIN["campaign"],
                                    {"n_tasks": N_TASKS, "max_steps": MAX_STEPS,
                                     "bfs_band": list(BFS_BAND), "steps": eval_steps()})
     cache_dir = campaign / "cache"
     cache_dir.mkdir(exist_ok=True)
 
-    seeds = guard.family_seeds("development", purpose="s2-u-curve")
+    family = CFG_TRAIN.get("seed_family", "development")
+    seeds = guard.family_seeds(family, purpose="s2-u-curve")
     if only_seed is not None:
         seeds = [only_seed]
     for seed in seeds:
@@ -116,12 +118,12 @@ def main() -> None:
 
     # 汇总（存在全部缓存时）
     all_done = all((cache_dir / f"s{s}_c{c:06d}.json").exists()
-                   for s in guard.family_seeds("development", purpose="s2-u-curve")
+                   for s in guard.family_seeds(family, purpose="s2-u-curve")
                    for c in eval_steps())
     if not all_done:
         print("尚有缓存缺口，汇总跳过")
         return
-    dev_seeds = guard.family_seeds("development", purpose="s2-u-curve")
+    dev_seeds = guard.family_seeds(family, purpose="s2-u-curve")
     rows = []
     for step in eval_steps():
         per = [json.loads((cache_dir / f"s{s}_c{step:06d}.json").read_text())["success"] / N_TASKS
