@@ -1,0 +1,32 @@
+{
+  "action_dim": 4,
+  "batch_episodes": 32,
+  "campaign": "s3_eval_v1",
+  "checkpoint_every": 500,
+  "checkpoint_log2_until": 512,
+  "d_model": 32,
+  "episode_len": 64,
+  "episodes": 500,
+  "ff_dim": 64,
+  "goal_sigma_dec": 0.04,
+  "holdout_episodes": 64,
+  "log_every": 500,
+  "lr": 0.001,
+  "maze_cells": 8,
+  "multi_step_k": 4,
+  "n_heads": 2,
+  "n_layers": 2,
+  "obs_dim": 50,
+  "sanity_nav": {
+    "bfs_max": 6,
+    "bfs_min": 2,
+    "max_steps": 24,
+    "n_mazes": 20
+  },
+  "seed_family": "evaluation",
+  "sigma_dec": 0.2,
+  "stage": "confirmation",
+  "torch_threads": 10,
+  "train_steps": 20000,
+  "view": 5
+}
