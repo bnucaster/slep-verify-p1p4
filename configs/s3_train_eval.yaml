@@ -1,0 +1,31 @@
+# S3 评估族训练（确证 11.5）。v1.2 时间戳（锚点 27df5af）后运行。
+# 与 s3_dev_v2 唯一差异：阶段与种子族。
+campaign: s3_eval_v1
+stage: confirmation
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+d_model: 32
+n_layers: 2
+n_heads: 2
+ff_dim: 64
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+multi_step_k: 4
+episodes: 500
+episode_len: 64
+train_steps: 20000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 500
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: evaluation
+torch_threads: 10
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24
