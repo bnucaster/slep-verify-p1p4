@@ -1,0 +1,16 @@
+# EXP-P1 × S3（确证 11.5）。同 exp_p1_s2p 口径，系统换 S3。
+train_config: configs/s3_train_eval.yaml
+u_curve_campaign: results/confirmation/s3_u_curve/s3_eval_v1
+out_campaign: s3_eval_v1
+system_class: S3
+n_episodes: 400
+burn_in: 8
+n_ref: 12000
+n_query: 1024
+n_flow_train: 12000
+n_flow_val: 2000
+n_entropy_eval: 8000
+k_potential: 32
+k_entropy_knn: 1
+n_geometry_query: 1024
+torch_threads: 10
