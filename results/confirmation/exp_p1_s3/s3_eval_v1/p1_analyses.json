@@ -1,0 +1,62 @@
+{
+  "5": {
+    "seed": 5,
+    "w_run": 3,
+    "sigma_rel": 0.007556534128804601,
+    "plateau_step": null,
+    "peak_step": 18000,
+    "s_drop_peak_window": 0.8496820586942135,
+    "v_drop_peak_window": -2.2897324672389914,
+    "rho": 0.9993959528843249,
+    "delta_flow": 0.8496820586942135,
+    "delta_knn": 0.5227919507999914
+  },
+  "6": {
+    "seed": 6,
+    "w_run": 3,
+    "sigma_rel": 0.003397332531465879,
+    "plateau_step": null,
+    "peak_step": 3000,
+    "s_drop_peak_window": 15.373504420274578,
+    "v_drop_peak_window": 7.319551152268154,
+    "rho": 0.9996979764421625,
+    "delta_flow": 15.373504420274578,
+    "delta_knn": 11.976783874367328
+  },
+  "7": {
+    "seed": 7,
+    "w_run": 3,
+    "sigma_rel": 0.004706172426574021,
+    "plateau_step": null,
+    "peak_step": 6000,
+    "s_drop_peak_window": 9.225637304662754,
+    "v_drop_peak_window": 9.44583528089844,
+    "rho": 0.9990939293264876,
+    "delta_flow": 9.225637304662754,
+    "delta_knn": 7.594903957904542
+  },
+  "8": {
+    "seed": 8,
+    "w_run": 3,
+    "sigma_rel": 0.0068887063972837646,
+    "plateau_step": null,
+    "peak_step": 6500,
+    "s_drop_peak_window": 8.648348588245327,
+    "v_drop_peak_window": 6.138026635048892,
+    "rho": 0.9996979764421625,
+    "delta_flow": 8.648348588245327,
+    "delta_knn": 7.23034957432656
+  },
+  "9": {
+    "seed": 9,
+    "w_run": 3,
+    "sigma_rel": 0.0068592591097409155,
+    "plateau_step": null,
+    "peak_step": 4500,
+    "s_drop_peak_window": 12.088929678482884,
+    "v_drop_peak_window": 8.842448935791626,
+    "rho": 0.9995469646632437,
+    "delta_flow": 12.088929678482884,
+    "delta_knn": 9.595405132996405
+  }
+}
