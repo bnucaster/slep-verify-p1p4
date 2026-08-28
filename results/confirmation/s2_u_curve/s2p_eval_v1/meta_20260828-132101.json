@@ -1,0 +1,15 @@
+{
+  "git": {
+    "commit": "95e8f38d43a563e5181d5b4787de9d9b50d25a19",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/probe_s2_u_curve.py",
+    "--config",
+    "configs/s2p_train_eval.yaml"
+  ],
+  "created": "2026-08-28T13:21:01+0100",
+  "torch": "2.13.0+cpu"
+}
