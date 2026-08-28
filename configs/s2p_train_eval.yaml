@@ -1,0 +1,29 @@
+# S2P 评估族训练（确证 11.5）。运行纪律：严格在协议 v1.2 外部时间戳
+# 之后启动（amendment 第 2 节）。与 s2p_v1（开发）唯一差异：阶段与种子族。
+campaign: s2p_eval_v1
+stage: confirmation
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+multi_step_k: 4
+episodes: 500
+episode_len: 64
+train_steps: 20000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 500
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: evaluation
+torch_threads: 10
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24
