@@ -1,0 +1,16 @@
+# EXP-P4'（S2P 多步解码头变体）确证配置。与 exp_p4.yaml 唯一差异：
+# 训练配置指向 S2P 评估族、战役名换；估计器自动走扩展解码口径。
+train_config: configs/s2p_train_eval.yaml
+out_campaign: s2p_eval_v1
+n_chains: 4
+episodes_per_chain: 4096
+burn_in: 8
+chain_stream_offset: 500000
+reservoir_per_chain: 14000
+rhat_series_n: 600
+n_ref: 16000
+n_query: 2048
+k_potential: 32
+k_knn_density: 32
+capability: {n_tasks: 160, max_steps: 24, bfs_band: [2, 6], task_stream_offset: 313000}
+torch_threads: 10

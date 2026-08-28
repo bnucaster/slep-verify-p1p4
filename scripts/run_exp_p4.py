@@ -56,17 +56,32 @@ THRESHOLDS_FILE = REPO_ROOT / "docs" / "protocol_v1.1_thresholds.json"
 
 def load_frozen_model(train_cfg: dict, seed: int) -> tuple[S2WorldModel, str]:
     ckpt_path = (
-        REPO_ROOT / "results" / "confirmation" / "s2_train" / train_cfg["campaign"]
-        / f"s{seed}" / "checkpoints" / f"ckpt_{train_cfg['train_steps']:06d}.pt"
+        REPO_ROOT / "results" / train_cfg.get("stage", "confirmation") / "s2_train"
+        / train_cfg["campaign"] / f"s{seed}" / "checkpoints"
+        / f"ckpt_{train_cfg['train_steps']:06d}.pt"
     )
     ck = torch.load(ckpt_path, weights_only=True)
     model = S2WorldModel(
         train_cfg["obs_dim"], train_cfg["action_dim"], train_cfg["embed_dim"],
         train_cfg["hidden_dim"], train_cfg["sigma_dec"], train_cfg.get("goal_sigma_dec"),
+        multi_step_k=train_cfg.get("multi_step_k", 1),
+        label_smooth_eps=train_cfg.get("label_smooth_eps", 0.0),
     )
     model.load_state_dict(ck["model"])
     model.eval()
     return model, str(ckpt_path.relative_to(REPO_ROOT))
+
+
+def model_io(model: S2WorldModel):
+    """估计器口径：S2P（multi_step_k>1）走扩展解码头与扩展方差。"""
+    ext = getattr(model, "multi_step_k", 1) > 1
+    obs_var = (model.obs_var_ext if ext else model.obs_var).double()
+
+    def dec(z):
+        return (model.decoder_mean_ext(z.float()).double() if ext
+                else model.decoder_mean(z.float()).double())
+
+    return dec, obs_var, ext
 
 
 def run_chain(cfg, train_cfg, model, seed: int, chain: int, seed_dir, log) -> None:
@@ -85,9 +100,12 @@ def run_chain(cfg, train_cfg, model, seed: int, chain: int, seed_dir, log) -> No
         hs = model.hidden_trajectory(obs, act)  # (E, T, H)
     bi = cfg["burn_in"]
     # 配对约定：hs[:, i] 解码预测 obs[:, i+1]（rollout_loss 同构）。
-    # 两切片每回合均 T−bi 个元素，展平后逐行对齐。
-    h_pool = hs[:, bi:].reshape(-1, model.hidden_dim)
-    o_next = obs[:, bi + 1:].reshape(-1, train_cfg["obs_dim"])
+    # S2P（k>1）：目标为未来 k 步观测拼接，弃各回合末 k−1 位。
+    k = getattr(model, "multi_step_k", 1)
+    n_pos = hs.shape[1] - k + 1
+    h_pool = hs[:, bi:n_pos].reshape(-1, model.hidden_dim)
+    o_ext = torch.cat([obs[:, bi + 1 + j: 1 + j + n_pos] for j in range(k)], dim=-1)
+    o_next = o_ext.reshape(-1, o_ext.shape[-1])
     n = h_pool.shape[0]
     # 全局时间标签：episode 内步序展平（episode 序 × 步序），链内单调
     t_glob = np.arange(n, dtype=np.int64)
@@ -123,7 +141,7 @@ def run_main(cfg, train_cfg, model, ckpt_rel: str, seed: int, seed_dir, log) -> 
         return json.loads(out_file.read_text(encoding="utf-8"))
     t0 = time.time()
     th_p4 = json.loads(THRESHOLDS_FILE.read_text(encoding="utf-8"))["p4"]
-    obs_var = model.obs_var.double()
+    dec, obs_var, _ = model_io(model)
 
     chains = [np.load(seed_dir / f"chain_{c}.npz") for c in range(cfg["n_chains"])]
     h_pool = torch.from_numpy(np.concatenate([c["h"] for c in chains])).double()
@@ -143,9 +161,6 @@ def run_main(cfg, train_cfg, model, ckpt_rel: str, seed: int, seed_dir, log) -> 
     h_ref, o_ref = h_pool[idx_ref], o_pool[idx_ref]
     h_q = h_pool[idx_q]
     t_q, chain_q = t_pool[idx_q], chain_tag[idx_q]
-
-    def dec(z):
-        return model.decoder_mean(z.float()).double()
 
     # ĝ 于 query 点：logdet 供体积校正；谱供几何门（10e 取用）
     g_q = fisher_pullback_gaussian_batch(dec, h_q, obs_var).detach()
@@ -277,7 +292,10 @@ def run_capability(cfg, train_cfg, model, seed: int, seed_dir, log) -> None:
 
 
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     train_cfg = yaml.safe_load(
         (REPO_ROOT / cfg["train_config"]).read_text(encoding="utf-8"))
     torch.set_num_threads(int(cfg["torch_threads"]))
