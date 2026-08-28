@@ -367,6 +367,142 @@
         "v_band": 39.5153917945944,
         "multiplier": 2.0
       }
+    },
+    "S2P": {
+      "gates": {
+        "capability": {
+          "value": 0.35124999999999995,
+          "system": "S2P"
+        },
+        "geometry": {
+          "log10_cond_median": 2.8504204636566532,
+          "participation_median": 4.002230870698111
+        }
+      },
+      "gates_by_seed": {
+        "s5": true,
+        "s6": true,
+        "s7": true,
+        "s8": true,
+        "s9": true
+      },
+      "gates_detail": {
+        "s5": {
+          "u_final": 0.36875,
+          "capability_pooled": 0.35124999999999995,
+          "log10_cond_median": 2.8504204636566532,
+          "participation_median": 4.002230870698111,
+          "gate_ok": true
+        },
+        "s6": {
+          "u_final": 0.3625,
+          "capability_pooled": 0.35124999999999995,
+          "log10_cond_median": 2.86641673390745,
+          "participation_median": 3.777262948664333,
+          "gate_ok": true
+        },
+        "s7": {
+          "u_final": 0.35,
+          "capability_pooled": 0.35124999999999995,
+          "log10_cond_median": 3.3480113309154658,
+          "participation_median": 3.419901103241067,
+          "gate_ok": true
+        },
+        "s8": {
+          "u_final": 0.3625,
+          "capability_pooled": 0.35124999999999995,
+          "log10_cond_median": 2.999087209954751,
+          "participation_median": 3.394941988067291,
+          "gate_ok": true
+        },
+        "s9": {
+          "u_final": 0.3125,
+          "capability_pooled": 0.35124999999999995,
+          "log10_cond_median": 2.967829753217227,
+          "participation_median": 3.9063294048179777,
+          "gate_ok": true
+        }
+      },
+      "exp_p1": {
+        "seeds": {
+          "s5": {
+            "dual_shape": {
+              "rho": 0.9945635759589248,
+              "delta_same_sign": true
+            },
+            "sigma_u": 0.0,
+            "sigma_u_max": 0.0016666666666666666,
+            "plateau_step": null,
+            "peak_step": 9000,
+            "s_drop": null,
+            "s_band": 7.069257912376875,
+            "v_post_trend": null,
+            "s_drop_peak_window": 3.3798248932094843
+          },
+          "s6": {
+            "dual_shape": {
+              "rho": 0.9503171247357293,
+              "delta_same_sign": true
+            },
+            "sigma_u": 0.0,
+            "sigma_u_max": 0.0016666666666666666,
+            "plateau_step": null,
+            "peak_step": 8000,
+            "s_drop": null,
+            "s_band": 7.069257912376875,
+            "v_post_trend": null,
+            "s_drop_peak_window": 4.689679470286057
+          },
+          "s7": {
+            "dual_shape": {
+              "rho": 0.8628813047417698,
+              "delta_same_sign": false
+            },
+            "sigma_u": 0.0,
+            "sigma_u_max": 0.0016666666666666666,
+            "plateau_step": null,
+            "peak_step": 16000,
+            "s_drop": null,
+            "s_band": 7.069257912376875,
+            "v_post_trend": null,
+            "s_drop_peak_window": -0.8590288269740682
+          },
+          "s8": {
+            "dual_shape": {
+              "rho": 0.8477801268498943,
+              "delta_same_sign": true
+            },
+            "sigma_u": 0.0,
+            "sigma_u_max": 0.0016666666666666666,
+            "plateau_step": null,
+            "peak_step": 19000,
+            "s_drop": null,
+            "s_band": 7.069257912376875,
+            "v_post_trend": null,
+            "s_drop_peak_window": 0.6342084558163181
+          },
+          "s9": {
+            "dual_shape": {
+              "rho": 0.9904862579281184,
+              "delta_same_sign": true
+            },
+            "sigma_u": 0.0,
+            "sigma_u_max": 0.0016666666666666666,
+            "plateau_step": null,
+            "peak_step": 7500,
+            "s_drop": null,
+            "s_band": 7.069257912376875,
+            "v_post_trend": null,
+            "s_drop_peak_window": 9.317827447412892
+          }
+        }
+      },
+      "bands": {
+        "s_band": 7.069257912376875,
+        "v_band": 6.343203078239578,
+        "multiplier": 2.0,
+        "dual_delta_floor_frac": 0.25
+      }
     }
   }
 }

@@ -3,7 +3,7 @@ train_config: configs/s3_train_eval.yaml
 u_curve_campaign: results/confirmation/s3_u_curve/s3_eval_v1
 out_campaign: s3_eval_v1
 system_class: S3
-n_episodes: 400
+n_episodes: 700
 burn_in: 8
 n_ref: 12000
 n_query: 1024

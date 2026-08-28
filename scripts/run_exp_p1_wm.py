@@ -180,9 +180,33 @@ def curve_row(cfg, train_cfg, seed: int, step: int, obs, act, rng_ids) -> dict:
                              n_couplings=fc["couplings"], hidden=fc["hidden"],
                              epochs=fc["epochs"], batch_size=fc["batch"])
     s_flow = entropy_flow(fd, h_ent)
-    s_knn = entropy_knn(h_ent, k=cfg["k_entropy_knn"], standardize=True)
+    # 早期检查点隐态存在重复/数值零距点（未训练映射折叠 + cdist 的 mm
+    # 式消去），留一 kNN 熵无定义。管线侧按冻结估计器同口径（标准化
+    # 坐标 + torch.cdist）预滤零距点后计算；剔除数入行记录，兜底逐轮
+    # 重滤（滤后重算 std 可能出新零距对，实测一两轮内收敛）。
+    h_uniq = torch.unique(h_ent, dim=0)
+    for _ in range(4):
+        try:
+            s_knn = entropy_knn(h_uniq, k=cfg["k_entropy_knn"], standardize=True)
+            break
+        except ValueError:
+            std = h_uniq.std(dim=0).clamp_min(1e-12)
+            hs = (h_uniq - h_uniq.mean(dim=0)) / std
+            d = torch.cdist(hs, hs)
+            d.fill_diagonal_(float("inf"))
+            keep = torch.ones(h_uniq.shape[0], dtype=torch.bool)
+            for i, j in (d == 0).nonzero().tolist():
+                if i < j and keep[i] and keep[j]:
+                    keep[j] = False
+            if bool(keep.all()):
+                h_uniq = h_uniq[:: 2]  # 极端兜底：均匀减半重试
+            else:
+                h_uniq = h_uniq[keep]
+    else:
+        raise RuntimeError("零距点预滤四轮未收敛")
     return {"step": step, "u_composite": u_from_probe(cfg, seed, step),
-            "v_mean": float(v_hat.mean()), "s_flow": s_flow, "s_knn": s_knn}
+            "v_mean": float(v_hat.mean()), "s_flow": s_flow, "s_knn": s_knn,
+            "n_ent_dupes": int(h_ent.shape[0] - h_uniq.shape[0])}
 
 
 def stage_curves(cfg, train_cfg, gates, out_dir, log, only_seed=None, deadline=None):

@@ -1,10 +1,11 @@
 # EXP-P1 × S2P（确证 11.5）。Û 逐检查点取效用探针缓存（确定性口径，
-# σ_Û 重复噪声为零）；V̂/Ŝ 逐检查点现算。
+# σ_Û 重复噪声为零）；V̂/Ŝ 逐检查点现算。状态池 700×53≈3.7 万 ≥ 抽样
+# 预算 3.5 万（ref 1.2 万 + query 1024 + flow 1.4 万 + 熵 8 千）。
 train_config: configs/s2p_train_eval.yaml
 u_curve_campaign: results/confirmation/s2_u_curve/s2p_eval_v1
 out_campaign: s2p_eval_v1
 system_class: S2P
-n_episodes: 400
+n_episodes: 700
 burn_in: 8
 n_ref: 12000
 n_query: 1024
