@@ -1,0 +1,16 @@
+{
+  "frac_below_q1": 1.0,
+  "n_traj": 1000,
+  "ablation": {
+    "wilcoxon_p": 1.039132520036565e-12,
+    "median_diff": 0.00205119775988577,
+    "n_pairs": 1000
+  },
+  "novelty": {
+    "logistic_p": 6.513983007416617e-05,
+    "positive": true,
+    "placebo_p": 0.9340320652967562
+  },
+  "drift_fraction": 0.10214606967883,
+  "gap_median": 0.4925969762798783
+}

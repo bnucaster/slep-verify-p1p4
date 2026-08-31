@@ -1,0 +1,15 @@
+{
+  "git": {
+    "commit": "3534019b7ebc9fb7fae7532809acdae5b949446f",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_exp_p2.py",
+    "--seed",
+    "6"
+  ],
+  "created": "2026-08-29T02:46:22+0100",
+  "torch": "2.13.0+cpu"
+}

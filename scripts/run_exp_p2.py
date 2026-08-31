@@ -142,7 +142,7 @@ def stage_field(cfg, train_cfg, model, seed: int, seed_dir, log) -> dict:
     return out
 
 
-def score_block(cfg, model, field, seed: int, seed_dir, block_idx: int,
+def score_block(cfg, train_cfg_g, model, field, seed: int, seed_dir, block_idx: int,
                 ablation: bool, log) -> None:
     tag = "abl" if ablation else "main"
     cache = seed_dir / f"{tag}_cache" / f"b{block_idx:03d}.json"
@@ -156,9 +156,25 @@ def score_block(cfg, model, field, seed: int, seed_dir, block_idx: int,
     dec, v_fn, v_const, g_fn = make_fns(model, cfg, h_ref, o_ref, field["g_floor"])
     v_use = v_const if ablation else v_fn
     pool = np.load(seed_dir / "traj_pool.npz")["hs"]
-    n_ep = pool.shape[0]
+    n_base = cfg["n_episodes"]
+    if pool.shape[0] < cfg["n_traj"]:
+        # 确定性扩池：同 RNG 流重采 n_traj+100 回合（序贯生成，前 n_base
+        # 回合与原池逐位一致），只重写 traj_pool；场文件（ref/地板/漂移）
+        # 不动，已缓存块的轨迹索引经下方序表保持有效
+        rng0 = np.random.default_rng(seed + 996_000)
+        obs_np, act_np = gw.collect_rollouts(cfg["n_traj"] + 100, cfg["episode_len"],
+                                             train_cfg_g["maze_cells"],
+                                             train_cfg_g["view"], rng0)
+        obs_t, act_t = torch.from_numpy(obs_np), torch.from_numpy(act_np)
+        with torch.no_grad():
+            hs_all = model.hidden_trajectory(obs_t, act_t)
+        pool = hs_all[:, cfg["burn_in"]:].numpy().astype(np.float32)
+        np.savez_compressed(seed_dir / "traj_pool.npz", hs=pool)
+        log(f"  s{seed} 轨迹池扩至 {pool.shape[0]} 回合（前 {n_base} 与原池一致）")
     rng = np.random.default_rng(seed + 997_000)
-    order = rng.permutation(n_ep)[: cfg["n_traj"]]
+    # 序表：前 n_base 沿用原置换（保已缓存块），其余顺序取扩池新回合
+    order = np.concatenate([rng.permutation(n_base),
+                            np.arange(n_base, pool.shape[0])])[: cfg["n_traj"]]
     lo = block_idx * cfg["block"]
     hi = min(lo + cfg["block"], cfg["n_traj"])
     rows = []
@@ -318,13 +334,15 @@ def main() -> None:
         field = stage_field(cfg, train_cfg, model, seed, seed_dir, log)
         if stage in (None, "main", "ablation", "assemble"):
             for b in range(n_blocks):
-                score_block(cfg, model, field, seed, seed_dir, b, ablation=False, log=log)
+                score_block(cfg, train_cfg, model, field, seed, seed_dir, b,
+                            ablation=False, log=log)
                 if deadline is not None and time.time() > deadline:
                     log("预算耗尽，暂停")
                     return
         if stage in (None, "ablation", "assemble"):
             for b in range(n_blocks):
-                score_block(cfg, model, field, seed, seed_dir, b, ablation=True, log=log)
+                score_block(cfg, train_cfg, model, field, seed, seed_dir, b,
+                            ablation=True, log=log)
                 if deadline is not None and time.time() > deadline:
                     log("预算耗尽，暂停")
                     return

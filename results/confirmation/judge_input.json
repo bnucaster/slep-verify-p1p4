@@ -321,7 +321,7 @@
           "b1_s9": {
             "dual_shape": {
               "rho": 0.9978656193972509,
-              "delta_same_sign": false
+              "delta_same_sign": true
             },
             "sigma_u": 0.001805192215555462,
             "sigma_u_max": 0.0016666666666666666,
@@ -638,6 +638,256 @@
         "v_band": 8.502896856640968,
         "multiplier": 2.0,
         "dual_delta_floor_frac": 0.25
+      }
+    },
+    "S2P:s5": {
+      "gates": {
+        "capability": {
+          "value": 0.35125,
+          "system": "S2P",
+          "per_seed_rate": 0.36875
+        },
+        "geometry": {
+          "log10_cond_median": 2.843094330219413,
+          "participation_median": 4.014471449007661
+        },
+        "stationarity": {
+          "rhat": 0.9998832724391415,
+          "n_chains": 4
+        }
+      },
+      "exp_p4": {
+        "p_lack_of_fit": 1.1486185217827228e-166,
+        "delta_bic": 750.763147526447,
+        "r_squared": 0.5399647253887316,
+        "curvature_effect_ratio": 0.4118005713467868,
+        "slope": 0.023166283100478555,
+        "t_split_rel": 0.07824215861577634,
+        "decoupling": {
+          "uniform_decoder_slope_shift_rel": 0.21417537437608286,
+          "policy_swap_slope_shift_rel": 0.018212769156495417
+        },
+        "temperature_hat": 43.16618232034567
+      },
+      "exp_p3": {
+        "terrain_ratio_ci_low": 1.868156485132665,
+        "mw_p": null,
+        "effect": null,
+        "low_lt_high": null,
+        "n_certified_pairs": 1
+      },
+      "exp_p2": {
+        "frac_below_q1": 1.0,
+        "n_traj": 1000,
+        "ablation": {
+          "wilcoxon_p": 4.707977154407485e-18,
+          "median_diff": 0.003083286274291497
+        },
+        "novelty": {
+          "logistic_p": 5.281111078069759e-07,
+          "positive": true
+        },
+        "drift_fraction": 0.10202275797404325
+      }
+    },
+    "S2P:s6": {
+      "gates": {
+        "capability": {
+          "value": 0.35125,
+          "system": "S2P",
+          "per_seed_rate": 0.3625
+        },
+        "geometry": {
+          "log10_cond_median": 2.888464172863427,
+          "participation_median": 3.6723398075188056
+        },
+        "stationarity": {
+          "rhat": 0.999363904992979,
+          "n_chains": 4
+        }
+      },
+      "exp_p4": {
+        "p_lack_of_fit": 7.99453163195038e-105,
+        "delta_bic": 465.95342941965646,
+        "r_squared": 0.4640040446703144,
+        "curvature_effect_ratio": 0.252841016247552,
+        "slope": 0.025636632781289016,
+        "t_split_rel": 0.02760608452764388,
+        "decoupling": {
+          "uniform_decoder_slope_shift_rel": 0.29793636195181467,
+          "policy_swap_slope_shift_rel": 0.005002418534441697
+        },
+        "temperature_hat": 39.006682684547144
+      },
+      "exp_p3": {
+        "terrain_ratio_ci_low": 1.8807573313282537,
+        "mw_p": null,
+        "effect": null,
+        "low_lt_high": null,
+        "n_certified_pairs": 1
+      },
+      "exp_p2": {
+        "frac_below_q1": 1.0,
+        "n_traj": 1000,
+        "ablation": {
+          "wilcoxon_p": 3.0101075608383826e-22,
+          "median_diff": 0.0026043339255771014
+        },
+        "novelty": {
+          "logistic_p": 1.0153169184831369e-07,
+          "positive": true
+        },
+        "drift_fraction": 0.044164725872138266
+      }
+    },
+    "S2P:s7": {
+      "gates": {
+        "capability": {
+          "value": 0.35125,
+          "system": "S2P",
+          "per_seed_rate": 0.35
+        },
+        "geometry": {
+          "log10_cond_median": 3.358897805149327,
+          "participation_median": 3.3542145788029347
+        },
+        "stationarity": {
+          "rhat": 0.9997263707385495,
+          "n_chains": 4
+        }
+      },
+      "exp_p4": {
+        "p_lack_of_fit": 5.523406260449326e-98,
+        "delta_bic": 434.47174068256027,
+        "r_squared": 0.588521818103033,
+        "curvature_effect_ratio": 0.2908251972586359,
+        "slope": 0.026053282747223242,
+        "t_split_rel": 0.059137987970100815,
+        "decoupling": {
+          "uniform_decoder_slope_shift_rel": 0.17176388432204082,
+          "policy_swap_slope_shift_rel": 0.0013847439921627117
+        },
+        "temperature_hat": 38.38287902919182
+      },
+      "exp_p3": {
+        "terrain_ratio_ci_low": 1.9373009042882532,
+        "mw_p": 0.3333333333333333,
+        "effect": 42976.56134955402,
+        "low_lt_high": true,
+        "n_certified_pairs": 3
+      },
+      "exp_p2": {
+        "frac_below_q1": 1.0,
+        "n_traj": 1000,
+        "ablation": {
+          "wilcoxon_p": 1.039132520036565e-12,
+          "median_diff": 0.00205119775988577
+        },
+        "novelty": {
+          "logistic_p": 6.513983007416617e-05,
+          "positive": true
+        },
+        "drift_fraction": 0.10214606967883
+      }
+    },
+    "S2P:s8": {
+      "gates": {
+        "capability": {
+          "value": 0.35125,
+          "system": "S2P",
+          "per_seed_rate": 0.3625
+        },
+        "geometry": {
+          "log10_cond_median": 3.0074811383864217,
+          "participation_median": 3.387749043366096
+        },
+        "stationarity": {
+          "rhat": 0.9992468805891599,
+          "n_chains": 4
+        }
+      },
+      "exp_p4": {
+        "p_lack_of_fit": 4.618351450279034e-101,
+        "delta_bic": 448.6378466719498,
+        "r_squared": 0.5082734310739188,
+        "curvature_effect_ratio": 0.32644923733438846,
+        "slope": 0.025449400282363185,
+        "t_split_rel": 0.10907003252681828,
+        "decoupling": {
+          "uniform_decoder_slope_shift_rel": 0.15867796258354394,
+          "policy_swap_slope_shift_rel": 0.09072915821962524
+        },
+        "temperature_hat": 39.293656781885545
+      },
+      "exp_p3": {
+        "terrain_ratio_ci_low": 1.9432433735374588,
+        "mw_p": 0.3333333333333333,
+        "effect": 296.7088224633083,
+        "low_lt_high": true,
+        "n_certified_pairs": 3
+      },
+      "exp_p2": {
+        "frac_below_q1": 1.0,
+        "n_traj": 1000,
+        "ablation": {
+          "wilcoxon_p": 5.696498906435593e-25,
+          "median_diff": 0.0030570269775236636
+        },
+        "novelty": {
+          "logistic_p": 6.375593997855084e-05,
+          "positive": true
+        },
+        "drift_fraction": 0.08917391519080042
+      }
+    },
+    "S2P:s9": {
+      "gates": {
+        "capability": {
+          "value": 0.35125,
+          "system": "S2P",
+          "per_seed_rate": 0.3125
+        },
+        "geometry": {
+          "log10_cond_median": 2.9223598093565437,
+          "participation_median": 4.072487058552265
+        },
+        "stationarity": {
+          "rhat": 1.003034613574854,
+          "n_chains": 4
+        }
+      },
+      "exp_p4": {
+        "p_lack_of_fit": 3.1386830906800833e-97,
+        "delta_bic": 430.99889976024406,
+        "r_squared": 0.5498051847970171,
+        "curvature_effect_ratio": 0.17458700310434264,
+        "slope": 0.025091155390033287,
+        "t_split_rel": 0.07198939069013187,
+        "decoupling": {
+          "uniform_decoder_slope_shift_rel": 0.27356267896675357,
+          "policy_swap_slope_shift_rel": 0.0566576252384124
+        },
+        "temperature_hat": 39.854681239478516
+      },
+      "exp_p3": {
+        "terrain_ratio_ci_low": 1.9447311661998954,
+        "mw_p": null,
+        "effect": null,
+        "low_lt_high": null,
+        "n_certified_pairs": 3
+      },
+      "exp_p2": {
+        "frac_below_q1": 1.0,
+        "n_traj": 1000,
+        "ablation": {
+          "wilcoxon_p": 6.940881965302153e-34,
+          "median_diff": 0.0035679047884525084
+        },
+        "novelty": {
+          "logistic_p": 0.00033089858909706593,
+          "positive": true
+        },
+        "drift_fraction": 0.10813507410068002
       }
     }
   }

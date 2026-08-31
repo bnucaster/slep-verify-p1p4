@@ -1,0 +1,227 @@
+{
+  "protocol_version": "1.2",
+  "cells": {
+    "P4×S2P": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "s5": {
+          "verdict": "未构成检验",
+          "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持"
+        },
+        "s6": {
+          "verdict": "未构成检验",
+          "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持"
+        },
+        "s7": {
+          "verdict": "未构成检验",
+          "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持"
+        },
+        "s8": {
+          "verdict": "未构成检验",
+          "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持"
+        },
+        "s9": {
+          "verdict": "未构成检验",
+          "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持"
+        }
+      }
+    },
+    "P4×S2(基线)": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "s5": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过"
+        },
+        "s6": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过"
+        },
+        "s7": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过"
+        },
+        "s8": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过"
+        },
+        "s9": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过"
+        }
+      }
+    },
+    "P3×S2P": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "s5": {
+          "verdict": "未构成检验",
+          "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+        },
+        "s6": {
+          "verdict": "未构成检验",
+          "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+        },
+        "s7": {
+          "verdict": "未构成检验",
+          "reason": "认证端点对不足"
+        },
+        "s8": {
+          "verdict": "未构成检验",
+          "reason": "认证端点对不足"
+        },
+        "s9": {
+          "verdict": "未构成检验",
+          "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+        }
+      }
+    },
+    "P2×S2P": {
+      "verdict": "通过",
+      "reason": "票型 ['通过', '通过', '通过', '通过', '通过']",
+      "per_seed": {
+        "s5": {
+          "verdict": "通过",
+          "reason": null
+        },
+        "s6": {
+          "verdict": "通过",
+          "reason": null
+        },
+        "s7": {
+          "verdict": "通过",
+          "reason": null
+        },
+        "s8": {
+          "verdict": "通过",
+          "reason": null
+        },
+        "s9": {
+          "verdict": "通过",
+          "reason": null
+        }
+      }
+    },
+    "P1×S1": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "b1_s5": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "b1_s6": {
+          "verdict": "未构成检验",
+          "reason": "Ŝ 双路形状判据未过（仪器）",
+          "supplement_peak_window": null
+        },
+        "b1_s7": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b1_s8": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b1_s9": {
+          "verdict": "未构成检验",
+          "reason": "σ_Û 超数据条件（CAL-P1）",
+          "supplement_peak_window": null
+        },
+        "b4_s5": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b4_s6": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b4_s7": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b4_s8": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        },
+        "b4_s9": {
+          "verdict": "未构成检验",
+          "reason": "入域门未过",
+          "supplement_peak_window": null
+        }
+      }
+    },
+    "P1×S2P": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "s5": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s6": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s7": {
+          "verdict": "未构成检验",
+          "reason": "Ŝ 双路形状判据未过（仪器）",
+          "supplement_peak_window": null
+        },
+        "s8": {
+          "verdict": "未构成检验",
+          "reason": "Ŝ 双路形状判据未过（仪器）",
+          "supplement_peak_window": null
+        },
+        "s9": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        }
+      }
+    },
+    "P1×S3": {
+      "verdict": "未构成检验",
+      "reason": "构成判定的种子不足两个",
+      "per_seed": {
+        "s5": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s6": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s7": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s8": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        },
+        "s9": {
+          "verdict": "未构成检验",
+          "reason": "效用平台未检出（母论文层前提）",
+          "supplement_peak_window": false
+        }
+      }
+    }
+  }
+}

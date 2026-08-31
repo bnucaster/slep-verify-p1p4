@@ -1,5 +1,6 @@
 {
-  "thresholds_file": "protocol_v1.1_thresholds.json",
+  "protocol_version": "1.2",
+  "thresholds_file": "protocol_v1.2_thresholds.json",
   "systems": {
     "S2:s5": {
       "gates": {
@@ -114,7 +115,7 @@
           },
           "b1_s9": {
             "verdict": "未构成检验",
-            "reason": "Ŝ 双路形状判据未过（仪器）"
+            "reason": "σ_Û 超数据条件（CAL-P1）"
           },
           "b4_s5": {
             "verdict": "未构成检验",
@@ -136,6 +137,243 @@
             "verdict": "未构成检验",
             "reason": "入域门未过"
           }
+        }
+      }
+    },
+    "S2P": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true
+        }
+      },
+      "P1": {
+        "verdict": "未构成检验",
+        "reason": "构成判定的种子不足两个",
+        "per_seed": {
+          "s5": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s6": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s7": {
+            "verdict": "未构成检验",
+            "reason": "Ŝ 双路形状判据未过（仪器）"
+          },
+          "s8": {
+            "verdict": "未构成检验",
+            "reason": "Ŝ 双路形状判据未过（仪器）"
+          },
+          "s9": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          }
+        }
+      }
+    },
+    "S3": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true
+        }
+      },
+      "P1": {
+        "verdict": "未构成检验",
+        "reason": "构成判定的种子不足两个",
+        "per_seed": {
+          "s5": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s6": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s7": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s8": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          },
+          "s9": {
+            "verdict": "未构成检验",
+            "reason": "效用平台未检出（母论文层前提）",
+            "supplement_peak_window": false
+          }
+        }
+      }
+    },
+    "S2P:s5": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持",
+        "layer": {
+          "decoupling_shift": 0.21417537437608286
+        }
+      },
+      "P3": {
+        "verdict": "未构成检验",
+        "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s6": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持",
+        "layer": {
+          "decoupling_shift": 0.29793636195181467
+        }
+      },
+      "P3": {
+        "verdict": "未构成检验",
+        "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s7": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持",
+        "layer": {
+          "decoupling_shift": 0.17176388432204082
+        }
+      },
+      "P3": {
+        "verdict": "未构成检验",
+        "reason": "认证端点对不足"
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s8": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持",
+        "layer": {
+          "decoupling_shift": 0.15867796258354394
+        }
+      },
+      "P3": {
+        "verdict": "未构成检验",
+        "reason": "认证端点对不足"
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s9": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P4": {
+        "verdict": "未构成检验",
+        "reason": "解耦对照失败：斜率随占据统计漂移，表观仿射不构成支持",
+        "layer": {
+          "decoupling_shift": 0.27356267896675357
+        }
+      },
+      "P3": {
+        "verdict": "未构成检验",
+        "reason": "字段缺失 ['mw_p', 'effect', 'low_lt_high']"
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
         }
       }
     }
@@ -463,7 +701,7 @@
             "b1_s9": {
               "dual_shape": {
                 "rho": 0.9978656193972509,
-                "delta_same_sign": false
+                "delta_same_sign": true
               },
               "sigma_u": 0.001805192215555462,
               "sigma_u_max": 0.0016666666666666666,
@@ -508,6 +746,528 @@
           "s_band": 1.5469624461499003,
           "v_band": 39.5153917945944,
           "multiplier": 2.0
+        }
+      },
+      "S2P": {
+        "gates": {
+          "capability": {
+            "value": 0.35124999999999995,
+            "system": "S2P"
+          },
+          "geometry": {
+            "log10_cond_median": 2.8504204636566532,
+            "participation_median": 4.002230870698111
+          }
+        },
+        "gates_by_seed": {
+          "s5": true,
+          "s6": true,
+          "s7": true,
+          "s8": true,
+          "s9": true
+        },
+        "gates_detail": {
+          "s5": {
+            "u_final": 0.36875,
+            "capability_pooled": 0.35124999999999995,
+            "log10_cond_median": 2.8504204636566532,
+            "participation_median": 4.002230870698111,
+            "gate_ok": true
+          },
+          "s6": {
+            "u_final": 0.3625,
+            "capability_pooled": 0.35124999999999995,
+            "log10_cond_median": 2.86641673390745,
+            "participation_median": 3.777262948664333,
+            "gate_ok": true
+          },
+          "s7": {
+            "u_final": 0.35,
+            "capability_pooled": 0.35124999999999995,
+            "log10_cond_median": 3.3480113309154658,
+            "participation_median": 3.419901103241067,
+            "gate_ok": true
+          },
+          "s8": {
+            "u_final": 0.3625,
+            "capability_pooled": 0.35124999999999995,
+            "log10_cond_median": 2.999087209954751,
+            "participation_median": 3.394941988067291,
+            "gate_ok": true
+          },
+          "s9": {
+            "u_final": 0.3125,
+            "capability_pooled": 0.35124999999999995,
+            "log10_cond_median": 2.967829753217227,
+            "participation_median": 3.9063294048179777,
+            "gate_ok": true
+          }
+        },
+        "exp_p1": {
+          "seeds": {
+            "s5": {
+              "dual_shape": {
+                "rho": 0.9945635759589248,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 9000,
+              "s_drop": null,
+              "s_band": 7.069257912376875,
+              "v_post_trend": null,
+              "s_drop_peak_window": 3.3798248932094843
+            },
+            "s6": {
+              "dual_shape": {
+                "rho": 0.9503171247357293,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 8000,
+              "s_drop": null,
+              "s_band": 7.069257912376875,
+              "v_post_trend": null,
+              "s_drop_peak_window": 4.689679470286057
+            },
+            "s7": {
+              "dual_shape": {
+                "rho": 0.8628813047417698,
+                "delta_same_sign": false
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 16000,
+              "s_drop": null,
+              "s_band": 7.069257912376875,
+              "v_post_trend": null,
+              "s_drop_peak_window": -0.8590288269740682
+            },
+            "s8": {
+              "dual_shape": {
+                "rho": 0.8477801268498943,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 19000,
+              "s_drop": null,
+              "s_band": 7.069257912376875,
+              "v_post_trend": null,
+              "s_drop_peak_window": 0.6342084558163181
+            },
+            "s9": {
+              "dual_shape": {
+                "rho": 0.9904862579281184,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 7500,
+              "s_drop": null,
+              "s_band": 7.069257912376875,
+              "v_post_trend": null,
+              "s_drop_peak_window": 9.317827447412892
+            }
+          }
+        },
+        "bands": {
+          "s_band": 7.069257912376875,
+          "v_band": 6.343203078239578,
+          "multiplier": 2.0,
+          "dual_delta_floor_frac": 0.25
+        }
+      },
+      "S3": {
+        "gates": {
+          "capability": {
+            "value": 0.325,
+            "system": "S3"
+          },
+          "geometry": {
+            "log10_cond_median": 4.23501339272658,
+            "participation_median": 4.215927763704161
+          }
+        },
+        "gates_by_seed": {
+          "s5": true,
+          "s6": true,
+          "s7": true,
+          "s8": true,
+          "s9": true
+        },
+        "gates_detail": {
+          "s5": {
+            "u_final": 0.36875,
+            "capability_pooled": 0.325,
+            "log10_cond_median": 4.23501339272658,
+            "participation_median": 4.215927763704161,
+            "gate_ok": true
+          },
+          "s6": {
+            "u_final": 0.35625,
+            "capability_pooled": 0.325,
+            "log10_cond_median": 4.337970473817246,
+            "participation_median": 3.607377579914721,
+            "gate_ok": true
+          },
+          "s7": {
+            "u_final": 0.3125,
+            "capability_pooled": 0.325,
+            "log10_cond_median": 4.186491238868786,
+            "participation_median": 4.15631100285675,
+            "gate_ok": true
+          },
+          "s8": {
+            "u_final": 0.325,
+            "capability_pooled": 0.325,
+            "log10_cond_median": 4.179204299247307,
+            "participation_median": 4.597571208005292,
+            "gate_ok": true
+          },
+          "s9": {
+            "u_final": 0.2625,
+            "capability_pooled": 0.325,
+            "log10_cond_median": 4.150040840613329,
+            "participation_median": 4.1941975014880155,
+            "gate_ok": true
+          }
+        },
+        "exp_p1": {
+          "seeds": {
+            "s5": {
+              "dual_shape": {
+                "rho": 0.9993959528843249,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 18000,
+              "s_drop": null,
+              "s_band": 9.653348890084267,
+              "v_post_trend": null,
+              "s_drop_peak_window": 0.8496820586942135
+            },
+            "s6": {
+              "dual_shape": {
+                "rho": 0.9996979764421625,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 3000,
+              "s_drop": null,
+              "s_band": 9.653348890084267,
+              "v_post_trend": null,
+              "s_drop_peak_window": 15.373504420274578
+            },
+            "s7": {
+              "dual_shape": {
+                "rho": 0.9990939293264876,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 6000,
+              "s_drop": null,
+              "s_band": 9.653348890084267,
+              "v_post_trend": null,
+              "s_drop_peak_window": 9.225637304662754
+            },
+            "s8": {
+              "dual_shape": {
+                "rho": 0.9996979764421625,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 6500,
+              "s_drop": null,
+              "s_band": 9.653348890084267,
+              "v_post_trend": null,
+              "s_drop_peak_window": 8.648348588245327
+            },
+            "s9": {
+              "dual_shape": {
+                "rho": 0.9995469646632437,
+                "delta_same_sign": true
+              },
+              "sigma_u": 0.0,
+              "sigma_u_max": 0.0016666666666666666,
+              "plateau_step": null,
+              "peak_step": 4500,
+              "s_drop": null,
+              "s_band": 9.653348890084267,
+              "v_post_trend": null,
+              "s_drop_peak_window": 12.088929678482884
+            }
+          }
+        },
+        "bands": {
+          "s_band": 9.653348890084267,
+          "v_band": 8.502896856640968,
+          "multiplier": 2.0,
+          "dual_delta_floor_frac": 0.25
+        }
+      },
+      "S2P:s5": {
+        "gates": {
+          "capability": {
+            "value": 0.35125,
+            "system": "S2P",
+            "per_seed_rate": 0.36875
+          },
+          "geometry": {
+            "log10_cond_median": 2.843094330219413,
+            "participation_median": 4.014471449007661
+          },
+          "stationarity": {
+            "rhat": 0.9998832724391415,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 1.1486185217827228e-166,
+          "delta_bic": 750.763147526447,
+          "r_squared": 0.5399647253887316,
+          "curvature_effect_ratio": 0.4118005713467868,
+          "slope": 0.023166283100478555,
+          "t_split_rel": 0.07824215861577634,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.21417537437608286,
+            "policy_swap_slope_shift_rel": 0.018212769156495417
+          },
+          "temperature_hat": 43.16618232034567
+        },
+        "exp_p3": {
+          "terrain_ratio_ci_low": 1.868156485132665,
+          "mw_p": null,
+          "effect": null,
+          "low_lt_high": null,
+          "n_certified_pairs": 1
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 4.707977154407485e-18,
+            "median_diff": 0.003083286274291497
+          },
+          "novelty": {
+            "logistic_p": 5.281111078069759e-07,
+            "positive": true
+          },
+          "drift_fraction": 0.10202275797404325
+        }
+      },
+      "S2P:s6": {
+        "gates": {
+          "capability": {
+            "value": 0.35125,
+            "system": "S2P",
+            "per_seed_rate": 0.3625
+          },
+          "geometry": {
+            "log10_cond_median": 2.888464172863427,
+            "participation_median": 3.6723398075188056
+          },
+          "stationarity": {
+            "rhat": 0.999363904992979,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 7.99453163195038e-105,
+          "delta_bic": 465.95342941965646,
+          "r_squared": 0.4640040446703144,
+          "curvature_effect_ratio": 0.252841016247552,
+          "slope": 0.025636632781289016,
+          "t_split_rel": 0.02760608452764388,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.29793636195181467,
+            "policy_swap_slope_shift_rel": 0.005002418534441697
+          },
+          "temperature_hat": 39.006682684547144
+        },
+        "exp_p3": {
+          "terrain_ratio_ci_low": 1.8807573313282537,
+          "mw_p": null,
+          "effect": null,
+          "low_lt_high": null,
+          "n_certified_pairs": 1
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 3.0101075608383826e-22,
+            "median_diff": 0.0026043339255771014
+          },
+          "novelty": {
+            "logistic_p": 1.0153169184831369e-07,
+            "positive": true
+          },
+          "drift_fraction": 0.044164725872138266
+        }
+      },
+      "S2P:s7": {
+        "gates": {
+          "capability": {
+            "value": 0.35125,
+            "system": "S2P",
+            "per_seed_rate": 0.35
+          },
+          "geometry": {
+            "log10_cond_median": 3.358897805149327,
+            "participation_median": 3.3542145788029347
+          },
+          "stationarity": {
+            "rhat": 0.9997263707385495,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 5.523406260449326e-98,
+          "delta_bic": 434.47174068256027,
+          "r_squared": 0.588521818103033,
+          "curvature_effect_ratio": 0.2908251972586359,
+          "slope": 0.026053282747223242,
+          "t_split_rel": 0.059137987970100815,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.17176388432204082,
+            "policy_swap_slope_shift_rel": 0.0013847439921627117
+          },
+          "temperature_hat": 38.38287902919182
+        },
+        "exp_p3": {
+          "terrain_ratio_ci_low": 1.9373009042882532,
+          "mw_p": 0.3333333333333333,
+          "effect": 42976.56134955402,
+          "low_lt_high": true,
+          "n_certified_pairs": 3
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 1.039132520036565e-12,
+            "median_diff": 0.00205119775988577
+          },
+          "novelty": {
+            "logistic_p": 6.513983007416617e-05,
+            "positive": true
+          },
+          "drift_fraction": 0.10214606967883
+        }
+      },
+      "S2P:s8": {
+        "gates": {
+          "capability": {
+            "value": 0.35125,
+            "system": "S2P",
+            "per_seed_rate": 0.3625
+          },
+          "geometry": {
+            "log10_cond_median": 3.0074811383864217,
+            "participation_median": 3.387749043366096
+          },
+          "stationarity": {
+            "rhat": 0.9992468805891599,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 4.618351450279034e-101,
+          "delta_bic": 448.6378466719498,
+          "r_squared": 0.5082734310739188,
+          "curvature_effect_ratio": 0.32644923733438846,
+          "slope": 0.025449400282363185,
+          "t_split_rel": 0.10907003252681828,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.15867796258354394,
+            "policy_swap_slope_shift_rel": 0.09072915821962524
+          },
+          "temperature_hat": 39.293656781885545
+        },
+        "exp_p3": {
+          "terrain_ratio_ci_low": 1.9432433735374588,
+          "mw_p": 0.3333333333333333,
+          "effect": 296.7088224633083,
+          "low_lt_high": true,
+          "n_certified_pairs": 3
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 5.696498906435593e-25,
+            "median_diff": 0.0030570269775236636
+          },
+          "novelty": {
+            "logistic_p": 6.375593997855084e-05,
+            "positive": true
+          },
+          "drift_fraction": 0.08917391519080042
+        }
+      },
+      "S2P:s9": {
+        "gates": {
+          "capability": {
+            "value": 0.35125,
+            "system": "S2P",
+            "per_seed_rate": 0.3125
+          },
+          "geometry": {
+            "log10_cond_median": 2.9223598093565437,
+            "participation_median": 4.072487058552265
+          },
+          "stationarity": {
+            "rhat": 1.003034613574854,
+            "n_chains": 4
+          }
+        },
+        "exp_p4": {
+          "p_lack_of_fit": 3.1386830906800833e-97,
+          "delta_bic": 430.99889976024406,
+          "r_squared": 0.5498051847970171,
+          "curvature_effect_ratio": 0.17458700310434264,
+          "slope": 0.025091155390033287,
+          "t_split_rel": 0.07198939069013187,
+          "decoupling": {
+            "uniform_decoder_slope_shift_rel": 0.27356267896675357,
+            "policy_swap_slope_shift_rel": 0.0566576252384124
+          },
+          "temperature_hat": 39.854681239478516
+        },
+        "exp_p3": {
+          "terrain_ratio_ci_low": 1.9447311661998954,
+          "mw_p": null,
+          "effect": null,
+          "low_lt_high": null,
+          "n_certified_pairs": 3
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 6.940881965302153e-34,
+            "median_diff": 0.0035679047884525084
+          },
+          "novelty": {
+            "logistic_p": 0.00033089858909706593,
+            "positive": true
+          },
+          "drift_fraction": 0.10813507410068002
         }
       }
     }
