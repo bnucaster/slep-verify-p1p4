@@ -24,6 +24,17 @@ pdflatex main
 pdflatex main
 ```
 
+已用官方 tmlr.sty/tmlr.bst 正式编译通过（TeX Live 2025）。两版产物：
+
+- 匿名投稿版：默认 `\usepackage{tmlr}`，作者显示 "Anonymous authors"（9 页）。
+- arXiv 先发版：把包行切到 `\usepackage[preprint]{tmlr}`（同时置 preprint+
+  accepted，显作者、无 OpenReview 行，10 页）。arXiv 源码包见
+  `slep_arxiv_source.zip`（main.tex 已切 preprint + main.bbl + 三样式 +
+  figures/*.pdf，自洽编译，arXiv 侧无需联网抓文献）。
+
+注：本目录的 tmlr.sty/tmlr.bst/fancyhdr.sty 与生成的 PDF/zip 均在
+gitignore（第三方样式不入库，构建产物可重生）；zip 已含样式供 arXiv 上传。
+
 ## 投稿前待办（不影响编译，影响内容合规）
 
 - **母论文引文**：`references.bib` 的 `slep_parent` 为占位（作者/年份/
