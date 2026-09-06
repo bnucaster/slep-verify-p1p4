@@ -14,3 +14,14 @@ results/confirmation/**/chain_*.npz
 results/confirmation/**/swap_chain_*.npz
 results/confirmation/**/refsets.npz
 results/calibration/**/samples.npz
+
+# LaTeX 构建产物（源为 main.tex / references.bib）
+docs/paper/tmlr/*.aux
+docs/paper/tmlr/*.log
+docs/paper/tmlr/*.out
+docs/paper/tmlr/*.bbl
+docs/paper/tmlr/*.blg
+docs/paper/tmlr/*.pdf
+docs/paper/tmlr/tmlr.sty
+docs/paper/tmlr/tmlr.bst
+docs/paper/tmlr/_check.*
