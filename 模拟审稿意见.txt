@@ -1,0 +1,53 @@
+# Expected Review Outcome:
+
+## Summary Of Contributions
+
+This paper executes a pre-registered-style empirical protocol for four predictions of the Semantic Least-Energy Principle across a $\beta$-VAE, GRU world models, and a small Transformer world model. The central positive result is P2 on S2P: Table 1 reports the only pass, and Figure 2 combines low Onsager–Machlup action relative to metric-matched surrogates, a potential-gradient ablation, and a novelty/placebo analysis. The paper is commendably explicit about negative and non-constituted outcomes: P1 lacks its plateau premise and shows a reverse entropy trend in Figure 4; P3 cannot meet its geodesic-residual quality gate in Figure 5; and P4 is invalidated by its decoder-occupancy decoupling control and curvature analysis in Figure 3. The three-valued accounting and unusually frank limitations in Section 6 are strengths. However, the only passing cell belongs to protocol v1.2, which was amended after aggregate evaluation-family results were public and added S2P, weakening the claimed pre-registration evidential status. There is also a concrete numerical overstatement in Section 5.2: the stated “six orders of magnitude” S2-to-S2P condition-number repair is incompatible with the condition numbers reported elsewhere for S2.
+
+## Are the claims made in the submission supported by accurate, convincing and clear evidence?
+
+No
+
+## Explain your answer above:
+
+Several empirical observations are clearly and carefully reported. In particular, the P2 result is internally coherent: Figure 2 and Section 4.2 report five seeds, 1,000 trajectories per seed, kinetically matched metric-space surrogates, a potential-term ablation, and a novelty placebo. Likewise, Figure 3 provides concrete evidence that the apparent P4 affine relation is not robust to decoder-occupancy decoupling, and Figure 4 supports the limited statement that the required P1 plateau was not detected in the tested runs.
+
+The principal issue is evidential rather than a direct contradiction of the reported measurements. Section 3 and the first limitation in Section 6 state that protocol v1.2 was amended after evaluation-family aggregate results were public. This amendment recalibrated the gate, added S2P and S3, and re-judged all cells. The sole pass in Table 1, P2 $\times$ S2P, is therefore not a result from the original frozen protocol. The authors candidly acknowledge the resulting “pre-registration after revision” status, but the title and presentation still overstate the strength of the pre-registered test. In particular, exposure to aggregate results before selecting and evaluating the repaired S2P system makes it difficult to interpret the P2 pass as a confirmatory test with the same force as an untouched pre-registration.
+
+The paper should also document the P2 surrogate and analysis pipeline much more fully in the main text. Equation 3 depends on estimated $\hat g$, $\nabla \hat V$, discretization, and a surrogate process described only as “metric-space smooth-random.” It is unclear how endpoint matching, smoothness, and speed-distribution matching are jointly enforced, whether the 1,000 within-seed trajectories are treated as independent for the Wilcoxon analysis, and how seed-level rather than trajectory-level inference supports the stated attribution. The reported ablation effect is statistically consistent but very small, $0.0021$ to $0.0036$ standardized-gap units, as Section 6 itself notes. This does not invalidate the result, but it requires stronger effect-size interpretation and robustness checks before supporting the broad inference-scale conclusion.
+
+There is an objective numerical inconsistency in Section 5.2. It states that S2P reduces the S2 condition-number median to $2.95$-$3.09$ “(six orders of magnitude).” Yet Section 5.1 reports S2 condition numbers around $2.4$-$2.9$ at 500 steps and $9.0$-$9.6$ at 20k steps. A change from approximately $9$-$10$ to approximately $3$ is meaningful for the calibrated gate, but it is not six orders of magnitude. The analogous S3 result, from approximately $10^{28}$ to $4.2$-$4.4$, could plausibly be described in orders of magnitude; the text currently conflates the two comparisons.
+
+Finally, the paper’s presentation makes several causal interpretations stronger than the evidence directly shown. Section 5.2 attributes the repair to previously unused memory dimensions becoming visible to the decoder, but no Jacobian singular-value spectra, per-coordinate sensitivities, or effective-rank comparison is presented. The explanation is plausible, but should be framed as a hypothesis unless directly measured.
+
+## Would at least some individuals in TMLR's audience be interested in knowing the findings of this paper?
+
+Yes
+
+## Explain your answer above:
+
+The paper is within TMLR’s scope through empirical methodology for testing learning-theoretic hypotheses, representation geometry, world models, density estimation, and trajectory-based analyses of learned dynamical systems. Researchers interested in empirical validation of free-energy-like principles, latent Riemannian geometry, and evaluation methodology would care about the attempted falsification protocol, especially the distinction between failure and an unconstituted test. The P2 formulation using Onsager–Machlup action and the P3 geodesic test also connect to active methodological questions in learned latent dynamics. The paper would be more useful to this audience with stronger positioning against existing work on Onsager–Machlup path estimation, empirical tests of free-energy principles, information-bottleneck/compression analyses, and geodesic computation in latent spaces.
+
+## Requested Changes
+
+1. Critical: Reframe the confirmatory status of the P2 result throughout the title, abstract, Introduction, Section 3, and Conclusion. The current paper acknowledges in Section 6 that v1.2 was amended after aggregate evaluation-family results were public, and that S2P was added in v1.2. Since Table 1’s only pass is P2 $\times$ S2P, clearly separate the original frozen v1.1 evidence from the post-revision evidence, report their respective results side by side, and avoid presenting the v1.2 P2 outcome as equivalent to an untouched pre-registered confirmation.
+
+2. Critical: Make the P2 evidence reproducible and statistically interpretable from the main paper. For Section 4.2 and Figure 2, specify the precise surrogate-generation algorithm, endpoint-matching tolerance, smoothing procedure, speed-distribution matching criterion, time discretization, and treatment of metric ill-conditioning in Equation 3. Clarify the inferential unit for the Wilcoxon tests and provide seed-level effect sizes and uncertainty intervals, not only trajectory-level $p$-values. Include robustness checks for reasonable alternative surrogate constructions and for numerical choices in estimating $\hat g$ and $\nabla\hat V$.
+
+3. Critical: Correct the “six orders of magnitude” claim in Section 5.2 for S2 to S2P. Based on the paper’s own values, the S2 condition-number median changes from roughly $9$-$10$ at 20k steps to roughly $3$, not by six orders of magnitude. Keep the separate S3 comparison if supported, but distinguish it explicitly. If the mechanistic explanation about invisible memory dimensions is retained, substantiate it with decoder-Jacobian singular-value spectra, effective rank, or per-latent-dimension decoder sensitivity for S2 versus S2P.
+
+4. Strengthen: Improve the presentation of the visual evidence. Figure 1 explicitly says that labels must be regenerated in English, which is not acceptable in a final submission. For Figure 2, add readable axis labels, numerical annotations, and captions that identify the exact statistic and unit shown in each panel. Figure 3 should similarly make the slope-change tolerance $0.12$ and curvature bound $0.17$ visually legible, since these thresholds determine the P4 verdict.
+
+5. Strengthen: Add a concise related-work and positioning discussion. The paper currently cites its parent theory and foundational estimator references but does not position the work relative to prior Onsager–Machlup-based trajectory inference, empirical validation of free-energy principles, information-bottleneck analyses of representation compression, or modern latent-space geodesic methods. This is especially important because the paper’s primary contribution is an empirical testing protocol rather than a new model.
+
+## Broader Impact Concerns
+
+N/A
+
+## Additional Comments
+
+The paper is unusually transparent about limitations, and the separation of “fail” from “test not constituted” is valuable. However, the manuscript should ensure that the conclusion preserves this distinction: the supplementary peak-window entropy analyses in Section 4.4 are suggestive negative evidence for P1, but they are not the title-verdict test because the stipulated plateau premise was not met.
+
+## Decision Recommendation
+
+2: leaning reject. The paper contains an interesting and potentially useful empirical-testing framework, and its transparency about null and unconstituted results is a real strength. However, the only positive result comes from a protocol revision made after aggregate evaluation data were public, central P2 methodological details are insufficiently specified in the main paper, and Section 5.2 contains a material numerical overstatement. These concerns need resolution before the empirical support can be treated as convincing confirmatory evidence.
