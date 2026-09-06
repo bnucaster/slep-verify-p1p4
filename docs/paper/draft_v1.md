@@ -275,13 +275,20 @@ freeze_manifest_v12.json；时间戳锚点提交 f7f7910 与 27df5af）。种子
 
 ## 附：图表清单状态（plan_v2 第 9 节）
 
-| 图 | 内容 | 状态 |
+七图已生成于 docs/paper/figures/（scripts/make_paper_figures.py，数据全部
+出自已入库产物）：
+
+| 图 | 内容 | 文件 |
 |---|---|---|
-| fig1 | 系统与估计管线总图 | 待绘制 |
-| fig2 | P1 主图：Ŝ 与 Û 双轴、平台/峰值窗口标记 | 数据齐（exp_p1_* 缓存），待绘制 |
-| fig3 | P2：Â_OM 分布 + 消融分板 + 新奇栅格 | 数据齐（exp_p2 缓存），待绘制 |
-| fig4 | P3：低/高梯度偏差对比 + 衰减记录 | 数据齐，待绘制 |
-| fig5 | P4：Î–V̂ 散点 + 解耦分板 + 分半 + 操纵 | 数据齐（scatter.npz + controls），待绘制 |
-| fig6 | 三值记分牌 | scoreboard_v12.json，待排版 |
-| fig7 | 阶梯符合度（开发族，探索性） | ladder_pilot.md，待绘制 |
-| 附录 | 校准图（cal_p4、frontier、geom_decomp） | decomp.png 等已有，待整理 |
+| fig1 | 系统—估计器—校准—判定管线总图 | fig1_pipeline.png |
+| fig2 | P1：三架构效用与熵沿训练（峰后熵升，平台均未检出） | fig2_p1.png |
+| fig3 | P2 × S2P（通过）：集中性 + 势项消融 + 新奇关联三层 | fig3_p2.png |
+| fig4 | P3 × S2P（未运行）：残差衰减 + 认证对 + 地形门 | fig4_p3.png |
+| fig5 | P4 × S2P（未构成）：Î–V̂ 散点 + 解耦对照 + 曲率/分半 | fig5_p4.png |
+| fig6 | 三值记分牌（judge v1.2） | fig6_scoreboard.png |
+| fig7 | 能力阶梯试点（S2，开发族，探索性） | fig7_ladder.png |
+
+作图口径注记：fig2 熵取 kNN 标准化口径（S2P 高维隐态上 flow 熵单点数值
+崩溃，判定的双路形状检查用整条曲线秩相关不受单点影响；作图取稳健路），
+熵曲线只画均匀段（≥500 步）。校准图（cal_p4、frontier、geom_decomp）已
+有产物，附录整理待排版轮。
