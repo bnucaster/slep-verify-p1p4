@@ -28,9 +28,10 @@ pdflatex main
 
 - **母论文引文**：`references.bib` 的 `slep_parent` 为占位（作者/年份/
   出处未核实，标 TODO）。投稿前须核实填齐，禁止凭记忆虚构。
-- **图内标签英文化**：现有七图 `docs/paper/figures/` 为中文标签（草稿
-  阶段产物）。英文投稿须把图内文字改英文——在 `scripts/make_paper_figures.py`
-  加英文标签模式重生成，图注已是英文。
+- ~~图内标签英文化~~：已完成。七图英文标签 + Times New Roman 正文 +
+  STIX 数学体，白底、300 dpi、矢量 PDF（`docs/paper/figures/figN.pdf`，
+  main.tex 引用 PDF）+ PNG 预览。重生成：
+  `.venv/Scripts/python.exe scripts/make_paper_figures.py`。
 - **作者块**：匿名版占位，署名版填 `\author{\name ... \email ...}`。
 - **仓库 URL**：匿名版复现声明里已隐去，定稿版补回
   `https://github.com/bnucaster/slep-verify-p1p4`。
