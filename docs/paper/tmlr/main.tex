@@ -39,51 +39,55 @@
 \maketitle
 
 \begin{abstract}
-The Semantic Least-Energy Principle (SLEP) states, in its prediction protocol,
-four falsifiable claims: P1, energy decreases during learning and compresses
-after fit; P2, inference trajectories concentrate on low-action paths; P3,
-deliberation trajectories in low-gradient regions are near-geodesic; P4,
-self-information is affine in the potential with an identifiable temperature.
-We execute a pre-registered test of these four predictions on three small
-systems (a $\beta$-VAE, a recurrent world model and a multi-step-decoder
-variant, and a small Transformer sequence world model). Decision thresholds
-are traced to calibration artifacts; the judging code is frozen before any
-evaluation data is touched and time-stamped by a public repository commit; each
-cell of the prediction $\times$ system grid receives a three-valued verdict
-(\emph{pass} / \emph{fail} / \emph{test not constituted}). P2 passes on the
-multi-step-decoder world model: across all five evaluation seeds the observed
-Onsager--Machlup action lies below the lower quartile of an endpoint-matched
-surrogate distribution, and the concentration is attributed to potential
-structure by a potential-term ablation (all five per-seed paired differences
-positive; across-seed sign test $p=0.031$). This pass exists only under the
-revised protocol, so we test it further: a pre-registered out-of-sample
-replication on a fresh, previously unused seed family (the P2 pipeline frozen
-verbatim) reproduces the pass on four of five seeds, raising it from a
-revised-protocol result to a revised-architecture-plus-fresh-confirmation one.
-The apparent affine
-law (P4) loses its evidential standing under a decoupling control (retraining
-the decoder on occupancy-uniform data shifts the slope by $0.16$--$0.30$,
-exceeding the pre-registered tolerance $0.12$), and its curvature effect size
-exceeds the substantive-bending bound on every seed; the utility-plateau premise
-of P1 holds on none of thirteen gated training instances, with post-peak entropy
-rising rather than compressing; P3 does not run because the geodesic residual
-quality check, calibrated on analytically smooth synthetic metrics, is not met
-on estimated metrics. The test itself yields four instrument findings: a
-mutual exclusion between training length and metric measurability, an
-order-of-magnitude repair of latent-space geometry by a multi-step decoder head,
-feasibility that is not a single-variable function of the condition number, and
-non-portability of a residual-scale quality check between analytic and estimated
-metrics.
+The Semantic Least-Energy Principle (SLEP) makes four falsifiable predictions in
+its protocol: P1, energy decreases during learning and compresses after fit; P2,
+inference trajectories concentrate on low-action paths; P3, deliberation in
+low-gradient regions is near-geodesic; P4, self-information is affine in the
+potential with an identifiable temperature. We test all four under a
+pre-registered protocol on three small systems: a $\beta$-VAE, a recurrent world
+model with a multi-step-decoder variant, and a small Transformer sequence world
+model. Every decision threshold traces to a calibration artifact, and the judging
+code is frozen and time-stamped by a public commit before any evaluation data is
+touched. Each prediction-by-system cell then receives a three-valued verdict:
+\emph{pass}, \emph{fail}, or \emph{test not constituted}. One prediction passes.
+On the multi-step-decoder world model, P2 holds across all five evaluation seeds,
+with the observed Onsager--Machlup action below the lower quartile of an
+endpoint-matched surrogate distribution. A potential-term ablation attributes this
+concentration to potential structure, all five per-seed paired differences being
+positive (across-seed sign test $p=0.031$). Because the pass exists only under a
+revised protocol, we retest it out of sample: a pre-registered replication on a
+fresh, previously unused seed family, pipeline frozen verbatim, reproduces it on
+four of five seeds, lifting the pass to a revised-architecture-plus-fresh-confirmation
+grade. The other three predictions are not constituted rather than confirmed or
+refuted. The apparent affine law (P4) loses its standing under a decoupling
+control, where retraining the decoder on occupancy-uniform data shifts the slope
+by $0.16$--$0.30$, past the pre-registered tolerance of $0.12$, and its curvature
+exceeds the substantive-bending bound on every seed. The plateau premise of P1
+holds on none of thirteen gated training instances, and entropy rises after the
+utility peak instead of compressing. P3 does not run at all: a geodesic residual
+check calibrated on analytically smooth synthetic metrics is not met on the
+estimated ones. These non-results localize four instrument boundaries: a mutual
+exclusion between training length and metric measurability, an order-of-magnitude
+repair of latent-space geometry by a multi-step decoder head, a feasibility region
+that is not a single-variable function of the condition number, and a
+residual-scale check that does not transfer from analytic to estimated metrics.
+Three-valued accounting keeps these instrument limits separate from the theory's
+truth.
 \end{abstract}
 
 \section{Introduction}
 
-The parent theory \citep{slep_parent} proposes that a learning system with a
-utility constraint descends a free energy on the learning time scale, and that
-on the inference time scale its internal state approximately follows a Langevin
-dynamics whose drift is a semantic potential gradient. Its prediction protocol
-(Section~4.7 of the parent paper) compresses this claim into four separately
-falsifiable predictions. This paper is a record of executing that protocol.
+Energy-based accounts of learning and cognition are easy to state and hard to
+falsify, because they are usually judged by qualitative fit rather than by a
+pre-committed test. The parent theory \citep{slep_parent} is unusual in committing
+to concrete predictions. It proposes that a learning system under a utility
+constraint descends a free energy on the learning time scale, and that on the
+inference time scale its internal state follows a Langevin dynamics whose drift is
+a semantic potential gradient. Its protocol (Section~4.7 of the parent paper)
+turns this claim into four separately falsifiable predictions. We execute that
+protocol under a measurement discipline built so that the outcome is interpretable
+whether a prediction is confirmed, refuted, or beyond the reach of the current
+estimators.
 
 The operational content of the four predictions is as follows.
 \begin{itemize}
