@@ -291,6 +291,18 @@ def run_capability(cfg, train_cfg, model, seed: int, seed_dir, log) -> None:
         f"({time.time() - t0:.0f}s)")
 
 
+def seeds_file_of(cfg):
+    return REPO_ROOT / cfg["seeds_file"] if cfg.get("seeds_file") else guard.SEEDS_FILE
+
+
+def require_v1_3_frozen(cfg):
+    if not cfg.get("require_v1_3_frozen"):
+        return
+    st = json.loads((REPO_ROOT / "docs" / "freeze_status.json").read_text(encoding="utf-8"))
+    if not st.get("v1_3", {}).get("frozen"):
+        raise SystemExit("协议 v1.3 增补未冻结，复制族 P4 门运行被拒。")
+
+
 def main() -> None:
     config_file = CONFIG_FILE
     if "--config" in sys.argv:
@@ -298,7 +310,12 @@ def main() -> None:
     cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     train_cfg = yaml.safe_load(
         (REPO_ROOT / cfg["train_config"]).read_text(encoding="utf-8"))
-    torch.set_num_threads(int(cfg["torch_threads"]))
+    torch.set_num_threads(
+        int(sys.argv[sys.argv.index("--torch-threads") + 1])
+        if "--torch-threads" in sys.argv else int(cfg["torch_threads"]))
+    require_v1_3_frozen(cfg)
+    sf = seeds_file_of(cfg)
+    fam = cfg.get("seed_family", "evaluation")
     only_seed = None
     if "--seed" in sys.argv:
         only_seed = int(sys.argv[sys.argv.index("--seed") + 1])
@@ -314,11 +331,11 @@ def main() -> None:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(line + "\n")
 
-    seeds = guard.family_seeds("evaluation", purpose="exp-p4")
+    seeds = guard.family_seeds(fam, purpose="exp-p4", seeds_file=sf)
     if only_seed is not None:
         seeds = [only_seed]
     for seed in seeds:
-        guard.assert_seed_allowed(seed, purpose="exp-p4")
+        guard.assert_seed_allowed(seed, purpose="exp-p4", seeds_file=sf)
         seed_dir = out_dir / f"s{seed}"
         seed_dir.mkdir(exist_ok=True)
         model, ckpt_rel = load_frozen_model(train_cfg, seed)
