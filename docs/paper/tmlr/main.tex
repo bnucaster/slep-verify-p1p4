@@ -8,7 +8,8 @@
 % \usepackage[preprint]{tmlr}   % non-anonymous preprint (arXiv build)
 % \usepackage[accepted]{tmlr}   % camera-ready
 
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath}
+\usepackage{newtxtext,newtxmath}  % Times New Roman body + math (matches figures/tables)
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{microtype}
@@ -288,15 +289,8 @@ P1 $\times$ S3         & TNC & plateau not detected (window-scale wobble) \\
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:scoreboard} and Figure~\ref{fig:scoreboard} give the seven cells.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.86\linewidth]{../figures/fig6_scoreboard.pdf}
-\caption{Three-valued scoreboard (judge v1.2). [Figure labels to be regenerated
-in English for submission.]}
-\label{fig:scoreboard}
-\end{figure}
+Table~\ref{tab:scoreboard} gives the seven cells: one pass (P2 $\times$ S2P) and
+six tests not constituted.
 
 \subsection{The P2 pass: evidence chain (main result)}
 
@@ -367,7 +361,29 @@ ablation holds on all five (per-seed median paired difference $+0.0013$ to
 $+0.0040$, all positive; across-seed sign test $p=0.031$), and the novelty layer
 holds on four of five ($p<0.01$; seed $21$ has $p=0.041$ and fails that layer).
 The frozen judge returns \emph{pass} on four seeds and \emph{fail} on one, a
-four-of-five majority: P2 $\times$ S2P replicates.
+four-of-five majority: P2 $\times$ S2P replicates (Table~\ref{tab:repl}).
+
+\begin{table}[t]
+\centering
+\caption{P2 $\times$ S2P on the fresh replication family $\{20\text{--}24\}$
+(v1.3, frozen pipeline). Concentration $=$ fraction of trajectories below the
+surrogate lower quartile (pass line $0.75$); ablation is the potential-term paired
+difference (pass: median $>0$ and Wilcoxon $p<0.01$); novelty is the injection
+logistic regression (pass: positive and $p<0.01$). A seed passes only if all
+three hold.}
+\label{tab:repl}
+\begin{tabular}{lccccc}
+\toprule
+Seed & Concentration & Ablation median & Ablation $p$ & Novelty $p$ & Verdict \\
+\midrule
+20 & $1.000$ & $+0.0026$ & $1.0\times10^{-19}$ & $4.2\times10^{-6}$ & Pass \\
+21 & $1.000$ & $+0.0027$ & $1.7\times10^{-20}$ & $4.1\times10^{-2}$ & Fail (novelty) \\
+22 & $1.000$ & $+0.0017$ & $4.9\times10^{-13}$ & $1.7\times10^{-4}$ & Pass \\
+23 & $1.000$ & $+0.0013$ & $7.6\times10^{-7}$ & $1.4\times10^{-6}$ & Pass \\
+24 & $1.000$ & $+0.0040$ & $1.7\times10^{-35}$ & $1.4\times10^{-3}$ & Pass \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Table~\ref{tab:threever} places the three protocol versions side by side. The
 pass does not exist in the original pre-registration---at 20k steps the base
@@ -397,98 +413,8 @@ v1.3 (\texttt{da5c015}) & S2P, replication $\{20\text{--}24\}$ & $\le 7.0$; got 
 \end{tabular}
 \end{table}
 
-\subsection{P4: why the apparent affine law does not constitute support}
-
-On S2P the instrument resolution is adequate: $R^2$ is $0.464$--$0.589$ (floor
-$0.25$), the slope is consistent across seeds ($0.023$--$0.026$, i.e.\ $\hat T\
-38.4$--$43.2$), the split-half temperature relative difference is
-$0.028$--$0.109$ (tolerance $0.20$), and the multi-chain stationarity $\hat R \le
-1.003$. Two layers nonetheless object (Figure~\ref{fig:p4}).
-\begin{itemize}
-\item \textbf{Decoupling control} (validity core): retraining the decoder on
-occupancy-uniform data with the visitation distribution unchanged shifts the
-slope by $0.159$--$0.298$, exceeding the tolerance $0.12$ on all five
-seeds---a substantial part of the apparent affine law comes from ``the decoder
-fits better where it is visited more,'' so by the pre-registered rule the
-apparent affine law does not constitute support. A control on the control:
-swapping the exploration policy (frozen decoder) barely moves the slope
-($0.001$--$0.091$), and the intercept shift in the manipulation check matches the
-predicted signature (ratio $0.99$--$1.01$), locating the failure in
-decoder--occupancy coupling rather than in a pipeline bug.
-\item \textbf{Curvature}: lack-of-fit statistically rejects ($p\le 10^{-26}$) and
-the curvature effect size $\rho = |c|\cdot\mathrm{SD}(\hat V)/|b|$ is
-$0.175$--$0.412$, exceeding the substantive-bending bound $0.17$ ($c$ the
-quadratic coefficient, $\mathrm{SD}(\hat V)$ the abscissa standard deviation).
-Even had the decoupling passed, the verdict would be fail rather than pass.
-\end{itemize}
-The base system S2 fails the geometry gate under both protocol versions
-(20k-step $\log_{10}$ condition-number median $9.18$--$9.70$).
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/fig5_p4.pdf}
-\caption{P4 $\times$ S2P (TNC): the instrument has resolution, yet the apparent
-affine law does not constitute support. (a) $\hat I$--$\hat V$ scatter with fit;
-(b) decoupling controls; (c) curvature $\rho$ over bound, split-half within
-tolerance.}
-\label{fig:p4}
-\end{figure}
-
-\subsection{P1: the plateau premise and post-peak entropy rise}
-
-Across three architectures and thirteen gated training instances, no utility
-plateau is detected by the frozen detector: the S1 escape instances are two
-late-escape (still rising at the tail, the runtime window rule yielding a
-window beyond the horizon) and one early-escape instance where the plateau is
-detected but the entropy change is near zero relative to the noise band; S2P and
-S3 give post-peak slow decline or window-scale wobble on all five seeds each. The
-parent-paper layer premise does not hold and all are recorded as test not
-constituted.
-
-The supplementary peak-window layer (listed separately in the pre-registration
-and not entering the title verdict) gives a directionally consistent reverse
-signal (Figure~\ref{fig:p1}): within the window from the utility peak to twice
-its position, the entropy change is $+1.3$ and $+1.9$ nats on S1, $-0.9$ to
-$+9.3$ on S2P (four of five positive), and $+0.85$ to $+15.4$ on S3 (all
-positive)---after utility tops out, entropy rises rather than falls more often.
-This signal was observed already on the development family and pre-registered as
-an ``expected-to-fail risky prediction''; the evaluation family reproduces it on
-all three architectures. On S3 the dual-path entropy rank correlation is
-$0.999$--$1.000$, the best instrument agreement, and the reverse signal is least
-ambiguous.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/fig2_p1.pdf}
-\caption{P1: utility and entropy along training on three architectures. Utility
-tops out and entropy then rises (kNN standardized path; uniform segment only).
-Plateau is detected on none.}
-\label{fig:p1}
-\end{figure}
-
-\subsection{P3: why the test does not run}
-
-The terrain gate is healthy (the bootstrap CI90 lower bound of the high/low
-gradient tertile median ratio is $1.87$--$1.94$, so the terrain has detectable
-structure), but the geodesic residual quality check rejects $70$--$77$ candidate
-pairs per seed (of $76$--$80$ solved), leaving only $1$--$3$ certified (floor
-$8$). The root cause is scale non-portability: the residual threshold $3\times
-10^{-3}$ is calibrated on an analytically smooth synthetic metric, whereas on the
-estimated MLP decoder metric the achievable residual is only about $0.26$ after
-double precision, energy normalization, and an increased iteration budget
-(Section~\ref{sec:scale}). P3 is recorded as test not constituted; the residual
-scale non-portability is in Section~\ref{sec:scale}. See Figure~\ref{fig:p3}.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{../figures/fig4_p3.pdf}
-\caption{P3 $\times$ S2P (test not constituted): the terrain is detectable, but
-certification is blocked by the residual scale. (a) residual distribution vs.\
-frozen threshold; (b) attrition; (c) terrain-gate health.}
-\label{fig:p3}
-\end{figure}
-
-\subsection{Four mechanisms behind ``test not constituted''}
+\subsection{The other three predictions: four mechanisms behind ``test not
+constituted''}
 \label{sec:tnc}
 
 Three-valued accounting separates \emph{test not constituted} from \emph{fail}.
@@ -508,8 +434,9 @@ meaningful geometry. This class is entirely neutral about the parent theory---it
 only says this system at this training length is beyond the instrument's range.
 
 \emph{(ii) Vetoed by a validity control (measurement happens but is shown
-invalid).} P4 $\times$ S2P: resolution is adequate ($R^2\ 0.464$--$0.589$,
-split-half $0.028$--$0.109$), but the decoupling control removes the apparent
+invalid).} P4 $\times$ S2P (Figure~\ref{fig:p4}): resolution is adequate ($R^2\
+0.464$--$0.589$, split-half $0.028$--$0.109$), but the decoupling control removes
+the apparent
 affine law's standing---after retraining the decoder on occupancy-uniform data
 the slope shifts by $0.159$--$0.298$ on all five seeds ($>0.12$), while swapping
 the exploration policy barely moves it ($0.001$--$0.091$). Alongside, the
@@ -519,8 +446,9 @@ current estimators cannot decouple the self-information--potential relation from
 the decoder's visitation statistics, not that the affine law is refuted.
 
 \emph{(iii) Instrument reach short (the estimator cannot meet the quality
-check).} P3 $\times$ S2P: the terrain gate is healthy (CI90 lower bound
-$1.87$--$1.94$), but the geodesic residual check rejects $70$--$77$ pairs per
+check).} P3 $\times$ S2P (Figure~\ref{fig:p3}): the terrain gate is healthy (CI90
+lower bound $1.87$--$1.94$), but the geodesic residual check rejects $70$--$77$
+pairs per
 seed (of $76$--$80$ solved), leaving $1$--$3$ certified, below the floor $8$. The
 root is scale non-portability: the threshold $3\times10^{-3}$ is calibrated on an
 analytically smooth synthetic metric, and on the estimated MLP metric the
@@ -530,7 +458,8 @@ neutral about the parent theory, pointing at the geodesic solver's resolution on
 estimated metrics rather than at whether low-gradient regions are near-geodesic.
 
 \emph{(iv) Premise not met (no ground for the parent-paper layer).} P1 $\times$
-S1/S2P/S3: the parent-paper layer requires post-plateau energy compression, and
+S1/S2P/S3 (Figure~\ref{fig:p1}): the parent-paper layer requires post-plateau
+energy compression, and
 the plateau premise holds on none of the thirteen gated training instances. S2P
 and S3 detect no plateau on all five seeds each (tail noise $\hat\sigma_{\rm rel}\
 0.003$--$0.008$, runtime window $W=3$, no three consecutive flat windows). The
@@ -767,6 +696,41 @@ uses $\hat T=1$ and is invariant to a common positive temperature factor. The
 ablation rescoring reuses the identical surrogate stream per trajectory (paired by
 seed) with $\nabla\hat V$ set to zero, so the paired difference isolates the
 potential term.
+
+\section{Figures for the tests-not-constituted cells}
+\label{app:tncfigs}
+
+The per-cell evidence for the three non-passing predictions
+(Section~\ref{sec:tnc}) is shown here; the numbers are stated in the main text.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{../figures/fig5_p4.pdf}
+\caption{P4 $\times$ S2P (TNC): the instrument has resolution, yet the apparent
+affine law does not constitute support. (a) $\hat I$--$\hat V$ scatter with fit;
+(b) decoupling controls (uniform-decoder slope shift $>0.12$); (c) curvature
+$\rho$ over bound, split-half within tolerance.}
+\label{fig:p4}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{../figures/fig4_p3.pdf}
+\caption{P3 $\times$ S2P (TNC): the terrain is detectable, but certification is
+blocked by the residual scale. (a) residual distribution vs.\ frozen threshold;
+(b) attrition ($1$--$3$ certified vs.\ floor $8$); (c) terrain-gate health.}
+\label{fig:p3}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\linewidth]{../figures/fig2_p1.pdf}
+\caption{P1 (TNC on all three architectures): utility and entropy along training.
+Utility tops out and entropy then rises (kNN standardized path, uniform segment);
+the frozen detector finds no plateau, so the parent-paper compression layer has no
+ground, and the post-peak rise is the supplementary-layer reverse signal.}
+\label{fig:p1}
+\end{figure}
 
 \bibliographystyle{tmlr}
 \bibliography{references}
