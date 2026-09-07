@@ -20,5 +20,16 @@
     "anchor_commit": "27df5af38e4aa675aaa88422d71fde395ef5598b",
     "manifest": "docs/freeze_manifest_v12.json",
     "note": "用户于 2026-08-28 确认（检查点 3）；v1.2 清单 22 文件此后不得修改（amendment 第 6 节第 4 条）；判定自此由 judge_v12 写入 metrics.json 并带 protocol_version；S2P/S3 评估族运行自此解禁"
+  },
+  "v1_3": {
+    "frozen": true,
+    "frozen_at": "2026-09-07",
+    "protocol_hash": {
+      "docs/protocol_v1.3_addendum.md": "c2664b5a274295f57fe63ce327673a5dc52754db8df7e0a45f6a876661e9e021",
+      "configs/seeds_v1_3.yaml": "97b96407745a8c6fc135f210b9ae8dc3696fd0f1b8b5731d1a4e466bb1520e7e"
+    },
+    "external_timestamp_url": "https://github.com/bnucaster/slep-verify-p1p4",
+    "anchor_commit": "da5c015fcdc501c1c55fc35b6eef51efe75f83b1",
+    "note": "A4 新鲜确证预注册（用户 2026-09-07 授权执行）；时间戳锚点提交先于任何复制族运行；置位后脚本层解锁 replication 族 {20-24}；P2 判据沿用 v1.2 不变；增补与 seeds_v1_3 此后运行期不得改"
   }
 }
