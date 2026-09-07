@@ -249,7 +249,9 @@ System S2P, five evaluation seeds, $1000$ inference trajectories per seed, each
 matched to $50$ metric-space smooth-random surrogates (matched in length and in
 speed distribution under $\hat g$; the Euclidean surrogate was shown in
 calibration to give a spurious full separation through kinetic mismatch, and is
-discarded). All three layers pass (Figure~\ref{fig:p2}).
+discarded). The surrogate construction, endpoint-match tolerance, metric-floor
+regularizer, and discretization are given in full in Appendix~\ref{app:surrogate}.
+All three layers pass (Figure~\ref{fig:p2}).
 \begin{itemize}
 \item \textbf{Concentration}: the fraction of trajectories whose $\hat
 A_{\mathrm{OM}}$ median is below the lower quartile of the surrogate distribution
@@ -257,14 +259,22 @@ is $1.000$ on all five seeds (decision line $0.75$); the standardized-gap median
 is $0.45$--$0.49$.
 \item \textbf{Potential-term ablation} (validity core): setting $\nabla\hat V$ to
 zero and rescoring the same paths gives a per-trajectory paired difference
-(with-potential gap minus constant-potential gap) with median $+0.0021$ to
-$+0.0036$ and Wilcoxon signed-rank $p$ between $1.0\times10^{-12}$ and
-$6.9\times10^{-34}$---the with-potential version is systematically more
+(with-potential gap minus constant-potential gap) with a per-seed median of
+$+0.0021$ to $+0.0036$; the with-potential version is systematically more
 discriminating, so the concentration can be attributed to potential structure.
-This criterion was flagged high-risk at pre-registration (on the base system S2
-the gradient fraction was zero and the ablation had no power); on S2P it gains
-power, and in step the empirical-drift gradient fraction changes from $0.000$ to
-$0.04$--$0.11$.
+Two inference units are reported. Within a seed the $1000$ paired trajectories
+give a Wilcoxon signed-rank $p$ between $1.0\times10^{-12}$ and
+$6.9\times10^{-34}$; because trajectories within a seed are not independent, this
+overstates the evidence and is a within-seed effect-size witness, not the unit of
+attribution. Taking the seed as the inference unit (five seeds), all five per-seed
+medians are positive with bootstrap 95\% intervals excluding zero, and the
+across-seed sign test and Wilcoxon both give $p=0.031$ (the smallest value five
+all-positive seeds can attain). This is the honest attribution-level statement:
+significant at five-of-five sign consistency, and much weaker than the
+within-seed $p$ suggests. This criterion was flagged high-risk at pre-registration
+(on the base system S2 the gradient fraction was zero and the ablation had no
+power); on S2P it gains power, and in step the empirical-drift gradient fraction
+changes from $0.000$ to $0.04$--$0.11$.
 \item \textbf{Novelty association and placebo}: the logistic regression of the
 per-step action increment at novelty-injection steps (maze topology switch) on
 the novelty indicator has a likelihood-ratio $p$ between $5.3\times10^{-7}$ and
@@ -567,12 +577,20 @@ premise not hold on three architectures with a stably reproduced reverse signal
 (P1), and one does not run because of residual-scale non-portability (P3). The
 three tests-not-constituted differ in epistemic weight (Section~\ref{sec:tnc}):
 the P4 and P3 ones are instrument boundaries, neutral about the parent theory's
-truth; only ``P1 parent-paper premise not met'' carries negative information. The
-implications for the parent theory are stated accordingly: the inference-scale
-``trajectories concentrate on low-action paths'' obtains support beyond a trivial
-explanation; the learning-scale ``compression after fit'' does not appear on any
-system here, and the post-peak entropy rise is a stable phenomenon calling for a
-theoretical response; the affine law and temperature identification cannot be
+truth; only ``P1 parent-paper premise not met'' carries negative information. That
+negative information is graded, not a title-level falsification: the P1 verdict is
+test not constituted, because the utility plateau---the premise the title
+prediction is conditioned on---is detected on none of the thirteen gated
+instances, so the compression test never runs at its own layer. The post-peak
+entropy rise is a suggestive reverse signal at the pre-registered supplementary
+layer, not a formal fail of P1; we report it as stably reproduced across three
+architectures and read it as evidence against the compression-after-fit picture
+that is weaker than a constituted failure would be. The implications for the
+parent theory are stated accordingly: the inference-scale ``trajectories
+concentrate on low-action paths'' obtains support beyond a trivial explanation;
+the learning-scale ``compression after fit'' is not observed on any system here,
+though the premise failure keeps this short of a title-level refutation; the
+affine law and temperature identification cannot be
 decoupled from the decoder-occupancy effect under current estimator technology,
 so we make no positive or negative judgment on the affine law and its test
 validity depends on instrument improvements that do not yet exist.
@@ -594,6 +612,56 @@ the evaluation family before the freeze flag is set. The verdict file
 \texttt{metrics.json} is written only by the frozen judging code. The estimator
 toolbox is released with the repository as a public citation anchor. (The
 repository URL is withheld here for the anonymous submission.)
+
+\appendix
+
+\section{The metric-space surrogate algorithm}
+\label{app:surrogate}
+
+The P2 concentration test compares each inference trajectory against surrogates
+that match its length and its speed distribution \emph{under the estimated metric}
+$\hat g$, so that any residual separation is carried by potential alignment rather
+than by kinetic mismatch. Calibration showed the Euclidean-speed surrogate to give
+a spurious full separation through the kinetic term alone (and a constant potential
+to separate equally well), which is why the metric-space construction is the frozen
+primary and the Euclidean one is discarded. The construction, released in
+\texttt{protocols/surrogates.py}, is as follows for an observed trajectory
+$z_0,\dots,z_n$ with steps $\Delta z_t = z_{t+1}-z_t$:
+
+\begin{enumerate}
+\item \textbf{Metric speeds.} Compute $s_t = \lVert\Delta z_t\rVert_{\hat
+g(z_t)} = (\Delta z_t^{\top}\hat g(z_t)\,\Delta z_t)^{1/2}$ and permute the
+multiset $\{s_t\}$ by a seed-derived random permutation, giving $s_{\pi(t)}$. This
+matches the surrogate's metric-speed distribution to the observed one exactly.
+\item \textbf{Smoothing window.} Set the window $w$ to the direction
+autocorrelation time of the observed path---the first lag at which the mean cosine
+between adjacent-step directions falls below $1/e$---so the surrogate's
+directional smoothness matches the trajectory's.
+\item \textbf{Whitened random directions.} Draw i.i.d.\ Gaussian vectors, smooth
+each coordinate with a length-$w$ box filter, and normalize to unit vectors
+$v_t$ in whitened coordinates.
+\item \textbf{Metric-consistent stepping.} At the current point $p_t$ form
+$\hat g(p_t)+\lambda I = L_tL_t^{\top}$ (Cholesky) and take $\delta z_t =
+L_t^{-\top}(s_{\pi(t)}\,v_t)$, so that $\lVert\delta z_t\rVert_{\hat g(p_t)} =
+s_{\pi(t)}$ by construction; $p_{t+1}=p_t+\delta z_t$.
+\item \textbf{Endpoint bridge.} Both endpoints are pinned: the path starts at
+$z_0$, and a linear drift $p_t \leftarrow p_t + \tfrac{t}{n}(z_n - p_n)$ fixes the
+terminal point to $z_n$. The endpoint-match tolerance is therefore exact up to the
+bridge; the induced deviation in the metric-length ratio is returned as a
+quality-control quantity.
+\end{enumerate}
+
+The regularizer $\lambda = \texttt{metric\_floor\_rel}\times\operatorname{median}
+\operatorname{eig}\hat g$ (with $\texttt{metric\_floor\_rel}=10^{-3}$) enters the
+surrogate stepping only, never any estimator: without it a surrogate can wander
+into the off-manifold region where the true decoder's sigmoid saturation makes
+Jacobian rows vanish and $\hat g$ is numerically singular. The Onsager--Machlup
+action $\hat A_{\mathrm{OM}}$ is evaluated on the observed and surrogate paths with
+the same $\hat g$ and $\hat V$ under midpoint quadrature; the ranking statistic
+uses $\hat T=1$ and is invariant to a common positive temperature factor. The
+ablation rescoring reuses the identical surrogate stream per trajectory (paired by
+seed) with $\nabla\hat V$ set to zero, so the paired difference isolates the
+potential term.
 
 \bibliographystyle{tmlr}
 \bibliography{references}
