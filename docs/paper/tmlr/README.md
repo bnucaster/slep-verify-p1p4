@@ -26,9 +26,9 @@ pdflatex main
 
 已用官方 tmlr.sty/tmlr.bst 正式编译通过（TeX Live 2025）。两版产物：
 
-- 匿名投稿版：默认 `\usepackage{tmlr}`，作者显示 "Anonymous authors"（9 页）。
+- 匿名投稿版：默认 `\usepackage{tmlr}`，作者显示 "Anonymous authors"（11 页）。
 - arXiv 先发版：把包行切到 `\usepackage[preprint]{tmlr}`（同时置 preprint+
-  accepted，显作者、无 OpenReview 行，10 页）。arXiv 源码包见
+  accepted，显作者、无 OpenReview 行，12 页）。arXiv 源码包见
   `slep_arxiv_source.zip`（main.tex 已切 preprint + main.bbl + 三样式 +
   figures/*.pdf，自洽编译，arXiv 侧无需联网抓文献）。
 
@@ -37,8 +37,8 @@ gitignore（第三方样式不入库，构建产物可重生）；zip 已含样�
 
 ## 投稿前待办（不影响编译，影响内容合规）
 
-- **母论文引文**：`references.bib` 的 `slep_parent` 为占位（作者/年份/
-  出处未核实，标 TODO）。投稿前须核实填齐，禁止凭记忆虚构。
+- ~~母论文引文~~：已完成。`references.bib` 的 `slep_parent` 已按 arXiv API
+  记录（2607.24287，作者 Zhang/Zhu/Zhang/Hu，2026，primaryClass cs.IT）核实填齐。
 - ~~图内标签英文化~~：已完成。七图英文标签 + Times New Roman 正文 +
   STIX 数学体，白底、300 dpi、矢量 PDF（`docs/paper/figures/figN.pdf`，
   main.tex 引用 PDF）+ PNG 预览。重生成：

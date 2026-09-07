@@ -22,6 +22,8 @@ docs/paper/tmlr/*.out
 docs/paper/tmlr/*.bbl
 docs/paper/tmlr/*.blg
 docs/paper/tmlr/*.pdf
+docs/paper/tmlr/*.zip
 docs/paper/tmlr/tmlr.sty
 docs/paper/tmlr/tmlr.bst
+docs/paper/tmlr/fancyhdr.sty
 docs/paper/tmlr/_check.*
