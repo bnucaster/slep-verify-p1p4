@@ -57,8 +57,8 @@ surrogate distribution, and the concentration is attributed to potential
 structure by a potential-term ablation (all five per-seed paired differences
 positive; across-seed sign test $p=0.031$). This pass exists only under the
 revised protocol, so we test it further: a pre-registered out-of-sample
-replication on a fresh, previously unused seed family---the P2 pipeline frozen
-verbatim---reproduces the pass on four of five seeds, raising it from a
+replication on a fresh, previously unused seed family (the P2 pipeline frozen
+verbatim) reproduces the pass on four of five seeds, raising it from a
 revised-protocol result to a revised-architecture-plus-fresh-confirmation one.
 The apparent affine
 law (P4) loses its evidential standing under a decoupling control (retraining
@@ -89,12 +89,12 @@ The operational content of the four predictions is as follows.
 \begin{itemize}
 \item \textbf{P1} (energy decreases during learning, compresses after fit): along
 training checkpoints, the mean potential $\langle\hat V\rangle$ and the entropy
-$\hat S$ keep decreasing after utility reaches a plateau---utility stops rising,
+$\hat S$ keep decreasing after utility reaches a plateau. Utility stops rising,
 yet the internal representation keeps compressing.
 \item \textbf{P2} (low-action concentration): the path action of an inference
 trajectory is significantly below that of endpoint-, length-, and
 speed-distribution-matched random surrogate paths, and this concentration is
-attributed to the potential-gradient term---replacing the potential with a
+attributed to the potential-gradient term. Replacing the potential with a
 constant should visibly degrade discrimination.
 \item \textbf{P3} (near-geodesic in low-gradient regions): deliberation
 trajectories in flat regions of the potential field are closer to the
@@ -113,7 +113,7 @@ evaluation-family data is touched, time-stamped by a public Git commit hash;
 during the evaluation phase the human role is reduced to running code. Third,
 three-valued accounting: a cell that fails an admission gate (capability,
 geometry, stationarity, geodesic uniqueness) is recorded as \emph{test not
-constituted} and is kept statistically separate from \emph{fail}---a failure
+constituted} and is kept statistically separate from \emph{fail}. A failure
 outside the gate has no refuting force, and a pass outside the gate has no
 supporting force.
 
@@ -142,7 +142,7 @@ information-bottleneck view of representation learning \citep{tishby1999ib,
 tishby2015ibdl} and specifically to the disputed claim that training passes
 through a compression phase \citep{shwartzziv2017blackbox}. We do not measure
 mutual-information planes; we track an entropy-and-potential proxy along training
-and find the utility-plateau premise---needed to even define ``after fit''---is
+and find the utility-plateau premise (needed to even define ``after fit'') is
 not detected on any of the architectures here, which is why P1 is recorded as
 test not constituted rather than as evidence for or against a compression phase.
 
@@ -171,7 +171,7 @@ deterministic near-target navigation success rate (fixed task list, per-task
 fixed random stream, so repeat noise is zero). The inference trajectory is the
 evolution of the hidden state along real execution.
 
-\textbf{S2P}: the multi-step-decoder variant of S2 (protocol v1.2 appendix)---the
+\textbf{S2P}: the multi-step-decoder variant of S2 (protocol v1.2 appendix). The
 decoder outputs the concatenation of the next four observations, everything else
 unchanged. The design motivation is in the instrument findings
 (Section~\ref{sec:multistep}).
@@ -226,8 +226,8 @@ known potential, known metric, and known temperature, its spectrum matched to
 pilot measurements of the real systems. Full-chain recovery establishes two
 things. First, the primary density path: the $k$-NN density has a $26$--$33\%$
 temperature error on the main 16-dimensional matched geometry, which the
-normalizing-flow path reduces to $1.2$--$6.0\%$---the flow path becomes the frozen
-primary. Second, the feasibility boundary: rerunning recovery on real 20k-step
+normalizing-flow path reduces to $1.2$--$6.0\%$, so the flow path becomes the
+frozen primary. Second, the feasibility boundary: rerunning recovery on real 20k-step
 spectra binned by condition number, each bin with a $\log_{10}$ condition-number
 median $\le 7.0$ has a temperature error of $1.3$--$8.4\%$, the $7.5$ bin exceeds
 the tolerance context ($12\%$) on the chain arm ($17.2\%$), and the $9.6$ bin
@@ -255,8 +255,8 @@ verdict is recorded as \emph{test not constituted}.
 Because the one pass (P2 $\times$ S2P) exists only under the revised protocol and
 was reached after the evaluation aggregates were seen, a second addendum v1.3
 (anchor commit \texttt{da5c015}) pre-registers a fresh out-of-sample replication:
-the entire v1.2 P2 pipeline---surrogate construction, endpoint tolerance,
-smoothing, discretization, and the pass criteria---is frozen verbatim and run on a
+the entire v1.2 P2 pipeline (surrogate construction, endpoint tolerance,
+smoothing, discretization, and the pass criteria) is frozen verbatim and run on a
 replication seed family $\{20,\dots,24\}$ that had never entered any training,
 loading, or analysis path. The anchor commit precedes any replication run, and a
 script-level assertion refuses the replication seeds until the v1.3 freeze flag is
@@ -332,7 +332,7 @@ the injection) is non-significant on all seeds ($p\ \,0.17$--$0.93$).
 \end{itemize}
 Following the pre-registered wording, the support here can only be stated as:
 the observation is consistent with the hypothesis, and the increment beyond a
-trivial explanation is---the concentration cannot be reproduced by kinetically
+trivial explanation is this: the concentration cannot be reproduced by kinetically
 matched random paths (the surrogate already matches the speed distribution), nor
 by a constant potential (the ablation paired difference is positive and
 significant).
@@ -386,7 +386,7 @@ Seed & Concentration & Ablation median & Ablation $p$ & Novelty $p$ & Verdict \\
 \end{table}
 
 Table~\ref{tab:threever} places the three protocol versions side by side. The
-pass does not exist in the original pre-registration---at 20k steps the base
+pass does not exist in the original pre-registration: at 20k steps the base
 system is rejected at the v1.1 geometry gate, so P2 $\times$ S2 is never
 constituted and there is no pass anywhere on the grid. It appears only after the
 disclosed v1.2 amendment (recalibrated gate plus the multi-step-decoder system),
@@ -426,18 +426,18 @@ instrument falls short, they form four classes, and the classification itself
 delineates the measurable boundary of the current estimators.
 
 \emph{(i) Rejected at the gate (measurement never happens).} P4 $\times$ S2
-(base): the $\log_{10}$ condition-number median is $9.18$--$9.70$, far above the
+(base): the $\log_{10}$ condition-number median is $9.2$--$9.7$, far above the
 geometry gate $7.0$, participation dimension $1.87$--$2.04$. The system leaves the
 calibration-verified measurable region (Section~\ref{sec:calib}, feasibility
 bound $7.0$) before any P4 statistic is computed; the affine fit never runs on a
-meaningful geometry. This class is entirely neutral about the parent theory---it
+meaningful geometry. This class is entirely neutral about the parent theory: it
 only says this system at this training length is beyond the instrument's range.
 
 \emph{(ii) Vetoed by a validity control (measurement happens but is shown
 invalid).} P4 $\times$ S2P (Figure~\ref{fig:p4}): resolution is adequate ($R^2\
 0.464$--$0.589$, split-half $0.028$--$0.109$), but the decoupling control removes
 the apparent
-affine law's standing---after retraining the decoder on occupancy-uniform data
+affine law's standing: after retraining the decoder on occupancy-uniform data
 the slope shifts by $0.159$--$0.298$ on all five seeds ($>0.12$), while swapping
 the exploration policy barely moves it ($0.001$--$0.091$). Alongside, the
 curvature effect size $0.175$--$0.412$ exceeds the bound $0.17$ on every seed.
@@ -470,7 +470,7 @@ condition on $\sigma_{\hat U}$. Unlike the first three classes, this one carries
 information about the parent theory: the supplementary peak-window layer gives a
 directionally consistent reverse signal on the measurable instances (entropy
 change $+1.3$ and $+1.9$ on S1, $-0.9$ to $+9.3$ on S2P, $+0.85$ to $+15.4$ on
-S3)---after utility tops out, entropy rises rather than falls. The signal was
+S3). After utility tops out, entropy rises rather than falls. The signal was
 pre-registered on the development family as an expected-to-fail risky prediction
 and reproduces on the evaluation family across three architectures; on S3 the
 dual-path rank correlation $0.999$--$1.000$ makes it least ambiguous.
@@ -481,7 +481,7 @@ and are neutral about the parent theory's truth; only ``P1 parent-paper premise
 not met'' carries negative information, and its supplementary-layer post-peak
 entropy rise is a stable phenomenon that calls for a theoretical response. We
 state this classification explicitly so that ``test not constituted'' is not
-misread as ``tested but inconclusive'' or as ``a disguised failure''---each cell
+misread as ``tested but inconclusive'' or as ``a disguised failure''. Each cell
 delineates a specific instrument or premise boundary.
 
 \section{Instrument findings}
@@ -491,11 +491,12 @@ delineates a specific instrument or premise boundary.
 \label{sec:geomexcl}
 
 The S2 base $\log_{10}$ condition-number median grows monotonically with
-training: about $2.4$--$2.9$ at $500$ steps, crossing $6.0$ at $6000$--$8000$,
-reaching $9.0$--$9.6$ at 20k with no sign of saturation; yet the utility plateau
+training (development-family trajectory): about $2.4$--$2.9$ at $500$ steps,
+crossing $6.0$ at $6000$--$8000$, reaching $9.0$--$9.6$ at 20k with no sign of
+saturation (the evaluation family reaches $9.2$--$9.7$); yet the utility plateau
 appears around 15500 steps. Learning to predict the target well requires pushing
 the decoder into the sigmoid saturation region, and saturation makes some hidden
-dimensions invisible to the observation geometry---the utility-plateau region and
+dimensions invisible to the observation geometry: the utility-plateau region and
 the measurable region (median $\le 7.0$) do not intersect on this system. An
 equal-variance control shows the conditioning is unrelated to the per-channel
 variance design and comes entirely from decoder-Jacobian degeneracy.
@@ -508,13 +509,13 @@ dimensions the decoder does not use (the instantaneous observation does not
 depend on them). Letting the decoder head output the concatenation of the next
 four observations makes the memory dimensions visible to the predictive
 observation geometry: the S2P $\log_{10}$ condition-number median drops to
-$2.95$--$3.09$---the condition number itself falls from $\approx 10^{9.4}$ to
-$\approx 10^{3}$, about six orders of magnitude---with no hardening throughout,
+$2.95$--$3.09$ (the condition number itself falls from $\approx 10^{9.4}$ to
+$\approx 10^{3}$, about six orders of magnitude), with no hardening throughout,
 and utility is not hurt (evaluation-family peak $0.368$ vs.\ base $0.329$); the
 same repair pulls S3 back from a near-rank-one degeneration ($\log_{10}$
 condition-number median $\approx 28$, participation dimension $1.0$) to
 $4.2$--$4.4$. The drift gradient fraction changes from $0.000$ to $0.04$--$0.11$,
-and the P2 potential-term ablation goes from no power to strong power---the P2
+and the P2 potential-term ablation goes from no power to strong power. The P2
 pass is in effect unlocked by this instrument repair.
 
 The invisible-dimension mechanism is measured directly, not only inferred, on the
@@ -524,7 +525,7 @@ the instantaneous decoder the S2 base Jacobian has a median effective rank
 (participation ratio $(\sum_i\sigma_i)^2/\sum_i\sigma_i^2$) of $3.72$ with about
 two near-zero singular values out of sixteen latent directions, and the
 head-free S3-v1 collapses to effective rank $1.34$ with $27$ of $32$ directions
-near zero---a near-rank-one Jacobian. The multi-step head lifts the effective
+near zero, a near-rank-one Jacobian. The multi-step head lifts the effective
 rank to $8.48$ (S2P) and $11.29$ (S3-v2) with no near-zero singular values in
 either case. The dimensions the decoder does not use are thus visible as
 near-zero Jacobian directions, and the head recruits them; this is the same
@@ -555,7 +556,7 @@ potential-well stiffness spectrum from a log-uniform ladder with a random draw
 containing near-duplicate values degrades the temperature recovery error from
 about $8\%$ to about $39\%$, the failure running through the potential
 estimation. Two systems with the same metric-spectrum statistics can have
-sharply different feasibility---the condition-number gate is a necessity screen,
+sharply different feasibility: the condition-number gate is a necessity screen,
 and a sufficiency certificate can only come from a per-system geometry-matched
 calibration recovery.
 
@@ -609,8 +610,8 @@ three tests-not-constituted differ in epistemic weight (Section~\ref{sec:tnc}):
 the P4 and P3 ones are instrument boundaries, neutral about the parent theory's
 truth; only ``P1 parent-paper premise not met'' carries negative information. That
 negative information is graded, not a title-level falsification: the P1 verdict is
-test not constituted, because the utility plateau---the premise the title
-prediction is conditioned on---is detected on none of the thirteen gated
+test not constituted, because the utility plateau (the premise the title
+prediction is conditioned on) is detected on none of the thirteen gated
 instances, so the compression test never runs at its own layer. The post-peak
 entropy rise is a suggestive reverse signal at the pre-registered supplementary
 layer, not a formal fail of P1; we report it as stably reproduced across three
@@ -668,8 +669,8 @@ g(z_t)} = (\Delta z_t^{\top}\hat g(z_t)\,\Delta z_t)^{1/2}$ and permute the
 multiset $\{s_t\}$ by a seed-derived random permutation, giving $s_{\pi(t)}$. This
 matches the surrogate's metric-speed distribution to the observed one exactly.
 \item \textbf{Smoothing window.} Set the window $w$ to the direction
-autocorrelation time of the observed path---the first lag at which the mean cosine
-between adjacent-step directions falls below $1/e$---so the surrogate's
+autocorrelation time of the observed path (the first lag at which the mean cosine
+between adjacent-step directions falls below $1/e$), so the surrogate's
 directional smoothness matches the trajectory's.
 \item \textbf{Whitened random directions.} Draw i.i.d.\ Gaussian vectors, smooth
 each coordinate with a length-$w$ box filter, and normalize to unit vectors
