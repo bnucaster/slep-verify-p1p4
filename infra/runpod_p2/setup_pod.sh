@@ -11,14 +11,14 @@ echo "=== [1/5] 还原 5 个冻结模型（base64 bundle）==="
 base64 -d infra/runpod_p2/models_bundle.tar.gz.b64 | tar xzf -
 ls results/confirmation/s2_train/s2p_repl_v1/s2*/checkpoints/ckpt_020000.pt | wc -l | xargs echo "  检查点数(应为5):"
 
-echo "=== [2/5] venv + 精确同版本依赖 ==="
-PY=python3.11; command -v $PY >/dev/null 2>&1 || PY=python3
-$PY --version
-$PY -m venv .venv
+echo "=== [2/5] uv + py3.13 venv + 精确同版本依赖（numpy 2.5.2 需 py3.12+，本机 py3.13）==="
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+command -v uv >/dev/null 2>&1 || { curl -LsSf https://astral.sh/uv/install.sh | sh; export PATH="$HOME/.local/bin:$PATH"; }
+uv python install 3.13
+uv venv --python 3.13 .venv
+uv pip install --python .venv/bin/python torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+uv pip install --python .venv/bin/python numpy==2.5.2 scipy==1.18.1 scikit-learn==1.9.0 pyyaml
 . .venv/bin/activate
-pip install -q --upgrade pip
-pip install -q torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
-pip install -q numpy==2.5.2 scipy==1.18.1 scikit-learn==1.9.0 pyyaml
 export PYTHONPATH="$PWD/src"
 
 echo "=== [3/5] 版本校验（须与本机一致以保数值可比）==="
