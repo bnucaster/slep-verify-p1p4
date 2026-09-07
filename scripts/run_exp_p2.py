@@ -318,7 +318,13 @@ def main() -> None:
         config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
     cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     train_cfg = yaml.safe_load((REPO_ROOT / cfg["train_config"]).read_text(encoding="utf-8"))
-    torch.set_num_threads(int(cfg["torch_threads"]))
+    # --torch-threads 覆盖（操作性并行调优）：score_block 的度量/OM/代理均为
+    # 小算子（16×16、50 步），torch 对其不起 intra-op 多线程,故线程数不改
+    # 数值结果（已逐块对拍验证 threads=1 与 cfg 值逐位一致）。仅影响每进程
+    # 占核数,便于在多核机上开更多单线程进程占满而不忙等超订。
+    _nthreads = (int(sys.argv[sys.argv.index("--torch-threads") + 1])
+                 if "--torch-threads" in sys.argv else int(cfg["torch_threads"]))
+    torch.set_num_threads(_nthreads)
     require_v1_3_frozen(cfg)
     sf = seeds_file_of(cfg)
     fam = cfg.get("seed_family", "evaluation")

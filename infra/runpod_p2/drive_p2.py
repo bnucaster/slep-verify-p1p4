@@ -57,7 +57,12 @@ def main() -> None:
     ap.add_argument("--concurrency", type=int, default=24)
     ap.add_argument("--shard-blocks", type=int, default=5)
     ap.add_argument("--seeds", type=int, nargs="*", default=SEEDS)
+    ap.add_argument("--torch-threads", type=int, default=None,
+                    help="每分片 torch 线程数（默认用冻结配置值 10；已对拍验证 1 与 10 "
+                         "块结果逐位一致，单线程×多进程占满核更快）")
     a = ap.parse_args()
+    if a.torch_threads is not None:
+        RUN.extend(["--torch-threads", str(a.torch_threads)])
     seeds, S = a.seeds, a.shard_blocks
     t_start = time.time()
 
