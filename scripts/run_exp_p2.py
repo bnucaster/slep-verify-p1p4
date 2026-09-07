@@ -331,6 +331,10 @@ def main() -> None:
     deadline = None
     if "--budget-seconds" in sys.argv:
         deadline = time.time() + float(sys.argv[sys.argv.index("--budget-seconds") + 1])
+    # 块分片（操作性并行；只限定本进程算哪些块,结果与顺序跑逐字一致,
+    # 因逐轨迹代理流由 seed*1e6+ti 决定、与块边界无关）。默认全量。
+    blk_start = int(sys.argv[sys.argv.index("--block-start") + 1]) if "--block-start" in sys.argv else 0
+    blk_end = int(sys.argv[sys.argv.index("--block-end") + 1]) if "--block-end" in sys.argv else None
     out_dir = create_campaign_dir("confirmation", "exp_p2", cfg["out_campaign"], cfg)
     log_path = out_dir / "log.txt"
 
@@ -344,6 +348,8 @@ def main() -> None:
     if only_seed is not None:
         seeds = [only_seed]
     n_blocks = math.ceil(cfg["n_traj"] / cfg["block"])
+    lo_b = max(0, blk_start)
+    hi_b = n_blocks if blk_end is None else min(n_blocks, blk_end)
     for seed in seeds:
         guard.assert_seed_allowed(seed, purpose="exp-p2", seeds_file=sf)
         seed_dir = out_dir / f"s{seed}"
@@ -351,14 +357,14 @@ def main() -> None:
         model = load_frozen_model(train_cfg, seed)
         field = stage_field(cfg, train_cfg, model, seed, seed_dir, log)
         if stage in (None, "main", "ablation", "assemble"):
-            for b in range(n_blocks):
+            for b in range(lo_b, hi_b):
                 score_block(cfg, train_cfg, model, field, seed, seed_dir, b,
                             ablation=False, log=log)
                 if deadline is not None and time.time() > deadline:
                     log("预算耗尽，暂停")
                     return
         if stage in (None, "ablation", "assemble"):
-            for b in range(n_blocks):
+            for b in range(lo_b, hi_b):
                 score_block(cfg, train_cfg, model, field, seed, seed_dir, b,
                             ablation=True, log=log)
                 if deadline is not None and time.time() > deadline:
