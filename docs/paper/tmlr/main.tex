@@ -224,7 +224,7 @@ Prediction $\times$ system & Verdict (v1.2) & One-line reason \\
 \midrule
 P2 $\times$ S2P        & \textbf{Pass} & five-seed sweep: concentration $+$ ablation attribution $+$ novelty \\
 P4 $\times$ S2P        & TNC & decoupling control fails (drift $0.16$--$0.30 > 0.12$); $\rho$ all $>0.17$ \\
-P4 $\times$ S2 (base)  & TNC & geometry gate (condition-number median $9.2$--$9.7 > 7.0$) \\
+P4 $\times$ S2 (base)  & TNC & geometry gate ($\log_{10}$ condition-number median $9.2$--$9.7 > 7.0$) \\
 P3 $\times$ S2P        & TNC & certified endpoint pairs $1$--$3 < 8$ (residual-scale block) \\
 P1 $\times$ S1         & TNC & plateau premise / dual-path instrument / data condition \\
 P1 $\times$ S2P        & TNC & plateau not detected (post-peak slow decline) \\
@@ -311,7 +311,7 @@ quadratic coefficient, $\mathrm{SD}(\hat V)$ the abscissa standard deviation).
 Even had the decoupling passed, the verdict would be fail rather than pass.
 \end{itemize}
 The base system S2 fails the geometry gate under both protocol versions
-(20k-step condition-number median $9.18$--$9.70$).
+(20k-step $\log_{10}$ condition-number median $9.18$--$9.70$).
 
 \begin{figure}[t]
 \centering
@@ -389,8 +389,8 @@ instrument falls short, they form four classes, and the classification itself
 delineates the measurable boundary of the current estimators.
 
 \emph{(i) Rejected at the gate (measurement never happens).} P4 $\times$ S2
-(base): the condition-number median is $9.18$--$9.70$, far above the geometry
-gate $7.0$, participation dimension $1.87$--$2.04$. The system leaves the
+(base): the $\log_{10}$ condition-number median is $9.18$--$9.70$, far above the
+geometry gate $7.0$, participation dimension $1.87$--$2.04$. The system leaves the
 calibration-verified measurable region (Section~\ref{sec:calib}, feasibility
 bound $7.0$) before any P4 statistic is computed; the affine fit never runs on a
 meaningful geometry. This class is entirely neutral about the parent theory---it
@@ -450,30 +450,61 @@ delineates a specific instrument or premise boundary.
 \subsection{Mutual exclusion of training length and metric measurability}
 \label{sec:geomexcl}
 
-The S2 base condition-number median grows monotonically with training: about
-$2.4$--$2.9$ at $500$ steps, crossing $6.0$ at $6000$--$8000$, reaching
-$9.0$--$9.6$ at 20k with no sign of saturation; yet the utility plateau appears
-around 15500 steps. Learning to predict the target well requires pushing the
-decoder into the sigmoid saturation region, and saturation makes some hidden
+The S2 base $\log_{10}$ condition-number median grows monotonically with
+training: about $2.4$--$2.9$ at $500$ steps, crossing $6.0$ at $6000$--$8000$,
+reaching $9.0$--$9.6$ at 20k with no sign of saturation; yet the utility plateau
+appears around 15500 steps. Learning to predict the target well requires pushing
+the decoder into the sigmoid saturation region, and saturation makes some hidden
 dimensions invisible to the observation geometry---the utility-plateau region and
-the measurable region ($\le 7.0$) do not intersect on this system. An
-equal-variance control shows the condition number is unrelated to the
-per-channel variance design and comes entirely from decoder-Jacobian degeneracy.
+the measurable region (median $\le 7.0$) do not intersect on this system. An
+equal-variance control shows the conditioning is unrelated to the per-channel
+variance design and comes entirely from decoder-Jacobian degeneracy.
 
 \subsection{Order-of-magnitude repair by a multi-step decoder head}
 \label{sec:multistep}
 
-Diagnosis attributes the low end of the condition number to hidden memory
+Diagnosis attributes the low end of the conditioning to hidden memory
 dimensions the decoder does not use (the instantaneous observation does not
 depend on them). Letting the decoder head output the concatenation of the next
 four observations makes the memory dimensions visible to the predictive
-observation geometry: the S2P condition-number median drops to $2.95$--$3.09$
-(six orders of magnitude), with no hardening throughout, and utility is not hurt
-(evaluation-family peak $0.368$ vs.\ base $0.329$); the same repair pulls S3 back
-from a near-rank-one degeneration (condition number $10^{28}$, participation
-dimension $1.0$) to $4.2$--$4.4$. The drift gradient fraction changes from
-$0.000$ to $0.04$--$0.11$, and the P2 potential-term ablation goes from no power
-to strong power---the P2 pass is in effect unlocked by this instrument repair.
+observation geometry: the S2P $\log_{10}$ condition-number median drops to
+$2.95$--$3.09$---the condition number itself falls from $\approx 10^{9.4}$ to
+$\approx 10^{3}$, about six orders of magnitude---with no hardening throughout,
+and utility is not hurt (evaluation-family peak $0.368$ vs.\ base $0.329$); the
+same repair pulls S3 back from a near-rank-one degeneration ($\log_{10}$
+condition-number median $\approx 28$, participation dimension $1.0$) to
+$4.2$--$4.4$. The drift gradient fraction changes from $0.000$ to $0.04$--$0.11$,
+and the P2 potential-term ablation goes from no power to strong power---the P2
+pass is in effect unlocked by this instrument repair.
+
+The invisible-dimension mechanism is measured directly, not only inferred, on the
+decoder Jacobian $J = \partial\hat\mu/\partial z$ whose singular spectrum drives
+the pullback metric $\hat g = J^{\top}\Sigma^{-1}J$ (Figure~\ref{fig:jac}). Under
+the instantaneous decoder the S2 base Jacobian has a median effective rank
+(participation ratio $(\sum_i\sigma_i)^2/\sum_i\sigma_i^2$) of $3.72$ with about
+two near-zero singular values out of sixteen latent directions, and the
+head-free S3-v1 collapses to effective rank $1.34$ with $27$ of $32$ directions
+near zero---a near-rank-one Jacobian. The multi-step head lifts the effective
+rank to $8.48$ (S2P) and $11.29$ (S3-v2) with no near-zero singular values in
+either case. The dimensions the decoder does not use are thus visible as
+near-zero Jacobian directions, and the head recruits them; this is the same
+degeneracy the condition-number gate detects, seen one level upstream in the
+map whose geometry the estimators pull back.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{../figures/fig8_jac.pdf}
+\caption{Decoder-Jacobian spectra and effective rank (development family, five
+seeds, median over $400$ query states per model). (a) Singular-value spectra of
+$J=\partial\hat\mu/\partial z$, large to small: the instantaneous decoders (S2
+base, blue solid; head-free S3-v1, blue dashed) drop toward zero, while the
+multi-step heads (S2P, orange solid; S3-v2, orange dashed) stay flat. (b) Median
+effective rank (participation ratio): $3.72$ (S2), $8.48$ (S2P), $1.34$ (S3-v1,
+near rank one), $11.29$ (S3-v2). The near-zero singular directions are the memory
+dimensions the instantaneous observation does not use; the multi-step head
+recruits them.}
+\label{fig:jac}
+\end{figure}
 
 \subsection{Feasibility is not a single-variable function of the condition
 number}
