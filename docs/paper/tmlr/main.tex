@@ -53,8 +53,13 @@ cell of the prediction $\times$ system grid receives a three-valued verdict
 multi-step-decoder world model: across all five evaluation seeds the observed
 Onsager--Machlup action lies below the lower quartile of an endpoint-matched
 surrogate distribution, and the concentration is attributed to potential
-structure by a potential-term ablation (paired difference positive, Wilcoxon
-signed-rank $p$ between $10^{-12}$ and $7\times10^{-34}$). The apparent affine
+structure by a potential-term ablation (all five per-seed paired differences
+positive; across-seed sign test $p=0.031$). This pass exists only under the
+revised protocol, so we test it further: a pre-registered out-of-sample
+replication on a fresh, previously unused seed family---the P2 pipeline frozen
+verbatim---reproduces the pass on four of five seeds, raising it from a
+revised-protocol result to a revised-architecture-plus-fresh-confirmation one.
+The apparent affine
 law (P4) loses its evidential standing under a decoupling control (retraining
 the decoder on occupancy-uniform data shifts the slope by $0.16$--$0.30$,
 exceeding the pre-registered tolerance $0.12$), and its curvature effect size
@@ -246,6 +251,18 @@ judging code into \texttt{metrics.json}; the aggregation rule is a majority of
 gated seeds (more than half agreeing), and fewer than two seeds constituting a
 verdict is recorded as \emph{test not constituted}.
 
+Because the one pass (P2 $\times$ S2P) exists only under the revised protocol and
+was reached after the evaluation aggregates were seen, a second addendum v1.3
+(anchor commit \texttt{da5c015}) pre-registers a fresh out-of-sample replication:
+the entire v1.2 P2 pipeline---surrogate construction, endpoint tolerance,
+smoothing, discretization, and the pass criteria---is frozen verbatim and run on a
+replication seed family $\{20,\dots,24\}$ that had never entered any training,
+loading, or analysis path. The anchor commit precedes any replication run, and a
+script-level assertion refuses the replication seeds until the v1.3 freeze flag is
+set. This removes the specific-evaluation-seed exposure but not the architecture
+exposure (S2P was still chosen after seeing the aggregates), and both layers are
+reported. The v1.1 and v1.2 evaluation verdicts are unchanged and kept alongside.
+
 \section{Results}
 
 \subsection{Scoreboard}
@@ -333,6 +350,52 @@ significant).
 potential-term ablation, novelty association vs.\ placebo.}
 \label{fig:p2}
 \end{figure}
+
+\subsection{P2 fresh out-of-sample confirmation and evidence grade}
+\label{sec:p2fresh}
+
+The single pass is the strongest claim in the study and the one most exposed to
+the objection that it was reached after the evaluation aggregates were seen. We
+therefore ran the pre-registered v1.3 replication (Section on protocol) on the
+untouched seed family $\{20,\dots,24\}$, with the P2 pipeline frozen verbatim.
+Five new S2P world models were trained on the new maze streams; all five clear the
+admission gates (log$_{10}$ condition-number median $2.79$--$3.16 \le 7.0$,
+participation dimension $3.08$--$4.04$, pooled capability $0.32$, multi-chain $\hat
+R \le 1.001$). On these fresh instances the concentration layer holds on all five
+seeds (fraction below the surrogate lower quartile $1.000$), the potential-term
+ablation holds on all five (per-seed median paired difference $+0.0013$ to
+$+0.0040$, all positive; across-seed sign test $p=0.031$), and the novelty layer
+holds on four of five ($p<0.01$; seed $21$ has $p=0.041$ and fails that layer).
+The frozen judge returns \emph{pass} on four seeds and \emph{fail} on one, a
+four-of-five majority: P2 $\times$ S2P replicates.
+
+Table~\ref{tab:threever} places the three protocol versions side by side. The
+pass does not exist in the original pre-registration---at 20k steps the base
+system is rejected at the v1.1 geometry gate, so P2 $\times$ S2 is never
+constituted and there is no pass anywhere on the grid. It appears only after the
+disclosed v1.2 amendment (recalibrated gate plus the multi-step-decoder system),
+and it survives a fresh out-of-sample replication in v1.3. This is the honest
+reading: the evidence for P2 is a revised-architecture-plus-fresh-confirmation
+result, stronger than a single revised-protocol pass but weaker than an
+untouched original pre-registration, and the architecture choice remains a
+disclosed exposure that the replication does not remove.
+
+\begin{table}[t]
+\centering
+\caption{P2 across the three frozen protocol versions. TNC $=$ test not
+constituted. Anchor commits time-stamp each freeze; the v1.3 replication family
+never entered any earlier path.}
+\label{tab:threever}
+\begin{tabular}{llll}
+\toprule
+Protocol (anchor) & System / family & Geometry gate & P2 verdict \\
+\midrule
+v1.1 (\texttt{f7f7910}) & S2 base, eval $\{5\text{--}9\}$ & $\le 6.0$; got $9.2$--$9.7$ & TNC (gate) \\
+v1.2 (\texttt{27df5af}) & S2P, eval $\{5\text{--}9\}$ & $\le 7.0$; got $\approx 3.0$ & \textbf{Pass} (5/5) \\
+v1.3 (\texttt{da5c015}) & S2P, replication $\{20\text{--}24\}$ & $\le 7.0$; got $2.8$--$3.2$ & \textbf{Pass} (4/5) \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{P4: why the apparent affine law does not constitute support}
 
@@ -625,7 +688,9 @@ layer, not a formal fail of P1; we report it as stably reproduced across three
 architectures and read it as evidence against the compression-after-fit picture
 that is weaker than a constituted failure would be. The implications for the
 parent theory are stated accordingly: the inference-scale ``trajectories
-concentrate on low-action paths'' obtains support beyond a trivial explanation;
+concentrate on low-action paths'' obtains support beyond a trivial explanation,
+reproduced on a fresh pre-registered out-of-sample seed family (four of five
+seeds) though under an architecture still chosen after the aggregates were seen;
 the learning-scale ``compression after fit'' is not observed on any system here,
 though the premise failure keeps this short of a title-level refutation; the
 affine law and temperature identification cannot be
@@ -642,11 +707,13 @@ shown in the non-anonymous versions only.)
 
 \section*{Reproducibility statement}
 
-The public repository (anchor commits \texttt{f7f7910} for v1.1 and
-\texttt{27df5af} for v1.2) contains all code, configurations, judging artifacts,
-and both frozen manifests. Seed families (calibration $\{99,100\}$, development
-$0$--$4$, evaluation $5$--$9$) are mechanically enforced by a guard that blocks
-the evaluation family before the freeze flag is set. The verdict file
+The public repository (anchor commits \texttt{f7f7910} for v1.1, \texttt{27df5af}
+for v1.2, and \texttt{da5c015} for the v1.3 replication addendum) contains all
+code, configurations, judging artifacts, and the frozen manifests. Seed families
+(calibration $\{99,100\}$, development $0$--$4$, evaluation $5$--$9$, replication
+$20$--$24$) are mechanically enforced by a guard that blocks the evaluation family
+before the freeze flag is set, and a script-level assertion blocks the replication
+family until the v1.3 freeze is stamped. The verdict file
 \texttt{metrics.json} is written only by the frozen judging code. The estimator
 toolbox is released with the repository as a public citation anchor. (The
 repository URL is withheld here for the anonymous submission.)
