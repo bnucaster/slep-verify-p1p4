@@ -1,0 +1,8 @@
+# 协议 v1.3 增补的复制种子族（docs/protocol_v1.3_addendum.md）。
+# 冻结的 configs/seeds.yaml 不改；本文件为新增。replication 的 5 个种子
+# 在本项目全程从未使用（校准 99,100；开发 0–4；评估 5–9）。
+# 脚本层在 freeze_status v1_3.frozen 置位前拒绝读取本族（预注册时间戳前置）。
+calibration: [99, 100]
+development: [0, 1, 2, 3, 4]
+evaluation: [5, 6, 7, 8, 9]
+replication: [20, 21, 22, 23, 24]

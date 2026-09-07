@@ -1,0 +1,32 @@
+# S2P 复制族训练（协议 v1.3 增补 A4）。与 s2p_train_eval 唯一差异：
+# 种子族改 replication（从 seeds_v1_3.yaml 读）、战役名、阶段。
+# 运行纪律：freeze_status v1_3.frozen 置位后方可跑（脚本层强制）。
+campaign: s2p_repl_v1
+stage: confirmation
+seeds_file: configs/seeds_v1_3.yaml
+require_v1_3_frozen: true
+maze_cells: 8
+view: 5
+obs_dim: 50
+action_dim: 4
+embed_dim: 32
+hidden_dim: 16
+sigma_dec: 0.2
+goal_sigma_dec: 0.04
+multi_step_k: 4
+episodes: 500
+episode_len: 64
+train_steps: 20000
+batch_episodes: 32
+lr: 1.0e-3
+log_every: 500
+checkpoint_log2_until: 512
+checkpoint_every: 500
+holdout_episodes: 64
+seed_family: replication
+torch_threads: 10
+sanity_nav:
+  n_mazes: 20
+  bfs_min: 2
+  bfs_max: 6
+  max_steps: 24

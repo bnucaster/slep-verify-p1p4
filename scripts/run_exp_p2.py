@@ -300,10 +300,28 @@ def stage_assemble(cfg, seed: int, seed_dir, field, log) -> dict:
     return out
 
 
+def seeds_file_of(cfg):
+    return REPO_ROOT / cfg["seeds_file"] if cfg.get("seeds_file") else guard.SEEDS_FILE
+
+
+def require_v1_3_frozen(cfg):
+    if not cfg.get("require_v1_3_frozen"):
+        return
+    st = json.loads((REPO_ROOT / "docs" / "freeze_status.json").read_text(encoding="utf-8"))
+    if not st.get("v1_3", {}).get("frozen"):
+        raise SystemExit("协议 v1.3 增补未冻结，复制族 P2 运行被拒。")
+
+
 def main() -> None:
-    cfg = yaml.safe_load(CONFIG_FILE.read_text(encoding="utf-8"))
+    config_file = CONFIG_FILE
+    if "--config" in sys.argv:
+        config_file = REPO_ROOT / sys.argv[sys.argv.index("--config") + 1]
+    cfg = yaml.safe_load(config_file.read_text(encoding="utf-8"))
     train_cfg = yaml.safe_load((REPO_ROOT / cfg["train_config"]).read_text(encoding="utf-8"))
     torch.set_num_threads(int(cfg["torch_threads"]))
+    require_v1_3_frozen(cfg)
+    sf = seeds_file_of(cfg)
+    fam = cfg.get("seed_family", "evaluation")
     only_seed = None
     if "--seed" in sys.argv:
         only_seed = int(sys.argv[sys.argv.index("--seed") + 1])
@@ -322,12 +340,12 @@ def main() -> None:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(line + "\n")
 
-    seeds = guard.family_seeds("evaluation", purpose="exp-p2")
+    seeds = guard.family_seeds(fam, purpose="exp-p2", seeds_file=sf)
     if only_seed is not None:
         seeds = [only_seed]
     n_blocks = math.ceil(cfg["n_traj"] / cfg["block"])
     for seed in seeds:
-        guard.assert_seed_allowed(seed, purpose="exp-p2")
+        guard.assert_seed_allowed(seed, purpose="exp-p2", seeds_file=sf)
         seed_dir = out_dir / f"s{seed}"
         seed_dir.mkdir(exist_ok=True)
         model = load_frozen_model(train_cfg, seed)

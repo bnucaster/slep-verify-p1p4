@@ -27,6 +27,23 @@ from slep.systems.s2_planner import ExhaustiveMPCPlanner, mpc_episode
 from slep.systems.s2_world_model import S2WorldModel
 from slep.utils.runs import REPO_ROOT, create_campaign_dir
 
+
+def seeds_file_of(cfg):
+    """复制族（v1.3 增补）从 seeds_v1_3.yaml 读；否则用默认冻结 seeds.yaml。"""
+    return REPO_ROOT / cfg["seeds_file"] if cfg.get("seeds_file") else guard.SEEDS_FILE
+
+
+def require_v1_3_frozen(cfg):
+    """v1.3 复制运行前置门：脚本层强制预注册时间戳先于运行（冻结 guard
+    不可改，故在此新脚本路径断言）。"""
+    if not cfg.get("require_v1_3_frozen"):
+        return
+    import json
+    st = json.loads((REPO_ROOT / "docs" / "freeze_status.json").read_text(encoding="utf-8"))
+    if not st.get("v1_3", {}).get("frozen"):
+        raise SystemExit("协议 v1.3 增补未冻结（freeze_status.v1_3.frozen 未置位），"
+                         "复制族运行被拒；须先取外部时间戳并置位。")
+
 CONFIG_FILE = REPO_ROOT / "configs" / "s2_train.yaml"
 
 
@@ -188,7 +205,9 @@ def main() -> None:
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(line + "\n")
 
-    seeds = guard.family_seeds(cfg["seed_family"], purpose="s2-train-dev")
+    require_v1_3_frozen(cfg)
+    sf = seeds_file_of(cfg)
+    seeds = guard.family_seeds(cfg["seed_family"], purpose="s2-train-dev", seeds_file=sf)
     if smoke:
         seeds = seeds[:1]
     if "--seeds" in sys.argv:  # 显式种子清单（初筛通过后补齐余种子用）
@@ -202,7 +221,7 @@ def main() -> None:
     log(f"campaign: {campaign}，seeds={seeds}")
     try:
         for seed in seeds:
-            guard.assert_seed_allowed(seed, purpose="s2-train")
+            guard.assert_seed_allowed(seed, purpose="s2-train", seeds_file=sf)
             train_one(cfg, seed, campaign, log, deadline)
     except BudgetExhausted:
         return

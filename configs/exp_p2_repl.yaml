@@ -1,0 +1,25 @@
+# EXP-P2 复制（协议 v1.3 增补 A4）：冻结 v1.2 P2 管线在复制族 S2P 上重跑。
+# 与 configs/exp_p2.yaml 唯一差异：训练配置指向复制族、战役名、种子族与
+# seeds_file、v1_3 门开关；判据/口径全部沿用 v1.2（judge_v12 取 p2 阈值）。
+train_config: configs/s2p_train_repl.yaml
+out_campaign: repl_v1
+system_class: S2P
+seeds_file: configs/seeds_v1_3.yaml
+seed_family: replication
+require_v1_3_frozen: true
+n_episodes: 900
+episode_len: 64
+burn_in: 8
+n_ref: 16000
+k_potential: 32
+n_traj: 1000
+traj_len: 50
+n_surrogates: 50
+block: 20
+metric_floor_rel: 0.001
+n_novelty_episodes: 200
+t_inject: 32
+novelty_window: 3
+n_drift_eval: 1500
+k_drift: 256
+torch_threads: 10
