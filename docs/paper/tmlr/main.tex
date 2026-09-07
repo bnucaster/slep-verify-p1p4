@@ -111,6 +111,44 @@ constituted} and is kept statistically separate from \emph{fail}---a failure
 outside the gate has no refuting force, and a pass outside the gate has no
 supporting force.
 
+\section{Related work}
+\label{sec:related}
+
+The low-action prediction (P2) is operationalized through the Onsager--Machlup
+functional \citep{onsager1953om}, the classical most-probable-path weight for a
+diffusion, applied here to inference trajectories in a learned latent space rather
+than to a physical system. Our contribution on this axis is not a new path-weight
+but an estimator-and-surrogate protocol that isolates the potential term from the
+kinetic term, since a metric mismatch alone can manufacture apparent
+concentration.
+
+The parent theory sits in the lineage of energy- and free-energy accounts of
+cognition, of which the free-energy principle \citep{friston2010fep} is the most
+developed. These accounts are largely evaluated by qualitative fit or by
+in-model simulation; pre-registered tests with calibration-verified instruments
+and an explicit not-constituted category are rare. The present work supplies one
+such test for a specific set of four predictions, and much of what it reports is
+about where the instruments do and do not have resolution rather than about the
+theory's truth.
+
+The learning-scale prediction (P1, ``compression after fit'') is adjacent to the
+information-bottleneck view of representation learning \citep{tishby1999ib,
+tishby2015ibdl} and specifically to the disputed claim that training passes
+through a compression phase \citep{shwartzziv2017blackbox}. We do not measure
+mutual-information planes; we track an entropy-and-potential proxy along training
+and find the utility-plateau premise---needed to even define ``after fit''---is
+not detected on any of the architectures here, which is why P1 is recorded as
+test not constituted rather than as evidence for or against a compression phase.
+
+The geometric estimators (pullback Fisher metric, geodesic deliberation for P3)
+build on latent-space Riemannian geometry for deep generative models
+\citep{arvanitidis2018oddity, shao2018riemannian}. Our geometry gate contributes a
+cautionary measurement to that line: on a trained recurrent world model the
+decoder Jacobian degenerates (Figure~\ref{fig:jac}), so the pullback metric
+becomes numerically singular exactly in the regime where the model is most useful,
+and a metric-space calibration is needed to certify that latent-geometry
+quantities are recoverable at all.
+
 \section{Systems and estimators}
 
 \subsection{Test systems}
