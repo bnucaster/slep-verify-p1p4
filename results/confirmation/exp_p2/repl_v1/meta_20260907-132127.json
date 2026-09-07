@@ -1,0 +1,25 @@
+{
+  "git": {
+    "commit": "66b243843379e02017bac6ec50347ffa64509170",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_exp_p2.py",
+    "--config",
+    "configs/exp_p2_repl.yaml",
+    "--seed",
+    "20",
+    "--stage",
+    "main",
+    "--block-start",
+    "45",
+    "--block-end",
+    "46",
+    "--torch-threads",
+    "10"
+  ],
+  "created": "2026-09-07T13:21:27+0100",
+  "torch": "2.13.0+cpu"
+}

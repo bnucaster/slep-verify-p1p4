@@ -49,14 +49,19 @@ def main() -> None:
     if th["_meta"].get("pending"):
         raise SystemExit("v1.2 阈值表有占位，不可判定")
     seeds = guard.family_seeds("replication", purpose="judge-repl", seeds_file=SEEDS_V1_3)
+    # 能力门用池化率（与评估族 assemble_judge_v12 同口径：系统级门,对所有
+    # 种子同值 = Σsuccess/Σn）,非逐种子
+    caps = {s: json.loads((P4_DIR / f"s{s}" / "capability.json").read_text(encoding="utf-8"))
+            for s in seeds}
+    cap_pooled = sum(caps[s]["success"] for s in seeds) / sum(caps[s]["n"] for s in seeds)
     inp = {"systems": {}}
     for s in seeds:
         m = json.loads((P4_DIR / f"s{s}" / "main.json").read_text(encoding="utf-8"))
-        cap = json.loads((P4_DIR / f"s{s}" / "capability.json").read_text(encoding="utf-8"))
         p2 = json.loads((P2_DIR / f"s{s}" / "p2_summary.json").read_text(encoding="utf-8"))
         block = inp["systems"].setdefault(f"S2P:s{s}", {})
         block["gates"] = {
-            "capability": {"value": cap["rate"], "system": "S2P"},
+            "capability": {"value": cap_pooled, "system": "S2P",
+                           "per_seed_rate": caps[s]["rate"]},
             "geometry": m["geometry"],
             "stationarity": {"rhat": m["stationarity"]["rhat"],
                              "n_chains": m["stationarity"]["n_chains"]},

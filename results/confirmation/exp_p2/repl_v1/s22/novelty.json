@@ -1,0 +1,9 @@
+{
+  "coef": 0.1576963957659089,
+  "logistic_p": 0.0001673111573965726,
+  "positive": true,
+  "placebo_coef": -0.02477660991840624,
+  "placebo_p": 0.5529836607491792,
+  "n_steps": 11000,
+  "wall_seconds": 33
+}

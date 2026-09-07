@@ -1,0 +1,91 @@
+{
+  "campaign": "repl_v1",
+  "inferential_note": "种子为推断单元:每种子取 1000 对的中位配对差,跨种子做符号检验/Wilcoxon;轨迹级 p 值另见 p2_summary",
+  "per_seed": {
+    "s20": {
+      "n_pairs": 1000,
+      "median_diff": 0.002614673706324233,
+      "median_diff_ci95": [
+        0.0015195263502051637,
+        0.0035222668480975328
+      ],
+      "frac_positive_pairs": 0.596,
+      "frac_below_q1": 1.0,
+      "novelty_p": 4.157771447197186e-06,
+      "novelty_placebo_p": 0.21698102463443056
+    },
+    "s21": {
+      "n_pairs": 1000,
+      "median_diff": 0.002720745053277074,
+      "median_diff_ci95": [
+        0.002002095626951972,
+        0.0033461322894398626
+      ],
+      "frac_positive_pairs": 0.615,
+      "frac_below_q1": 1.0,
+      "novelty_p": 0.04070032275834731,
+      "novelty_placebo_p": 0.40771518157741327
+    },
+    "s22": {
+      "n_pairs": 1000,
+      "median_diff": 0.0016542330062873367,
+      "median_diff_ci95": [
+        0.0009357390596274502,
+        0.002288325885519943
+      ],
+      "frac_positive_pairs": 0.57,
+      "frac_below_q1": 1.0,
+      "novelty_p": 0.0001673111573965726,
+      "novelty_placebo_p": 0.5529836607491792
+    },
+    "s23": {
+      "n_pairs": 1000,
+      "median_diff": 0.001313937014278732,
+      "median_diff_ci95": [
+        0.0005822002855924713,
+        0.002028324782928692
+      ],
+      "frac_positive_pairs": 0.562,
+      "frac_below_q1": 1.0,
+      "novelty_p": 1.444821510201389e-06,
+      "novelty_placebo_p": 0.21223025799910505
+    },
+    "s24": {
+      "n_pairs": 1000,
+      "median_diff": 0.003997434255051946,
+      "median_diff_ci95": [
+        0.002880614660206282,
+        0.004918002304853092
+      ],
+      "frac_positive_pairs": 0.647,
+      "frac_below_q1": 1.0,
+      "novelty_p": 0.0014229272693334178,
+      "novelty_placebo_p": 0.04081000373355036
+    }
+  },
+  "seed_level": {
+    "n_seeds": 5,
+    "seed_median_diffs": [
+      0.002614673706324233,
+      0.002720745053277074,
+      0.0016542330062873367,
+      0.001313937014278732,
+      0.003997434255051946
+    ],
+    "mean_of_seed_medians": 0.0024602046070438645,
+    "n_seeds_positive": 5,
+    "sign_test_p": 0.03125,
+    "wilcoxon_across_seeds_p": 0.03125,
+    "frac_below_q1_all_seeds": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "novelty_p_range": [
+      1.444821510201389e-06,
+      0.04070032275834731
+    ]
+  }
+}

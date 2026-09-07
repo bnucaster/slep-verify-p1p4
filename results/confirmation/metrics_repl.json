@@ -1,0 +1,260 @@
+{
+  "protocol_version": "1.2",
+  "thresholds_file": "protocol_v1.2_thresholds.json",
+  "systems": {
+    "S2P:s20": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s21": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P2": {
+        "verdict": "失败",
+        "layer": {
+          "novelty_ok": false,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s22": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s23": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    },
+    "S2P:s24": {
+      "gates": {
+        "ok": true,
+        "missing": [],
+        "detail": {
+          "capability": true,
+          "geometry_cond": true,
+          "geometry_dim": true,
+          "stationarity": true
+        }
+      },
+      "P2": {
+        "verdict": "通过",
+        "layer": {
+          "novelty_ok": true,
+          "concentration": true,
+          "ablation": true
+        }
+      }
+    }
+  },
+  "input_echo": {
+    "systems": {
+      "S2P:s20": {
+        "gates": {
+          "capability": {
+            "value": 0.3225,
+            "system": "S2P",
+            "per_seed_rate": 0.325
+          },
+          "geometry": {
+            "log10_cond_median": 2.7870786773495766,
+            "participation_median": 3.834609042695697
+          },
+          "stationarity": {
+            "rhat": 0.999813564888024,
+            "n_chains": 4
+          }
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 1.0430658466729838e-19,
+            "median_diff": 0.002614673706324233
+          },
+          "novelty": {
+            "logistic_p": 4.157771447197186e-06,
+            "positive": true
+          },
+          "drift_fraction": 0.07484518569565202
+        }
+      },
+      "S2P:s21": {
+        "gates": {
+          "capability": {
+            "value": 0.3225,
+            "system": "S2P",
+            "per_seed_rate": 0.28125
+          },
+          "geometry": {
+            "log10_cond_median": 2.914218742340115,
+            "participation_median": 3.8117882552714155
+          },
+          "stationarity": {
+            "rhat": 1.000736078304328,
+            "n_chains": 4
+          }
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 1.6735201468455222e-20,
+            "median_diff": 0.002720745053277074
+          },
+          "novelty": {
+            "logistic_p": 0.04070032275834731,
+            "positive": true
+          },
+          "drift_fraction": 0.11230886889922287
+        }
+      },
+      "S2P:s22": {
+        "gates": {
+          "capability": {
+            "value": 0.3225,
+            "system": "S2P",
+            "per_seed_rate": 0.35
+          },
+          "geometry": {
+            "log10_cond_median": 3.1601181331141954,
+            "participation_median": 3.0840287484821647
+          },
+          "stationarity": {
+            "rhat": 0.9999710753376042,
+            "n_chains": 4
+          }
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 4.863249781094287e-13,
+            "median_diff": 0.0016542330062873367
+          },
+          "novelty": {
+            "logistic_p": 0.0001673111573965726,
+            "positive": true
+          },
+          "drift_fraction": 0.07850237401759552
+        }
+      },
+      "S2P:s23": {
+        "gates": {
+          "capability": {
+            "value": 0.3225,
+            "system": "S2P",
+            "per_seed_rate": 0.35625
+          },
+          "geometry": {
+            "log10_cond_median": 2.964611900724133,
+            "participation_median": 3.338897259779909
+          },
+          "stationarity": {
+            "rhat": 0.9999644995905471,
+            "n_chains": 4
+          }
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 7.554876161836173e-07,
+            "median_diff": 0.001313937014278732
+          },
+          "novelty": {
+            "logistic_p": 1.444821510201389e-06,
+            "positive": true
+          },
+          "drift_fraction": 0.07779875469080677
+        }
+      },
+      "S2P:s24": {
+        "gates": {
+          "capability": {
+            "value": 0.3225,
+            "system": "S2P",
+            "per_seed_rate": 0.3
+          },
+          "geometry": {
+            "log10_cond_median": 2.893410518004648,
+            "participation_median": 4.036810464269747
+          },
+          "stationarity": {
+            "rhat": 0.999869680862776,
+            "n_chains": 4
+          }
+        },
+        "exp_p2": {
+          "frac_below_q1": 1.0,
+          "n_traj": 1000,
+          "ablation": {
+            "wilcoxon_p": 1.70944912209061e-35,
+            "median_diff": 0.003997434255051946
+          },
+          "novelty": {
+            "logistic_p": 0.0014229272693334178,
+            "positive": true
+          },
+          "drift_fraction": 0.13302911300486275
+        }
+      }
+    }
+  }
+}
