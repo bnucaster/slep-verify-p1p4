@@ -1,0 +1,17 @@
+{
+  "git": {
+    "commit": "ecfb877290dc3a41d045a93c4755823c03d807d0",
+    "dirty": true
+  },
+  "python": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "argv": [
+    "scripts/run_s2_train.py",
+    "--config",
+    "configs/s2p_train_repl.yaml",
+    "--budget-seconds",
+    "500"
+  ],
+  "created": "2026-09-07T04:01:56+0100",
+  "torch": "2.13.0+cpu"
+}

@@ -71,7 +71,9 @@ def load_s2(c, camp, seed, k):
                     / "checkpoints" / "ckpt_020000.pt", weights_only=True)
     m = S2WorldModel(c["obs_dim"], c["action_dim"], c["embed_dim"], c["hidden_dim"],
                      c["sigma_dec"], c.get("goal_sigma_dec"), multi_step_k=k)
-    m.load_state_dict(ck["model"])
+    # strict=False:旧检查点(加 obs_var_ext 缓冲前存)缺该派生键,__init__ 已正确
+    # 初始化(k=1 时 obs_var_ext=obs_var),不影响 decoder 权重加载
+    m.load_state_dict(ck["model"], strict=False)
     m.eval()
     return m
 
@@ -85,7 +87,7 @@ def load_s3(camp, seed, k):
                         c["n_heads"], c["ff_dim"], max_len=c["episode_len"] + 4,
                         sigma_dec=c["sigma_dec"], goal_sigma_dec=c.get("goal_sigma_dec"),
                         multi_step_k=k)
-    m.load_state_dict(ck["model"])
+    m.load_state_dict(ck["model"], strict=False)  # 同 load_s2:旧检查点缺派生缓冲
     m.eval()
     return m, c
 
